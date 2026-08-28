@@ -1,52 +1,246 @@
 {% extends "base.html" %}
-{% block title %}My transactions | {{ PLATFORM_NAME }}{% endblock %}
+{% load static %}
+{% block title %}{% if user.is_item_owner %}Rental Transactions{% else %}My Rentals{% endif %} | {{ PLATFORM_NAME }}{% endblock %}
+
 {% block content %}
 <div class="page-header">
   <div class="container">
-    <span class="eyebrow">{% if user.is_item_owner %}Owner Dashboard{% else %}Customer Dashboard{% endif %}</span>
-    <h1 class="mt-0">Transaction Records</h1>
-    <p class="subtle">Permanent, transparent records of all electronic payments for item rentals in {{ PLATFORM_SERVICE_AREA }}.</p>
+    <span class="eyebrow">{% if user.is_item_owner %}Owner Dashboard{% else %}Customer Portal{% endif %}</span>
+    <h1 class="mt-0">{% if user.is_item_owner %}Rental Transactions{% else %}My Rentals &amp; Order History{% endif %}</h1>
+    <p class="subtle">
+      {% if user.is_item_owner %}
+        Permanent, transparent records of all electronic payments and earnings for your listings in {{ PLATFORM_SERVICE_AREA }}.
+      {% else %}
+        Review your rented equipment, track payment settlements, and access official electronic receipts in {{ PLATFORM_SERVICE_AREA }}.
+      {% endif %}
+    </p>
   </div>
 </div>
 
 <section class="container" style="padding-bottom:60px;">
-  <div class="dashboard-shell">
-    {% if user.is_item_owner %}
+  {% if user.is_item_owner %}
+    <div class="dashboard-shell">
       {% include "listings/_owner_nav.html" with active="transactions" %}
-    {% endif %}
 
-    <div class="dashboard-content">
+      <div class="dashboard-content">
+        <div class="stat-row" style="margin-bottom: 24px;">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>Total Orders</span>
+              <div class="stat-icon teal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">{{ total_count }}</div>
+            <div class="stat-sub">All-time customer rentals</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>Paid Orders</span>
+              <div class="stat-icon emerald">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">{{ paid_count }}</div>
+            <div class="stat-sub">Credited to your wallet</div>
+          </div>
+
+          <div class="stat-card stat-card-highlight">
+            <div class="stat-header">
+              <span>Net Earnings</span>
+              <div class="stat-icon teal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">₦{{ total_earnings|floatformat:2 }}</div>
+            <div class="stat-sub">After {{ PLATFORM_COMMISSION_PERCENT }}% platform commission</div>
+          </div>
+        </div>
+
+        {% if transactions %}
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Item &amp; Category</th>
+                  <th>Reference</th>
+                  <th>Customer</th>
+                  <th>Rental Specs</th>
+                  <th>Your Earning</th>
+                  <th>Status</th>
+                  <th class="text-right">Receipt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for transaction in transactions %}
+                  <tr>
+                    <td>
+                      <div class="table-item-cell">
+                        {% if transaction.item.primary_image %}
+                          <img src="{{ transaction.item.primary_image.image.url }}" alt="{{ transaction.item.name }}" class="item-mini-thumb">
+                        {% else %}
+                          <div class="item-mini-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                          </div>
+                        {% endif %}
+                        <div>
+                          <a href="{{ transaction.item.get_absolute_url }}" class="table-link-title">{{ transaction.item.name }}</a>
+                          <div class="subtle text-xs" style="margin-top:2px;">
+                            <span class="badge-category-chip">{{ transaction.item.category.name }}</span>
+                            &middot; {{ transaction.item.location }}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge-code">{{ transaction.reference }}</span>
+                      <div class="subtle text-xs" style="margin-top:2px;">{{ transaction.created_at|date:"d M Y" }}</div>
+                    </td>
+                    <td>
+                      <div class="font-medium text-sm">{{ transaction.customer.get_full_name|default:transaction.customer.username }}</div>
+                      <div class="subtle text-xs">{{ transaction.customer.email }}</div>
+                    </td>
+                    <td>
+                      <div class="text-sm font-medium">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</div>
+                      <div class="subtle text-xs">{{ transaction.duration }} {{ transaction.item.get_price_unit_display }}</div>
+                    </td>
+                    <td>
+                      <div class="mono font-semibold" style="color:var(--color-primary-navy);">₦{{ transaction.owner_earning|floatformat:2 }}</div>
+                      <div class="subtle text-xs">Total: ₦{{ transaction.amount|floatformat:0 }}</div>
+                    </td>
+                    <td>
+                      {% if transaction.status == "paid" %}
+                        <span class="badge badge-success"><span class="badge-dot"></span>Paid</span>
+                      {% elif transaction.status == "pending" %}
+                        <span class="badge badge-warning"><span class="badge-dot"></span>Pending</span>
+                      {% else %}
+                        <span class="badge badge-danger"><span class="badge-dot"></span>{{ transaction.get_status_display }}</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-right">
+                      <a href="{% url 'transactions:receipt' transaction.reference %}" class="btn btn-sm btn-outline">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Receipt
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            </div>
+            <h3 class="mt-0">No rental transactions yet</h3>
+            <p class="subtle">When customers rent your listed items, confirmed transactions and earnings will automatically show up here.</p>
+            <a href="{% url 'listings:item_create' %}" class="btn btn-primary">+ List a New Item</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    {# Customer View (Full Width & Clean Card / Table Architecture) #}
+    <div style="max-width: 1100px; margin: 0 auto;">
+      <div class="stat-row" style="margin-bottom: 28px;">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span>Total Bookings</span>
+            <div class="stat-icon teal">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">{{ total_count }}</div>
+          <div class="stat-sub">All-time rental requests</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span>Confirmed &amp; Paid</span>
+            <div class="stat-icon emerald">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">{{ paid_count }}</div>
+          <div class="stat-sub">Active receipts on ledger</div>
+        </div>
+
+        <div class="stat-card stat-card-highlight">
+          <div class="stat-header">
+            <span>Total Amount Paid</span>
+            <div class="stat-icon teal">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">₦{{ total_spent|floatformat:2 }}</div>
+          <div class="stat-sub">Secure electronic payments</div>
+        </div>
+      </div>
+
+      <div class="flex-between" style="margin-bottom: 18px;">
+        <div>
+          <h2 class="mt-0" style="font-size: 1.35rem; margin-bottom: 2px;">Rental History</h2>
+          <p class="subtle text-xs" style="margin:0;">Showing {{ total_count }} recorded rental order{{ total_count|pluralize }}</p>
+        </div>
+        <a href="{% url 'listings:item_list' %}" class="btn btn-sm btn-outline">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+          Browse More Items
+        </a>
+      </div>
+
       {% if transactions %}
         <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
+                <th>Item &amp; Category</th>
                 <th>Reference</th>
-                <th>Item</th>
-                {% if user.is_item_owner %}
-                  <th>Customer</th>
-                  <th>Your Earning</th>
-                {% else %}
-                  <th>Item Owner</th>
-                  <th>Amount Paid</th>
-                {% endif %}
+                <th>Item Owner</th>
+                <th>Rental Details</th>
+                <th>Amount Paid</th>
                 <th>Status</th>
-                <th>Date</th>
-                <th class="text-right">Receipt</th>
+                <th class="text-right">Action</th>
               </tr>
             </thead>
             <tbody>
               {% for transaction in transactions %}
                 <tr>
-                  <td class="mono font-medium text-xs">{{ transaction.reference }}</td>
-                  <td class="font-medium">{{ transaction.item.name }}</td>
-                  {% if user.is_item_owner %}
-                    <td>{{ transaction.customer.get_full_name|default:transaction.customer.username }}</td>
-                    <td class="mono font-semibold">₦{{ transaction.owner_earning|floatformat:2 }}</td>
-                  {% else %}
-                    <td>{{ transaction.owner.get_full_name|default:transaction.owner.username }}</td>
-                    <td class="mono font-semibold">₦{{ transaction.amount|floatformat:2 }}</td>
-                  {% endif %}
+                  <td>
+                    <div class="table-item-cell">
+                      {% if transaction.item.primary_image %}
+                        <img src="{{ transaction.item.primary_image.image.url }}" alt="{{ transaction.item.name }}" class="item-mini-thumb">
+                      {% else %}
+                        <div class="item-mini-icon">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                        </div>
+                      {% endif %}
+                      <div>
+                        <a href="{{ transaction.item.get_absolute_url }}" class="table-link-title">{{ transaction.item.name }}</a>
+                        <div class="subtle text-xs" style="margin-top:2px;">
+                          <span class="badge-category-chip">{{ transaction.item.category.name }}</span>
+                          &middot; {{ transaction.item.location }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-code">{{ transaction.reference }}</span>
+                    <div class="subtle text-xs" style="margin-top:2px;">{{ transaction.created_at|date:"d M Y, h:i A" }}</div>
+                  </td>
+                  <td>
+                    <div class="font-medium text-sm">{{ transaction.owner.get_full_name|default:transaction.owner.username }}</div>
+                    <div class="subtle text-xs">Verified Owner</div>
+                  </td>
+                  <td>
+                    <div class="text-sm font-medium">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</div>
+                    <div class="subtle text-xs">{{ transaction.duration }} {{ transaction.item.get_price_unit_display }}</div>
+                  </td>
+                  <td>
+                    <div class="mono font-semibold" style="color:var(--color-primary-navy);">₦{{ transaction.amount|floatformat:2 }}</div>
+                    <div class="subtle text-xs">₦{{ transaction.item.rental_price|floatformat:0 }} / {{ transaction.item.get_price_unit_display }}</div>
+                  </td>
                   <td>
                     {% if transaction.status == "paid" %}
                       <span class="badge badge-success"><span class="badge-dot"></span>Paid</span>
@@ -56,9 +250,21 @@
                       <span class="badge badge-danger"><span class="badge-dot"></span>{{ transaction.get_status_display }}</span>
                     {% endif %}
                   </td>
-                  <td class="subtle text-xs">{{ transaction.created_at|date:"d M Y" }}</td>
                   <td class="text-right">
-                    <a href="{% url 'transactions:receipt' transaction.reference %}" class="btn btn-sm btn-outline">View Receipt</a>
+                    {% if transaction.status == "paid" %}
+                      <a href="{% url 'transactions:receipt' transaction.reference %}" class="btn btn-sm btn-outline">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        View Receipt
+                      </a>
+                    {% elif transaction.status == "pending" %}
+                      <a href="{% url 'transactions:checkout' transaction.reference %}" class="btn btn-sm btn-primary">
+                        Pay Now
+                      </a>
+                    {% else %}
+                      <a href="{{ transaction.item.get_absolute_url }}" class="btn btn-sm btn-outline">
+                        Rent Again
+                      </a>
+                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}
@@ -66,16 +272,18 @@
           </table>
         </div>
       {% else %}
-        <div class="empty-state">
-          <div class="empty-icon">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+        <div class="empty-state" style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:48px 24px;">
+          <div class="empty-icon" style="background:var(--color-accent-teal-subtle); color:var(--color-accent-teal-dark);">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           </div>
-          <h3>No transactions recorded yet</h3>
-          <p class="subtle">{% if user.is_item_owner %}Transactions will appear here once a customer rents one of your items.{% else %}Browse catalogue items and complete your first rental to generate a receipt.{% endif %}</p>
-          <a href="{% url 'listings:item_list' %}" class="btn btn-primary">Browse Catalogue</a>
+          <h3 class="mt-0">You have not rented any items yet</h3>
+          <p class="subtle" style="max-width:44ch; margin:8px auto 24px;">Browse party canopies, event chairs, tools, and spaces available in {{ PLATFORM_SERVICE_AREA }}. Rent with electronic payment and instant receipts.</p>
+          <a href="{% url 'listings:item_list' %}" class="btn btn-primary btn-lg">
+            Explore Available Items
+          </a>
         </div>
       {% endif %}
     </div>
-  </div>
+  {% endif %}
 </section>
 {% endblock %}

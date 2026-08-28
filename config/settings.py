@@ -59,7 +59,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",   # serves static files in production
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -67,6 +66,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+if not DEBUG:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 ROOT_URLCONF = "config.urls"
 
@@ -172,17 +174,16 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-# WhiteNoise compresses and caches static files efficiently in production
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # --------------------------------------------------------------------------
-# Production security hardening
+# Production security hardening & static file caching
 # These are safe no-ops when DEBUG=True (local dev) and active in production.
 # --------------------------------------------------------------------------
 if not DEBUG:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
