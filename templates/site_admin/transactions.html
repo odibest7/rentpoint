@@ -69,13 +69,18 @@
                   </td>
                   <td class="subtle text-xs">{{ tx.created_at|date:"d M Y" }}</td>
                   <td class="text-right">
-                    <a href="{% url 'transactions:receipt' tx.reference %}" class="btn btn-sm btn-outline">Receipt</a>
+                    <a href="{% url 'transactions:receipt' tx.reference %}" data-open-modal="receipt-modal-{{ tx.reference }}" class="btn btn-sm btn-outline">Receipt</a>
                   </td>
                 </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
+
+        <!-- Popup Receipt Modals for Admin Oversight -->
+        {% for tx in transactions %}
+          {% include "transactions/_receipt_modal.html" with transaction=tx %}
+        {% endfor %}
       {% else %}
         <div class="empty-state">
           <h3>No transactions found</h3>
