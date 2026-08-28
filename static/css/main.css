@@ -425,14 +425,17 @@ img {
   cursor: pointer;
 }
 
-/* ---------- Hero Section ---------- */
+/* ---------- Hero Section (Deep Navy Distinct Hero Design) ---------- */
 .hero {
-  padding: 72px 0 52px;
+  padding: 76px 0 60px;
   background: 
-    radial-gradient(circle at 85% 15%, rgba(0, 168, 150, 0.07) 0%, transparent 45%),
-    radial-gradient(circle at 15% 85%, rgba(10, 35, 66, 0.05) 0%, transparent 40%),
-    linear-gradient(180deg, #FFFFFF 0%, var(--color-bg) 100%);
-  border-bottom: 1px solid var(--color-border);
+    radial-gradient(circle at 85% 20%, rgba(0, 168, 150, 0.20) 0%, transparent 45%),
+    radial-gradient(circle at 15% 85%, rgba(14, 165, 233, 0.14) 0%, transparent 40%),
+    linear-gradient(135deg, #061528 0%, #0A2342 55%, #0F3560 100%);
+  color: #FFFFFF;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-grid {
@@ -440,6 +443,14 @@ img {
   grid-template-columns: 1.15fr 0.85fr;
   gap: 52px;
   align-items: center;
+}
+
+.hero h1 {
+  color: #FFFFFF;
+}
+
+.hero .hero-lead {
+  color: #E2E8F0;
 }
 
 .eyebrow {
@@ -450,9 +461,9 @@ img {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--color-primary-navy);
-  background: var(--color-accent-teal-subtle);
-  border: 1px solid var(--color-accent-teal-border);
+  color: #2DD4BF;
+  background: rgba(0, 168, 150, 0.18);
+  border: 1px solid rgba(45, 212, 191, 0.45);
   border-radius: var(--radius-full);
   padding: 6px 16px;
   margin-bottom: 20px;
@@ -462,15 +473,8 @@ img {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--color-accent-teal);
-  box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.25);
-}
-
-.hero-lead {
-  font-size: 1.125rem;
-  color: var(--color-ink-soft);
-  max-width: 48ch;
-  line-height: 1.7;
+  background: #2DD4BF;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
 }
 
 .hero-actions {
@@ -485,7 +489,7 @@ img {
   gap: 36px;
   flex-wrap: wrap;
   padding-top: 24px;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .hero-stat strong {
@@ -493,14 +497,26 @@ img {
   font-family: var(--font-display);
   font-size: 1.85rem;
   font-weight: 800;
-  color: var(--color-primary-navy);
+  color: #FFFFFF;
   letter-spacing: -0.03em;
 }
 
 .hero-stat span {
   font-size: 0.85rem;
-  color: var(--color-ink-muted);
+  color: #94A3B8;
   font-weight: 500;
+}
+
+.hero .btn-outline {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+}
+
+.hero .btn-outline:hover {
+  background: #FFFFFF;
+  color: var(--color-primary-navy);
+  border-color: #FFFFFF;
 }
 
 /* Hero Showcase Card */
@@ -1091,11 +1107,53 @@ input[type="number"], input[type="file"], select, textarea {
   color: var(--color-ink-muted);
 }
 
-/* ---------- Page Header ---------- */
+/* ---------- Page Header Hero Section (Distinct Deep Navy Banner) ---------- */
 .page-header {
-  padding: 44px 0 28px;
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: 36px;
+  padding: 52px 0 46px;
+  background: 
+    radial-gradient(circle at 85% 20%, rgba(0, 168, 150, 0.18) 0%, transparent 45%),
+    radial-gradient(circle at 10% 80%, rgba(14, 165, 233, 0.12) 0%, transparent 40%),
+    linear-gradient(135deg, #061528 0%, #0A2342 55%, #0F3560 100%);
+  color: #FFFFFF;
+  margin-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header h1,
+.page-header h2,
+.page-header h3 {
+  color: #FFFFFF;
+}
+
+.page-header p,
+.page-header .subtle,
+.page-header .hero-lead {
+  color: #CBD5E1;
+}
+
+.page-header .eyebrow {
+  background: rgba(0, 168, 150, 0.18);
+  border: 1px solid rgba(45, 212, 191, 0.45);
+  color: #2DD4BF;
+}
+
+.page-header .eyebrow-dot {
+  background: #2DD4BF;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
+}
+
+.page-header .btn-outline {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+}
+
+.page-header .btn-outline:hover {
+  background: #FFFFFF;
+  color: var(--color-primary-navy);
+  border-color: #FFFFFF;
 }
 
 .flex-between {

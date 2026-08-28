@@ -1,25 +1,32 @@
 {% extends "base.html" %}
 {% block title %}Checkout | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<section class="container" style="padding:40px 0 60px; max-width:520px;">
-  <h1>Complete your payment</h1>
+<div class="page-header">
+  <div class="container">
+    <span class="eyebrow">Payment Verification</span>
+    <h1 class="mt-0">Complete Your Payment</h1>
+    <p class="subtle">Secure electronic escrow settlement for {{ transaction.item.name }} in {{ PLATFORM_SERVICE_AREA }}.</p>
+  </div>
+</div>
+
+<section class="container" style="padding-bottom:60px; max-width:520px;">
   <div class="form-card">
     <div class="receipt-rows" style="padding:0 0 16px;">
-      <div class="receipt-row"><span>Item</span><span>{{ transaction.item.name }}</span></div>
+      <div class="receipt-row"><span>Item</span><span class="font-semibold">{{ transaction.item.name }}</span></div>
       <div class="receipt-row"><span>Quantity</span><span>{{ transaction.quantity }}</span></div>
       <div class="receipt-row"><span>Duration</span><span>{{ transaction.duration }} &times; {{ transaction.item.get_price_unit_display }}</span></div>
-      <div class="receipt-row"><span>Reference</span><span>{{ transaction.reference }}</span></div>
+      <div class="receipt-row"><span>Reference</span><span class="mono text-xs">{{ transaction.reference }}</span></div>
     </div>
-    <div class="flex-between" style="padding:16px 0; border-top:1px dashed var(--color-line);">
-      <span class="subtle">Amount to pay</span>
-      <span class="mono" style="font-size:1.3rem; font-weight:600;">₦{{ transaction.amount|floatformat:2 }}</span>
+    <div class="flex-between" style="padding:16px 0; border-top:1px dashed var(--color-border); margin-bottom:20px;">
+      <span class="font-medium">Total Amount Due</span>
+      <span class="mono" style="font-size:1.35rem; font-weight:700; color:var(--color-primary-navy);">₦{{ transaction.amount|floatformat:2 }}</span>
     </div>
 
     <form method="post">
       {% csrf_token %}
-      <button type="submit" class="btn btn-primary btn-block">Pay ₦{{ transaction.amount|floatformat:2 }} now</button>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">Pay ₦{{ transaction.amount|floatformat:2 }} now</button>
     </form>
-    <p class="field-hint text-center" style="margin-top:12px;">Payment is processed through RentPoint's secure electronic payment channel.</p>
+    <p class="field-hint text-center" style="margin-top:14px;">Payment is processed through RentPoint's secure electronic payment channel.</p>
   </div>
 </section>
 {% endblock %}

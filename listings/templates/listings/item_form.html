@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block title %}{% if is_new %}List a new item{% else %}Edit listing{% endif %} | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<div class="page-header container">
-  <span class="eyebrow">Item owner</span>
-  <h1>{% if is_new %}List a new item{% else %}Edit "{{ item.name }}"{% endif %}</h1>
+<div class="page-header">
+  <div class="container">
+    <span class="eyebrow">Item owner</span>
+    <h1>{% if is_new %}List a new item{% else %}Edit "{{ item.name }}"{% endif %}</h1>
+  </div>
 </div>
 
 <section class="container" style="padding-bottom:60px; max-width:760px;">

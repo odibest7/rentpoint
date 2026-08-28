@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Request a withdrawal | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<section class="container" style="padding:40px 0 60px; max-width:520px;">
-  <a href="{% url 'wallet:earnings' %}" class="subtle">&larr; Back to earnings</a>
-  <h1 style="margin-top:16px;">Request a withdrawal</h1>
-  <p class="subtle">Available balance: <strong class="mono">₦{{ wallet.balance|floatformat:2 }}</strong></p>
+<div class="page-header">
+  <div class="container">
+    <a href="{% url 'wallet:earnings' %}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to earnings</a>
+    <span class="eyebrow">Owner Payout</span>
+    <h1 class="mt-0">Request a Withdrawal</h1>
+    <p class="subtle">Available balance: <strong class="mono" style="color:#FFFFFF;">₦{{ wallet.balance|floatformat:2 }}</strong></p>
+  </div>
+</div>
 
+<section class="container" style="padding-bottom:60px; max-width:520px;">
   <form method="post" class="form-card stack" novalidate>
     {% csrf_token %}
     <div class="field-group">
@@ -27,7 +32,7 @@
         {{ form.account_name }}
       </div>
     </div>
-    <button type="submit" class="btn btn-primary btn-block">Submit request</button>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">Submit payout request</button>
   </form>
 </section>
 {% endblock %}
