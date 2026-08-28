@@ -1,48 +1,53 @@
 {% extends "base.html" %}
 {% block title %}Receipt {{ transaction.reference }} | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<section class="container" style="padding:48px 0 70px;">
+<div class="page-header">
+  <div class="container">
+    <span class="eyebrow">Payment Receipt</span>
+    <h1 class="mt-0">Transaction Confirmation</h1>
+    <p class="subtle">Official electronic proof of payment recorded on the RentPoint platform in {{ PLATFORM_SERVICE_AREA }}.</p>
+  </div>
+</div>
+
+<section class="container" style="padding-bottom:70px;">
   <div class="receipt">
     <div class="receipt-top">
       <div class="flex-between">
         <div>
-          <div class="receipt-brand"><span style="color:var(--color-primary);">Rent</span>Point</div>
+          <div class="receipt-brand"><span style="color:var(--color-accent-teal);">Rent</span>Point</div>
           <div class="receipt-ref">{{ transaction.reference }}</div>
         </div>
         {% if transaction.status == "paid" %}
-          <span class="badge badge-success">Paid</span>
+          <span class="badge badge-success"><span class="badge-dot"></span>Paid</span>
         {% elif transaction.status == "pending" %}
-          <span class="badge badge-warning">Pending</span>
+          <span class="badge badge-warning"><span class="badge-dot"></span>Pending</span>
         {% else %}
-          <span class="badge badge-danger">{{ transaction.get_status_display }}</span>
+          <span class="badge badge-danger"><span class="badge-dot"></span>{{ transaction.get_status_display }}</span>
         {% endif %}
       </div>
     </div>
 
     <div class="receipt-rows">
-      <div class="receipt-row"><span>Item</span><span>{{ transaction.item.name }}</span></div>
+      <div class="receipt-row"><span>Item</span><span class="font-semibold">{{ transaction.item.name }}</span></div>
       <div class="receipt-row"><span>Customer</span><span>{{ transaction.customer.get_full_name|default:transaction.customer.username }}</span></div>
       <div class="receipt-row"><span>Item owner</span><span>{{ transaction.owner.get_full_name|default:transaction.owner.username }}</span></div>
       <div class="receipt-row"><span>Quantity</span><span>{{ transaction.quantity }}</span></div>
       <div class="receipt-row"><span>Duration</span><span>{{ transaction.duration }} &times; {{ transaction.item.get_price_unit_display }}</span></div>
       <div class="receipt-row"><span>Date</span><span>{{ transaction.paid_at|default:transaction.created_at|date:"d M Y, H:i" }}</span></div>
       {% if transaction.provider_reference %}
-        <div class="receipt-row"><span>Payment reference</span><span>{{ transaction.provider_reference }}</span></div>
+        <div class="receipt-row"><span>Payment reference</span><span class="mono text-xs">{{ transaction.provider_reference }}</span></div>
       {% endif %}
     </div>
 
     <div class="receipt-total">
-      <span>Total paid</span>
-      <span>₦{{ transaction.amount|floatformat:2 }}</span>
+      <span>Total Paid</span>
+      <span class="mono font-bold" style="font-size:1.35rem; color:var(--color-primary-navy);">₦{{ transaction.amount|floatformat:2 }}</span>
     </div>
-    <div class="receipt-jag"></div>
-  </div>
 
-  <div class="text-center" style="margin-top:24px;">
-    <a href="{% url 'transactions:my_transactions' %}" class="btn btn-outline">View all my transactions</a>
-    {% if transaction.status == "pending" %}
-      <a href="{% url 'transactions:checkout' transaction.reference %}" class="btn btn-primary">Complete payment</a>
-    {% endif %}
+    <div class="receipt-footer flex-between" style="padding-top:16px;">
+      <a href="{% url 'listings:item_list' %}" class="btn btn-primary">Browse More Items</a>
+      <button onclick="window.print()" class="btn btn-outline">Print Receipt</button>
+    </div>
   </div>
 </section>
 {% endblock %}

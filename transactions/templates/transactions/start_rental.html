@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Rent {{ item.name }} | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<section class="container" style="padding:40px 0 60px; max-width:520px;">
-  <a href="{{ item.get_absolute_url }}" class="subtle">&larr; Back to {{ item.name }}</a>
-  <h1 style="margin-top:16px;">Rent "{{ item.name }}"</h1>
-  <p class="subtle">₦{{ item.rental_price|floatformat:2 }} {{ item.get_price_unit_display }}</p>
+<div class="page-header">
+  <div class="container">
+    <a href="{{ item.get_absolute_url }}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to item</a>
+    <span class="eyebrow">Rental Order</span>
+    <h1 class="mt-0">Rent "{{ item.name }}"</h1>
+    <p class="subtle">₦{{ item.rental_price|floatformat:0 }} / {{ item.get_price_unit_display }} &middot; {{ item.location }}</p>
+  </div>
+</div>
 
+<section class="container" style="padding-bottom:60px; max-width:520px;">
   <form method="post" class="form-card stack" novalidate>
     {% csrf_token %}
     <div class="field-group">
@@ -20,7 +25,7 @@
       <p class="field-hint">{{ form.duration.help_text }}</p>
       {% for error in form.duration.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
-    <button type="submit" class="btn btn-primary btn-block">Continue to payment</button>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">Continue to payment</button>
   </form>
 </section>
 {% endblock %}
