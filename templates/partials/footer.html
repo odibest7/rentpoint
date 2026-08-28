@@ -1,36 +1,48 @@
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
-      <div>
-        <h4 class="mono">RentPoint</h4>
-        <p class="subtle">A centralised way to list, find, and pay for rentable items and property across {{ PLATFORM_SERVICE_AREA }}, with clear records for every transaction.</p>
+      <div class="footer-brand-col">
+        <a href="{% url 'core:home' %}" class="brand footer-brand">
+          <span class="brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>
+          <span class="brand-text">Rent<span class="brand-accent">Point</span></span>
+        </a>
+        <p class="subtle footer-desc">
+          A modern rental management marketplace in {{ PLATFORM_SERVICE_AREA }}. Browse, list, and pay for rentable property with transparent receipts.
+        </p>
       </div>
       <div>
-        <h4>Platform</h4>
+        <h4>Explore Platform</h4>
         <ul>
-          <li><a href="{% url 'listings:item_list' %}">Browse items</a></li>
-          <li><a href="{% url 'core:how_it_works' %}">How it works</a></li>
-          <li><a href="{% url 'core:about' %}">About RentPoint</a></li>
+          <li><a href="{% url 'listings:item_list' %}">Browse Items</a></li>
+          <li><a href="{% url 'core:how_it_works' %}">How It Works</a></li>
+          <li><a href="{% url 'core:about' %}">About Us</a></li>
         </ul>
       </div>
       <div>
-        <h4>For item owners</h4>
+        <h4>Item Owners</h4>
         <ul>
-          <li><a href="{% url 'accounts:signup_item_owner' %}">List an item</a></li>
-          <li><a href="{% url 'wallet:earnings' %}">Manage earnings</a></li>
+          <li><a href="{% url 'accounts:signup_item_owner' %}">Become an Owner</a></li>
+          <li><a href="{% url 'listings:owner_item_list' %}">Owner Dashboard</a></li>
+          <li><a href="{% url 'wallet:earnings' %}">Payout Earnings</a></li>
         </ul>
       </div>
       <div>
-        <h4>For customers</h4>
+        <h4>Customers</h4>
         <ul>
-          <li><a href="{% url 'accounts:signup_customer' %}">Create an account</a></li>
-          <li><a href="{% url 'accounts:login' %}">Log in</a></li>
+          <li><a href="{% url 'accounts:signup_customer' %}">Customer Sign Up</a></li>
+          <li><a href="{% url 'accounts:login' %}">Account Log In</a></li>
+          <li><a href="{% url 'transactions:my_transactions' %}">Rental Receipts</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>&copy; {% now "Y" %} RentPoint. Built for {{ PLATFORM_SERVICE_AREA }}.</span>
-      <span>Payments processed through a secure electronic payment channel.</span>
+      <span>&copy; {% now "Y" %} RentPoint. Serving {{ PLATFORM_SERVICE_AREA }}.</span>
+      <span class="footer-secure">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secured Electronic Transaction Records
+      </span>
     </div>
   </div>
 </footer>
