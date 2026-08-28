@@ -1725,25 +1725,37 @@ input[type="number"], input[type="file"], select, textarea {
 }
 
 /* ---------- Media Print Stylesheet (Clean Tax Invoice Paper Layout) ---------- */
+.no-print {
+  /* Utility class for elements hidden during print */
+}
+
 @media print {
-  /* Hide all non-printable navigation, buttons, and headers */
+  /* Hide all non-receipt UI elements on print */
+  .no-print,
   .navbar,
   .site-footer,
   .page-header,
   .receipt-actions-bar,
   .nav-toggle,
-  .alert-list {
+  .alert-list,
+  .alert {
     display: none !important;
   }
 
+  html,
   body {
     background: #FFFFFF !important;
     color: #000000 !important;
-    font-size: 11pt !important;
+    font-size: 10.5pt !important;
     padding: 0 !important;
     margin: 0 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .container {
@@ -1755,8 +1767,11 @@ input[type="number"], input[type="file"], select, textarea {
 
   .receipt-wrapper {
     max-width: 100% !important;
+    width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .receipt-card {
@@ -1765,41 +1780,67 @@ input[type="number"], input[type="file"], select, textarea {
     padding: 0 !important;
     margin: 0 !important;
     background: #FFFFFF !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .receipt-header {
     border-bottom: 2pt solid #0A2342 !important;
-    padding-bottom: 16pt !important;
-    margin-bottom: 18pt !important;
+    padding-bottom: 12pt !important;
+    margin-bottom: 14pt !important;
   }
 
   .receipt-parties-grid {
     background: #F8FAFC !important;
     border: 1pt solid #CBD5E1 !important;
-    padding: 14pt !important;
-    margin-bottom: 18pt !important;
+    padding: 10pt 14pt !important;
+    margin-bottom: 14pt !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .receipt-table {
+    margin-bottom: 14pt !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .receipt-table tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .receipt-table th {
     background: #0A2342 !important;
     color: #FFFFFF !important;
+    padding: 8pt 10pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
   .receipt-table td {
+    padding: 10pt 10pt !important;
     border-bottom: 1pt solid #E2E8F0 !important;
   }
 
   .receipt-handover-box {
     border: 1.5pt dashed #00A896 !important;
     background: #FFFFFF !important;
-    padding: 12pt !important;
-    margin-bottom: 18pt !important;
+    padding: 10pt 14pt !important;
+    margin-bottom: 14pt !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .receipt-summary-box {
+    margin-bottom: 14pt !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .receipt-summary-total {
     border-top: 2pt solid #0A2342 !important;
+    padding-top: 6pt !important;
   }
 
   .badge-success {
@@ -1811,7 +1852,7 @@ input[type="number"], input[type="file"], select, textarea {
   }
 
   @page {
-    margin: 15mm 15mm 15mm 15mm;
+    margin: 12mm 12mm 12mm 12mm;
     size: A4 portrait;
   }
 }
