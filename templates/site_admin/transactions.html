@@ -51,8 +51,11 @@
               {% for tx in transactions %}
                 <tr>
                   <td class="mono font-medium text-xs">{{ tx.reference }}</td>
-                  <td class="font-medium">{{ tx.item.name }}</td>
-                  <td>{{ tx.customer.username }}</td>
+                  <td>
+                    <div class="font-medium">{{ tx.item.name }}</div>
+                    <div class="subtle text-xs">{{ tx.item.location }} &middot; {{ tx.get_delivery_option_display }}</div>
+                  </td>
+                  <td>{{ tx.customer.get_full_name|default:tx.customer.username }}</td>
                   <td class="mono">₦{{ tx.owner_earning|floatformat:2 }}</td>
                   <td class="mono font-semibold">₦{{ tx.amount|floatformat:2 }}</td>
                   <td>

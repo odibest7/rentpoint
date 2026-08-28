@@ -1,31 +1,93 @@
 {% extends "base.html" %}
 {% block title %}Rent {{ item.name }} | {{ PLATFORM_NAME }}{% endblock %}
+
 {% block content %}
 <div class="page-header">
-  <div class="container">
+  <div class="container" style="max-width: 640px;">
     <a href="{{ item.get_absolute_url }}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to item</a>
-    <span class="eyebrow">Rental Order</span>
-    <h1 class="mt-0">Rent "{{ item.name }}"</h1>
-    <p class="subtle">₦{{ item.rental_price|floatformat:0 }} / {{ item.get_price_unit_display }} &middot; {{ item.location }}</p>
+    <div style="display:block;">
+      <span class="eyebrow">Rental Booking</span>
+    </div>
+    <h1 class="mt-0">Rent {{ item.name }}</h1>
+    <p class="subtle">₦{{ item.rental_price|floatformat:0 }} / {{ item.get_price_unit_display }} &middot; Located in {{ item.location }}</p>
   </div>
 </div>
 
-<section class="container" style="padding-bottom:60px; max-width:520px;">
-  <form method="post" class="form-card stack" novalidate>
+<section class="container" style="padding-bottom:70px; max-width:640px;">
+  <!-- Owner & Location Verification Banner -->
+  <div class="card" style="margin-bottom: 24px; padding: 18px 22px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
+    <div class="flex-between">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--color-accent-teal-subtle); color: var(--color-accent-teal-dark); display: flex; align-items: center; justify-content: center; font-weight: 700;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <div class="font-semibold text-sm" style="color:var(--color-primary-navy);">Item Location: {{ item.location }}</div>
+          <div class="subtle text-xs">Listed by {{ item.owner.get_full_name|default:item.owner.username }} &middot; Verified Owner</div>
+        </div>
+      </div>
+      <span class="badge badge-success"><span class="badge-dot"></span>Available</span>
+    </div>
+  </div>
+
+  <form method="post" class="form-card stack" novalidate style="padding: 28px;">
     {% csrf_token %}
-    <div class="field-group">
-      <label for="{{ form.quantity.id_for_label }}">Quantity</label>
-      {{ form.quantity }}
-      <p class="field-hint">{{ form.quantity.help_text }}</p>
-      {% for error in form.quantity.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    
+    <h3 class="mt-0" style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin-bottom: 18px;">
+      1. Rental Quantity &amp; Duration
+    </h3>
+
+    <div class="form-row">
+      <div class="field-group">
+        <label for="{{ form.quantity.id_for_label }}">Quantity to Rent</label>
+        {{ form.quantity }}
+        <p class="field-hint">{{ form.quantity.help_text }}</p>
+        {% for error in form.quantity.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field-group">
+        <label for="{{ form.duration.id_for_label }}">Duration ({{ item.get_price_unit_display }})</label>
+        {{ form.duration }}
+        <p class="field-hint">{{ form.duration.help_text }}</p>
+        {% for error in form.duration.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
     </div>
+
+    <h3 style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin: 24px 0 18px;">
+      2. Location &amp; Handover Details
+    </h3>
+
     <div class="field-group">
-      <label for="{{ form.duration.id_for_label }}">Duration</label>
-      {{ form.duration }}
-      <p class="field-hint">{{ form.duration.help_text }}</p>
-      {% for error in form.duration.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      <label for="{{ form.delivery_option.id_for_label }}">Fulfillment / Handover Preference</label>
+      {{ form.delivery_option }}
+      <p class="field-hint">Choose whether you will pick up at the owner's address in {{ item.location }} or need direct delivery.</p>
+      {% for error in form.delivery_option.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
-    <button type="submit" class="btn btn-primary btn-block btn-lg">Continue to payment</button>
+
+    <div class="field-group">
+      <label for="{{ form.contact_phone.id_for_label }}">Your Phone Number (For Handover Coordination)</label>
+      {{ form.contact_phone }}
+      <p class="field-hint">{{ form.contact_phone.help_text }}</p>
+      {% for error in form.contact_phone.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+
+    <div class="field-group">
+      <label for="{{ form.delivery_address.id_for_label }}">Your Delivery Address / Specific Area</label>
+      {{ form.delivery_address }}
+      <p class="field-hint">{{ form.delivery_address.help_text }}</p>
+      {% for error in form.delivery_address.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+
+    <div class="field-group">
+      <label for="{{ form.pickup_notes.id_for_label }}">Special Instructions / Handover Notes (Optional)</label>
+      {{ form.pickup_notes }}
+      {% for error in form.pickup_notes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+
+    <div style="margin-top: 14px; padding-top: 18px; border-top: 1px solid var(--color-border);">
+      <button type="submit" class="btn btn-primary btn-block btn-lg">
+        Proceed to Secure Checkout &rarr;
+      </button>
+    </div>
   </form>
 </section>
 {% endblock %}

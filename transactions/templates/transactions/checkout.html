@@ -1,32 +1,59 @@
 {% extends "base.html" %}
 {% block title %}Checkout | {{ PLATFORM_NAME }}{% endblock %}
+
 {% block content %}
 <div class="page-header text-center">
-  <div class="container" style="max-width: 560px;">
+  <div class="container" style="max-width: 580px;">
     <span class="eyebrow">Checkout &amp; Escrow</span>
     <h1 class="mt-0">Complete Your Payment</h1>
-    <p class="subtle" style="margin: 0 auto;">Review order details and finalize your rental with secure escrow protection.</p>
+    <p class="subtle" style="margin: 0 auto;">Review order details, location handover, and finalize your rental payment.</p>
   </div>
 </div>
 
-<section class="container" style="padding-bottom:60px; max-width:520px;">
-  <div class="form-card">
+<section class="container" style="padding-bottom:70px; max-width:560px;">
+  <div class="form-card" style="padding: 28px;">
+    <h3 class="mt-0" style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin-bottom: 16px;">
+      Order Summary
+    </h3>
+
     <div class="receipt-rows" style="padding:0 0 16px;">
-      <div class="receipt-row"><span>Item</span><span class="font-semibold">{{ transaction.item.name }}</span></div>
-      <div class="receipt-row"><span>Quantity</span><span>{{ transaction.quantity }}</span></div>
+      <div class="receipt-row"><span>Item</span><span class="font-semibold" style="color:var(--color-primary-navy);">{{ transaction.item.name }}</span></div>
+      <div class="receipt-row"><span>Quantity</span><span>{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</span></div>
       <div class="receipt-row"><span>Duration</span><span>{{ transaction.duration }} &times; {{ transaction.item.get_price_unit_display }}</span></div>
-      <div class="receipt-row"><span>Reference</span><span class="mono text-xs">{{ transaction.reference }}</span></div>
+      <div class="receipt-row"><span>Reference Code</span><span class="badge-code">{{ transaction.reference }}</span></div>
     </div>
+
+    <h3 style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin: 16px 0 14px;">
+      Location &amp; Handover
+    </h3>
+
+    <div class="receipt-rows" style="padding:0 0 16px;">
+      <div class="receipt-row"><span>Fulfillment Method</span><span class="font-semibold">{{ transaction.get_delivery_option_display }}</span></div>
+      <div class="receipt-row"><span>Item Location</span><span>{{ transaction.item.location }}</span></div>
+      {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
+        <div class="receipt-row"><span>Delivery Address</span><span>{{ transaction.delivery_address }}</span></div>
+      {% endif %}
+      <div class="receipt-row"><span>Coordination Phone</span><span class="mono">{{ transaction.contact_phone|default:user.phone_number }}</span></div>
+      {% if transaction.pickup_notes %}
+        <div class="receipt-row"><span>Handover Notes</span><span>{{ transaction.pickup_notes }}</span></div>
+      {% endif %}
+    </div>
+
     <div class="flex-between" style="padding:16px 0; border-top:1px dashed var(--color-border); margin-bottom:20px;">
-      <span class="font-medium">Total Amount Due</span>
-      <span class="mono" style="font-size:1.35rem; font-weight:700; color:var(--color-primary-navy);">₦{{ transaction.amount|floatformat:2 }}</span>
+      <span class="font-semibold" style="font-size: 1rem;">Total Amount Due</span>
+      <span class="mono font-bold" style="font-size:1.4rem; color:var(--color-primary-navy);">₦{{ transaction.amount|floatformat:2 }}</span>
     </div>
 
     <form method="post">
       {% csrf_token %}
-      <button type="submit" class="btn btn-primary btn-block btn-lg">Pay ₦{{ transaction.amount|floatformat:2 }} now</button>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">
+        Pay ₦{{ transaction.amount|floatformat:2 }} Now
+      </button>
     </form>
-    <p class="field-hint text-center" style="margin-top:14px;">Payment is processed through RentPoint's secure electronic payment channel.</p>
+    <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:16px; color:var(--color-ink-muted); font-size:0.8rem;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Secured with electronic escrow records &middot; Serving {{ PLATFORM_SERVICE_AREA }}
+    </div>
   </div>
 </section>
 {% endblock %}
