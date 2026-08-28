@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Site Admin Dashboard | {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">Platform Administration</span>
+  <h1 class="mt-0">Site Control Dashboard</h1>
+  <p class="subtle">System overview, metrics, users, platform volume, and pending payout approvals in {{ PLATFORM_SERVICE_AREA }}.</p>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% include "site_admin/_admin_nav.html" with active="dashboard" %}
+
+    <div class="dashboard-content">
+      <div class="stat-row">
+        <div class="stat-card stat-card-highlight">
+          <div class="stat-header">
+            <span>Total Transacted</span>
+            <span class="stat-icon teal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </span>
+          </div>
+          <strong class="mono stat-value">₦{{ total_volume|floatformat:2 }}</strong>
+          <span class="stat-sub">Gross rental revenue</span>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span>Registered Users</span>
+            <span class="stat-icon emerald">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+          </div>
+          <strong class="mono stat-value">{{ total_users }}</strong>
+          <span class="stat-sub">{{ customer_count }} customers &middot; {{ owner_count }} owners</span>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span>Pending Payouts</span>
+            <span class="stat-icon amber">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+            </span>
+          </div>
+          <strong class="mono stat-value">₦{{ pending_withdrawals_sum|floatformat:2 }}</strong>
+          <span class="stat-sub">{{ pending_withdrawals_count }} pending requests</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 36px;">
+        <div class="flex-between" style="margin-bottom: 16px;">
+          <h2 class="mt-0" style="font-size: 1.3rem;">Recent Transactions</h2>
+          <a href="{% url 'core:admin_transactions' %}" class="btn btn-sm btn-outline">View All Transactions</a>
+        </div>
+        {% if recent_transactions %}
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Item</th>
+                  <th>Customer</th>
+                  <th>Owner</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for tx in recent_transactions %}
+                  <tr>
+                    <td class="mono font-medium text-xs">{{ tx.reference }}</td>
+                    <td class="font-medium">{{ tx.item.name }}</td>
+                    <td>{{ tx.customer.username }}</td>
+                    <td>{{ tx.owner.username }}</td>
+                    <td class="mono font-semibold">₦{{ tx.amount|floatformat:2 }}</td>
+                    <td>
+                      {% if tx.status == "paid" %}
+                        <span class="badge badge-success"><span class="badge-dot"></span>Paid</span>
+                      {% else %}
+                        <span class="badge badge-warning"><span class="badge-dot"></span>{{ tx.get_status_display }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <p class="subtle">No platform transactions recorded yet.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

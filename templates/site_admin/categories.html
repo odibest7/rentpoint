@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Category Management | {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">Platform Administration</span>
+  <h1 class="mt-0">Category Management</h1>
+  <p class="subtle">Add, update, or remove rental marketplace categories in {{ PLATFORM_SERVICE_AREA }}.</p>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% include "site_admin/_admin_nav.html" with active="categories" %}
+
+    <div class="dashboard-content">
+      <div style="display:grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: start;">
+        <div>
+          {% if categories %}
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Category Name</th>
+                    <th>Listings Count</th>
+                    <th>Description</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for c in categories %}
+                    <tr>
+                      <td class="font-semibold">{{ c.name }}</td>
+                      <td>
+                        <span class="badge badge-neutral">{{ c.item_count }} listings</span>
+                      </td>
+                      <td class="subtle text-xs mono">{{ c.icon|default:"standard" }}</td>
+                      <td class="text-right">
+                        {% if c.item_count == 0 %}
+                          <form action="{% url 'core:admin_category_delete' c.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-ghost btn-danger-text">Delete</button>
+                          </form>
+                        {% else %}
+                          <span class="subtle text-xs" title="Category has active items">In Use</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <p class="subtle">No categories created yet.</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-card">
+          <h3 class="mt-0">Add New Category</h3>
+          <form method="post" class="stack">
+            {% csrf_token %}
+            <div class="field-group" style="margin: 0;">
+              <label for="name">Category Name</label>
+              <input type="text" name="name" id="name" required placeholder="e.g. Generators &amp; Power">
+            </div>
+            <div class="field-group" style="margin: 0;">
+              <label for="icon">Icon Identifier</label>
+              <input type="text" name="icon" id="icon" placeholder="e.g. sofa, canopy, tools">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">+ Create Category</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

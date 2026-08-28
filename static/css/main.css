@@ -337,6 +337,22 @@ img {
   color: var(--color-primary-dark);
 }
 
+.btn-admin-link {
+  color: var(--color-accent-dark) !important;
+  background: var(--color-accent-light) !important;
+  border: 1px solid rgba(217, 119, 6, 0.2) !important;
+}
+
+.admin-badge-count {
+  background: var(--color-accent);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  margin-left: auto;
+}
+
 .nav-actions {
   display: flex;
   align-items: center;

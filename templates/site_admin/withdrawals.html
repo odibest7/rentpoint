@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Payout Requests | {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">Platform Administration</span>
+  <h1 class="mt-0">Payout &amp; Withdrawal Approvals</h1>
+  <p class="subtle">Approve or reject bank withdrawal payout requests submitted by item owners.</p>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% include "site_admin/_admin_nav.html" with active="withdrawals" %}
+
+    <div class="dashboard-content">
+      <form method="get" class="form-card" style="margin-bottom: 24px; padding: 20px;">
+        <div class="field-group" style="margin: 0; max-width: 240px;">
+          <label for="status">Status Filter</label>
+          <select name="status" id="status" onchange="this.form.submit()">
+            <option value="">All Requests</option>
+            <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending Review</option>
+            <option value="approved" {% if status_filter == "approved" %}selected{% endif %}>Approved</option>
+            <option value="rejected" {% if status_filter == "rejected" %}selected{% endif %}>Rejected</option>
+          </select>
+        </div>
+      </form>
+
+      {% if withdrawals %}
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Item Owner</th>
+                <th>Amount</th>
+                <th>Bank &amp; Account</th>
+                <th>Status</th>
+                <th>Date Requested</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for w in withdrawals %}
+                <tr>
+                  <td>
+                    <strong style="display:block; color:var(--color-ink);">{{ w.owner.get_full_name|default:w.owner.username }}</strong>
+                    <span class="subtle text-xs">@{{ w.owner.username }}</span>
+                  </td>
+                  <td class="mono font-semibold" style="font-size:1.05rem;">₦{{ w.amount|floatformat:2 }}</td>
+                  <td>
+                    <div class="font-medium">{{ w.bank_name }}</div>
+                    <div class="subtle mono text-xs">{{ w.account_number }}</div>
+                  </td>
+                  <td>
+                    {% if w.status == "approved" %}
+                      <span class="badge badge-success"><span class="badge-dot"></span>Approved &amp; Paid</span>
+                    {% elif w.status == "pending" %}
+                      <span class="badge badge-warning"><span class="badge-dot"></span>Pending Review</span>
+                    {% else %}
+                      <span class="badge badge-danger"><span class="badge-dot"></span>Rejected</span>
+                    {% endif %}
+                  </td>
+                  <td class="subtle text-xs">{{ w.requested_at|date:"d M Y, H:i" }}</td>
+                  <td class="text-right">
+                    {% if w.status == "pending" %}
+                      <div class="table-actions">
+                        <form action="{% url 'core:admin_withdrawal_action' w.id 'approve' %}" method="post" style="display:inline;">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-sm btn-primary">Approve &amp; Pay</button>
+                        </form>
+                        <form action="{% url 'core:admin_withdrawal_action' w.id 'reject' %}" method="post" style="display:inline;">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-sm btn-ghost btn-danger-text">Reject</button>
+                        </form>
+                      </div>
+                    {% else %}
+                      <span class="subtle text-xs">Processed</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h3>No payout requests found</h3>
+          <p class="subtle">When item owners request earnings withdrawals, they will appear here for verification.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
