@@ -4,8 +4,14 @@ Django==6.1.*
 # Image handling for item listing photos
 Pillow==11.*
 
-# Production MySQL driver (only needed when DB_ENGINE=mysql, see docs/RUNBOOK.md)
-mysqlclient==2.*
-
 # Production WSGI server (only needed for deployment, see docs/RUNBOOK.md)
 gunicorn==23.*
+
+# Static files serving in production (no separate Nginx/CDN config needed)
+whitenoise==6.*
+
+# PostgreSQL driver — used when DB_ENGINE=postgres (Supabase, Railway, Neon, etc.)
+psycopg2-binary==2.*
+
+# MySQL driver — only needed when DB_ENGINE=mysql (shared hosting, etc.)
+mysqlclient==2.*

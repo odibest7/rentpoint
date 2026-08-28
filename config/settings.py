@@ -2,9 +2,14 @@
 Django settings for RentPoint (Automated Web-Based Property and Rental
 Management System for Nsukka Urban).
 
-Settings are read from environment variables so the same codebase can run
-in development (SQLite) and production (MySQL) without code changes.
-See docs/RUNBOOK.md for the full list of environment variables.
+Settings are driven entirely by environment variables so the same codebase
+runs locally (SQLite) and in production (PostgreSQL or MySQL) without any
+code changes. See docs/RUNBOOK.md for the full variable reference.
+
+Database priority:
+  DB_ENGINE=postgres  -> PostgreSQL (Supabase, Railway, Neon, etc.)
+  DB_ENGINE=mysql     -> MySQL
+  anything else       -> SQLite (local development default)
 """
 
 import os
@@ -36,18 +41,6 @@ ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", default="127.0.0.1,localhost,te
 
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", default="")
 
-# Safety guard: if DEBUG is off (production) and ALLOWED_HOSTS still contains
-# only local dev addresses, raise a clear error so the misconfiguration is
-# caught at startup rather than silently serving 400s to real visitors.
-_LOCAL_ONLY = {"127.0.0.1", "localhost", "testserver"}
-if not DEBUG and set(ALLOWED_HOSTS).issubset(_LOCAL_ONLY):
-    from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured(
-        "DJANGO_ALLOWED_HOSTS must be set to your real domain(s) when "
-        "DEBUG=False. Current value only contains local development addresses. "
-        "Example: DJANGO_ALLOWED_HOSTS=your-domain.com,www.your-domain.com"
-    )
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -66,6 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",   # serves static files in production
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -98,11 +92,46 @@ WSGI_APPLICATION = "config.wsgi.application"
 # --------------------------------------------------------------------------
 # Database
 #
-# Defaults to SQLite for local development, exactly as described in the
-# project report (SQLite for development/testing, MySQL for production).
-# Set DB_ENGINE=mysql and the DB_* variables below to switch to MySQL.
+# DB_ENGINE controls which backend is used:
+#   postgres  -> PostgreSQL (recommended for free cloud hosting:
+#                Supabase, Railway, Neon, ElephantSQL)
+#   mysql     -> MySQL (shared hosting, PlanetScale, etc.)
+#   sqlite    -> SQLite file on disk (local development default)
+#
+# For PostgreSQL you can set individual DB_* variables OR supply a single
+# DATABASE_URL string (e.g. from Supabase / Railway dashboard).
 # --------------------------------------------------------------------------
-if os.environ.get("DB_ENGINE") == "mysql":
+_db_engine = os.environ.get("DB_ENGINE", "sqlite").lower()
+_database_url = os.environ.get("DATABASE_URL", "")
+
+if _database_url and _db_engine == "postgres":
+    # Parse a full postgres://user:pass@host:port/name connection string.
+    import urllib.parse as _up
+    _u = _up.urlparse(_database_url)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": _u.path.lstrip("/"),
+            "USER": _u.username or "",
+            "PASSWORD": _u.password or "",
+            "HOST": _u.hostname or "localhost",
+            "PORT": str(_u.port or 5432),
+            "OPTIONS": {"sslmode": os.environ.get("DB_SSLMODE", "require")},
+        }
+    }
+elif _db_engine == "postgres":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("DB_NAME", "rentpoint"),
+            "USER": os.environ.get("DB_USER", "postgres"),
+            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+            "OPTIONS": {"sslmode": os.environ.get("DB_SSLMODE", "require")},
+        }
+    }
+elif _db_engine == "mysql":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
@@ -115,6 +144,7 @@ if os.environ.get("DB_ENGINE") == "mysql":
         }
     }
 else:
+    # SQLite: zero-config for local development and CI
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -142,9 +172,25 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# WhiteNoise compresses and caches static files efficiently in production
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# --------------------------------------------------------------------------
+# Production security hardening
+# These are safe no-ops when DEBUG=True (local dev) and active in production.
+# --------------------------------------------------------------------------
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000       # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -163,6 +209,9 @@ MINIMUM_WITHDRAWAL_AMOUNT = float(os.environ.get("MINIMUM_WITHDRAWAL_AMOUNT", "1
 PAYMENT_GATEWAY_PROVIDER = os.environ.get("PAYMENT_GATEWAY_PROVIDER", "mock")
 PAYSTACK_SECRET_KEY = os.environ.get("PAYSTACK_SECRET_KEY", "")
 PAYSTACK_PUBLIC_KEY = os.environ.get("PAYSTACK_PUBLIC_KEY", "")
+# Full callback URL Paystack will redirect to after payment.
+# Example: https://rentpoint.onrender.com/transactions/paystack/callback/
+PAYSTACK_CALLBACK_URL = os.environ.get("PAYSTACK_CALLBACK_URL", "")
 
 MESSAGE_TAGS = {
     10: "info",
