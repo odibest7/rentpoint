@@ -1,6 +1,18 @@
 <nav class="dashboard-nav" aria-label="Item owner navigation">
-  <a href="{% url 'listings:owner_item_list' %}" class="{% if active == 'listings' %}active{% endif %}">My listings</a>
-  <a href="{% url 'transactions:my_transactions' %}" class="{% if active == 'transactions' %}active{% endif %}">Transactions</a>
-  <a href="{% url 'wallet:earnings' %}" class="{% if active == 'earnings' %}active{% endif %}">Earnings &amp; withdrawal</a>
-  <a href="{% url 'accounts:profile' %}" class="{% if active == 'profile' %}active{% endif %}">Profile</a>
+  <a href="{% url 'listings:owner_item_list' %}" class="nav-item {% if active == 'listings' %}active{% endif %}">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+    <span>My Listings</span>
+  </a>
+  <a href="{% url 'transactions:my_transactions' %}" class="nav-item {% if active == 'transactions' %}active{% endif %}">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+    <span>Transactions</span>
+  </a>
+  <a href="{% url 'wallet:earnings' %}" class="nav-item {% if active == 'earnings' %}active{% endif %}">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+    <span>Earnings &amp; Wallet</span>
+  </a>
+  <a href="{% url 'accounts:profile' %}" class="nav-item {% if active == 'profile' %}active{% endif %}">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Account Profile</span>
+  </a>
 </nav>

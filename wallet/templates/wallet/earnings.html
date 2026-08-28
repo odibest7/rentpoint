@@ -1,49 +1,100 @@
 {% extends "base.html" %}
-{% block title %}Earnings — {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Earnings | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="page-header container">
-  <span class="eyebrow">Item owner dashboard</span>
-  <h1 class="mt-0">Earnings &amp; withdrawal</h1>
+  <span class="eyebrow">Owner Wallet</span>
+  <h1 class="mt-0">Earnings &amp; Withdrawal</h1>
+  <p class="subtle">Monitor your rental income balance, total payouts, and submit payout requests.</p>
 </div>
 
 <section class="container" style="padding-bottom:60px;">
   <div class="dashboard-shell">
     {% include "listings/_owner_nav.html" with active="earnings" %}
 
-    <div>
+    <div class="dashboard-content">
       <div class="stat-row">
-        <div class="stat-card"><span>Available balance</span><strong class="mono">₦{{ wallet.balance|floatformat:2 }}</strong></div>
-        <div class="stat-card"><span>Total earned</span><strong class="mono">₦{{ wallet.total_earned|floatformat:2 }}</strong></div>
-        <div class="stat-card"><span>Total withdrawn</span><strong class="mono">₦{{ wallet.total_withdrawn|floatformat:2 }}</strong></div>
+        <div class="stat-card stat-card-highlight">
+          <div class="stat-header">
+            <span>Available Balance</span>
+            <span class="stat-icon teal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+            </span>
+          </div>
+          <strong class="mono stat-value">₦{{ wallet.balance|floatformat:2 }}</strong>
+          <span class="stat-sub">Ready to withdraw</span>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span>Total Earned</span>
+            <span class="stat-icon emerald">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </span>
+          </div>
+          <strong class="mono stat-value">₦{{ wallet.total_earned|floatformat:2 }}</strong>
+          <span class="stat-sub">Lifetime earnings</span>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span>Total Withdrawn</span>
+            <span class="stat-icon amber">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            </span>
+          </div>
+          <strong class="mono stat-value">₦{{ wallet.total_withdrawn|floatformat:2 }}</strong>
+          <span class="stat-sub">Paid out to bank</span>
+        </div>
       </div>
 
-      <div class="flex-between" style="margin-bottom:16px;">
-        <h2 class="mt-0">Withdrawal requests</h2>
-        <a href="{% url 'wallet:withdraw' %}" class="btn btn-primary">Request a withdrawal</a>
+      <div class="flex-between" style="margin: 32px 0 16px;">
+        <div>
+          <h2 class="mt-0" style="font-size: 1.35rem;">Withdrawal History</h2>
+          <p class="subtle" style="margin: 0;">Track the status of your bank payout requests.</p>
+        </div>
+        <a href="{% url 'wallet:withdraw' %}" class="btn btn-primary">Request Withdrawal</a>
       </div>
 
       {% if withdrawals %}
-        <table class="data-table">
-          <thead><tr><th>Amount</th><th>Bank</th><th>Status</th><th>Requested</th></tr></thead>
-          <tbody>
-            {% for withdrawal in withdrawals %}
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
               <tr>
-                <td class="mono">₦{{ withdrawal.amount|floatformat:2 }}</td>
-                <td>{{ withdrawal.bank_name }} &middot; {{ withdrawal.account_number }}</td>
-                <td>
-                  {% if withdrawal.status == "approved" %}<span class="badge badge-success">Approved &amp; paid</span>
-                  {% elif withdrawal.status == "pending" %}<span class="badge badge-warning">Pending review</span>
-                  {% else %}<span class="badge badge-danger">Rejected</span>{% endif %}
-                </td>
-                <td class="subtle">{{ withdrawal.requested_at|date:"d M Y" }}</td>
+                <th>Amount</th>
+                <th>Destination Bank</th>
+                <th>Status</th>
+                <th>Date Requested</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for withdrawal in withdrawals %}
+                <tr>
+                  <td class="mono font-semibold">₦{{ withdrawal.amount|floatformat:2 }}</td>
+                  <td>
+                    <div class="bank-cell">
+                      <span class="font-medium">{{ withdrawal.bank_name }}</span>
+                      <span class="subtle mono text-xs">{{ withdrawal.account_number }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    {% if withdrawal.status == "approved" %}
+                      <span class="badge badge-success"><span class="badge-dot"></span>Approved &amp; Paid</span>
+                    {% elif withdrawal.status == "pending" %}
+                      <span class="badge badge-warning"><span class="badge-dot"></span>Pending Review</span>
+                    {% else %}
+                      <span class="badge badge-danger"><span class="badge-dot"></span>Rejected</span>
+                    {% endif %}
+                  </td>
+                  <td class="subtle">{{ withdrawal.requested_at|date:"d M Y" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       {% else %}
         <div class="empty-state">
           <h3>No withdrawal requests yet</h3>
-          <p class="subtle">Once you have an available balance, you can request a withdrawal to your bank account.</p>
+          <p class="subtle">Once you have an available balance from completed rentals, you can request a payout directly to your bank account.</p>
         </div>
       {% endif %}
     </div>

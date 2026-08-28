@@ -2,21 +2,24 @@
 <header class="navbar">
   <div class="navbar-inner">
     <a href="{% url 'core:home' %}" class="brand">
-      <span class="brand-mark">Rent</span>Point
+      <span class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </span>
+      <span class="brand-text">Rent<span class="brand-accent">Point</span></span>
       <span class="brand-tag">{{ PLATFORM_SERVICE_AREA }}</span>
     </a>
 
-    <nav aria-label="Primary">
+    <nav aria-label="Primary nav">
       <ul class="nav-links">
-        <li><a href="{% url 'listings:item_list' %}">Browse items</a></li>
-        <li><a href="{% url 'core:how_it_works' %}">How it works</a></li>
+        <li><a href="{% url 'listings:item_list' %}">Browse Items</a></li>
+        <li><a href="{% url 'core:how_it_works' %}">How It Works</a></li>
         <li><a href="{% url 'core:about' %}">About</a></li>
         {% if user.is_authenticated %}
           {% if user.is_item_owner %}
-            <li><a href="{% url 'listings:owner_item_list' %}">My listings</a></li>
+            <li><a href="{% url 'listings:owner_item_list' %}">Dashboard</a></li>
             <li><a href="{% url 'wallet:earnings' %}">Earnings</a></li>
           {% else %}
-            <li><a href="{% url 'transactions:my_transactions' %}">My rentals</a></li>
+            <li><a href="{% url 'transactions:my_transactions' %}">My Rentals</a></li>
           {% endif %}
         {% endif %}
       </ul>
@@ -24,16 +27,26 @@
 
     <div class="nav-actions">
       {% if user.is_authenticated %}
-        <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">{{ user.first_name|default:user.username }}</a>
-        <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-outline">Log out</button>
-        </form>
+        <div class="user-pill">
+          <a href="{% url 'accounts:profile' %}" class="user-link">
+            <span class="avatar">{{ user.first_name|default:user.username|slice:":1"|upper }}</span>
+            <span class="user-name">{{ user.first_name|default:user.username }}</span>
+            <span class="role-badge">{% if user.is_item_owner %}Owner{% else %}Customer{% endif %}</span>
+          </a>
+          <form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-ghost logout-btn" title="Log out">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+          </form>
+        </div>
       {% else %}
-        <a href="{% url 'accounts:login' %}" class="btn btn-outline">Log in</a>
+        <a href="{% url 'accounts:login' %}" class="btn btn-ghost">Log in</a>
         <a href="{% url 'accounts:signup_customer' %}" class="btn btn-primary">Sign up</a>
       {% endif %}
-      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
     </div>
   </div>
 </header>
