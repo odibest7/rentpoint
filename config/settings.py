@@ -36,6 +36,18 @@ ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", default="127.0.0.1,localhost,te
 
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", default="")
 
+# Safety guard: if DEBUG is off (production) and ALLOWED_HOSTS still contains
+# only local dev addresses, raise a clear error so the misconfiguration is
+# caught at startup rather than silently serving 400s to real visitors.
+_LOCAL_ONLY = {"127.0.0.1", "localhost", "testserver"}
+if not DEBUG and set(ALLOWED_HOSTS).issubset(_LOCAL_ONLY):
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured(
+        "DJANGO_ALLOWED_HOSTS must be set to your real domain(s) when "
+        "DEBUG=False. Current value only contains local development addresses. "
+        "Example: DJANGO_ALLOWED_HOSTS=your-domain.com,www.your-domain.com"
+    )
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
