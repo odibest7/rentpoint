@@ -21,7 +21,7 @@
         <span class="price-amount">₦{{ item.rental_price|floatformat:0 }}</span>
         <span class="price-unit">/ {{ item.get_price_unit_display }}</span>
       </div>
-      <a href="{{ item.get_absolute_url }}" class="btn btn-sm btn-outline card-action-btn">Details</a>
+      <a href="{{ item.get_absolute_url }}" class="btn btn-sm btn-primary">Rent Now</a>
     </div>
   </div>
 </article>

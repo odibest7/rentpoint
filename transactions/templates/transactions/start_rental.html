@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Rent {{ item.name }} — {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Rent {{ item.name }} | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <section class="container" style="padding:40px 0 60px; max-width:520px;">
   <a href="{{ item.get_absolute_url }}" class="subtle">&larr; Back to {{ item.name }}</a>
