@@ -191,15 +191,18 @@ img {
   box-shadow: 0 5px 16px rgba(10, 35, 66, 0.35);
 }
 
-/* Warm Amber Accent Button */
+/* Secondary CTA Button - matches primary teal but with navy outline style */
 .btn-accent {
-  background: var(--color-accent-amber);
+  background: var(--color-primary-navy);
   color: #FFFFFF !important;
-  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.25);
+  border-color: var(--color-primary-navy);
+  box-shadow: 0 3px 10px rgba(10, 35, 66, 0.25);
 }
 .btn-accent:hover {
-  background: var(--color-accent-amber-dark);
+  background: var(--color-primary-navy-light);
+  border-color: var(--color-primary-navy-light);
   color: #FFFFFF !important;
+  box-shadow: 0 5px 16px rgba(10, 35, 66, 0.35);
 }
 
 /* Outline Button */
@@ -336,9 +339,10 @@ img {
 }
 
 .btn-admin-link {
-  color: var(--color-accent-amber-dark) !important;
-  background: var(--color-accent-amber-light) !important;
-  border: 1px solid rgba(217, 119, 6, 0.25) !important;
+  color: var(--color-primary-navy) !important;
+  background: var(--color-accent-teal-subtle) !important;
+  border: 1px solid var(--color-accent-teal-border) !important;
+  font-weight: 700;
 }
 
 .admin-badge-count {
@@ -798,8 +802,8 @@ img {
 }
 
 .owner-icon {
-  background: var(--color-accent-amber-light);
-  color: var(--color-accent-amber-dark);
+  background: rgba(10, 35, 66, 0.08);
+  color: var(--color-primary-navy);
 }
 
 /* ---------- Dashboard Architecture ---------- */
