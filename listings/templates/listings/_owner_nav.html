@@ -1,0 +1,6 @@
+<nav class="dashboard-nav" aria-label="Item owner navigation">
+  <a href="{% url 'listings:owner_item_list' %}" class="{% if active == 'listings' %}active{% endif %}">My listings</a>
+  <a href="{% url 'transactions:my_transactions' %}" class="{% if active == 'transactions' %}active{% endif %}">Transactions</a>
+  <a href="{% url 'wallet:earnings' %}" class="{% if active == 'earnings' %}active{% endif %}">Earnings &amp; withdrawal</a>
+  <a href="{% url 'accounts:profile' %}" class="{% if active == 'profile' %}active{% endif %}">Profile</a>
+</nav>

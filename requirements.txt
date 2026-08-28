@@ -1,0 +1,11 @@
+# Core framework
+Django==6.1.*
+
+# Image handling for item listing photos
+Pillow==11.*
+
+# Production MySQL driver (only needed when DB_ENGINE=mysql, see docs/RUNBOOK.md)
+mysqlclient==2.*
+
+# Production WSGI server (only needed for deployment, see docs/RUNBOOK.md)
+gunicorn==23.*

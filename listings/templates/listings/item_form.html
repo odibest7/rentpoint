@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{% if is_new %}List a new item{% else %}Edit listing{% endif %} — {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">Item owner</span>
+  <h1>{% if is_new %}List a new item{% else %}Edit "{{ item.name }}"{% endif %}</h1>
+</div>
+
+<section class="container" style="padding-bottom:60px; max-width:760px;">
+  <form method="post" enctype="multipart/form-data" class="form-card stack" novalidate>
+    {% csrf_token %}
+    <div class="field-group">
+      <label for="{{ form.name.id_for_label }}">Item name</label>
+      {{ form.name }}
+      {% for error in form.name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="field-group">
+      <label for="{{ form.category.id_for_label }}">Category</label>
+      {{ form.category }}
+      {% for error in form.category.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="field-group">
+      <label for="{{ form.description.id_for_label }}">Description</label>
+      {{ form.description }}
+      {% for error in form.description.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="form-row">
+      <div class="field-group">
+        <label for="{{ form.rental_price.id_for_label }}">Rental price (₦)</label>
+        {{ form.rental_price }}
+      </div>
+      <div class="field-group">
+        <label for="{{ form.price_unit.id_for_label }}">Price unit</label>
+        {{ form.price_unit }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field-group">
+        <label for="{{ form.condition.id_for_label }}">Condition</label>
+        {{ form.condition }}
+      </div>
+      <div class="field-group">
+        <label for="{{ form.quantity_available.id_for_label }}">Quantity available</label>
+        {{ form.quantity_available }}
+      </div>
+    </div>
+    <div class="field-group">
+      <label for="{{ form.location.id_for_label }}">Location</label>
+      {{ form.location }}
+    </div>
+    <div class="field-group">
+      <label>{{ form.is_available }} Available for rent right now</label>
+    </div>
+
+    <fieldset>
+      <legend>Photos</legend>
+      {{ formset.management_form }}
+      <div data-formset-rows>
+        {% for image_form in formset %}
+          <div class="form-row" data-formset-row style="align-items:center;">
+            {{ image_form.id }}
+            <div class="field-group">{{ image_form.image }}</div>
+            <div class="field-group">
+              {{ image_form.position }}
+              {% if image_form.DELETE %}<label style="font-weight:400; display:flex; align-items:center; gap:6px; margin-top:8px;">{{ image_form.DELETE }} Remove</label>{% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <button type="button" class="btn btn-sm btn-ghost" data-add-image-row>+ Add another photo</button>
+    </fieldset>
+
+    <button type="submit" class="btn btn-primary">{% if is_new %}Publish listing{% else %}Save changes{% endif %}</button>
+  </form>
+</section>
+{% endblock %}

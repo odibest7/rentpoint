@@ -1,0 +1,18 @@
+{% load static %}
+<article class="item-card">
+  <a href="{{ item.get_absolute_url }}" class="item-card-media" style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}');{% endif %}">
+    <span class="item-card-category">{{ item.category.name }}</span>
+  </a>
+  <div class="item-card-body">
+    <h3 class="item-card-title"><a href="{{ item.get_absolute_url }}">{{ item.name }}</a></h3>
+    <span class="item-card-location">{{ item.location }}</span>
+    <div class="item-card-footer">
+      <span class="item-card-price">₦{{ item.rental_price|floatformat:0 }} <span>/ {{ item.get_price_unit_display }}</span></span>
+      {% if item.is_available %}
+        <span class="badge badge-success">Available</span>
+      {% else %}
+        <span class="badge badge-neutral">Unavailable</span>
+      {% endif %}
+    </div>
+  </div>
+</article>

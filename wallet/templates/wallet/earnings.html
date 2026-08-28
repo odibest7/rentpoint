@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Earnings — {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">Item owner dashboard</span>
+  <h1 class="mt-0">Earnings &amp; withdrawal</h1>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% include "listings/_owner_nav.html" with active="earnings" %}
+
+    <div>
+      <div class="stat-row">
+        <div class="stat-card"><span>Available balance</span><strong class="mono">₦{{ wallet.balance|floatformat:2 }}</strong></div>
+        <div class="stat-card"><span>Total earned</span><strong class="mono">₦{{ wallet.total_earned|floatformat:2 }}</strong></div>
+        <div class="stat-card"><span>Total withdrawn</span><strong class="mono">₦{{ wallet.total_withdrawn|floatformat:2 }}</strong></div>
+      </div>
+
+      <div class="flex-between" style="margin-bottom:16px;">
+        <h2 class="mt-0">Withdrawal requests</h2>
+        <a href="{% url 'wallet:withdraw' %}" class="btn btn-primary">Request a withdrawal</a>
+      </div>
+
+      {% if withdrawals %}
+        <table class="data-table">
+          <thead><tr><th>Amount</th><th>Bank</th><th>Status</th><th>Requested</th></tr></thead>
+          <tbody>
+            {% for withdrawal in withdrawals %}
+              <tr>
+                <td class="mono">₦{{ withdrawal.amount|floatformat:2 }}</td>
+                <td>{{ withdrawal.bank_name }} &middot; {{ withdrawal.account_number }}</td>
+                <td>
+                  {% if withdrawal.status == "approved" %}<span class="badge badge-success">Approved &amp; paid</span>
+                  {% elif withdrawal.status == "pending" %}<span class="badge badge-warning">Pending review</span>
+                  {% else %}<span class="badge badge-danger">Rejected</span>{% endif %}
+                </td>
+                <td class="subtle">{{ withdrawal.requested_at|date:"d M Y" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="empty-state">
+          <h3>No withdrawal requests yet</h3>
+          <p class="subtle">Once you have an available balance, you can request a withdrawal to your bank account.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

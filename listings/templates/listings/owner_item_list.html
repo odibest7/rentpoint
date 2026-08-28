@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}My listings — {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">Item owner dashboard</span>
+  <div class="flex-between">
+    <h1 class="mt-0">My listings</h1>
+    <a href="{% url 'listings:item_create' %}" class="btn btn-primary">+ List a new item</a>
+  </div>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% include "listings/_owner_nav.html" with active="listings" %}
+
+    <div>
+      {% if items %}
+        <table class="data-table">
+          <thead>
+            <tr><th>Item</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+              <tr>
+                <td><a href="{{ item.get_absolute_url }}">{{ item.name }}</a></td>
+                <td>{{ item.category.name }}</td>
+                <td class="mono">₦{{ item.rental_price|floatformat:0 }} / {{ item.get_price_unit_display }}</td>
+                <td>
+                  {% if item.is_available %}<span class="badge badge-success">Available</span>{% else %}<span class="badge badge-neutral">Unavailable</span>{% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'listings:item_update' item.slug %}" class="btn btn-sm btn-outline">Edit</a>
+                  <a href="{% url 'listings:item_delete' item.slug %}" class="btn btn-sm btn-ghost">Remove</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="empty-state">
+          <h3>You have not listed anything yet</h3>
+          <p class="subtle">Add your first item so customers can find and rent it.</p>
+          <a href="{% url 'listings:item_create' %}" class="btn btn-primary">List your first item</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

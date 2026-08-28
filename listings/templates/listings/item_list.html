@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Browse rentable items — {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">Catalogue</span>
+  <h1>Rentable items and property in {{ PLATFORM_SERVICE_AREA }}</h1>
+  <p class="hero-lead mt-0">Filter by category, location, or price to find exactly what you need.</p>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <form method="get" class="form-card" style="margin-bottom:32px;">
+    <div class="form-row">
+      <div class="field-group">
+        <label for="{{ form.q.id_for_label }}">Search</label>
+        {{ form.q }}
+      </div>
+      <div class="field-group">
+        <label for="{{ form.category.id_for_label }}">Category</label>
+        {{ form.category }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field-group">
+        <label for="{{ form.location.id_for_label }}">Location</label>
+        {{ form.location }}
+      </div>
+      <div class="field-group">
+        <label for="{{ form.max_price.id_for_label }}">Max price</label>
+        {{ form.max_price }}
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Apply filters</button>
+    <a href="{% url 'listings:item_list' %}" class="btn btn-ghost">Reset</a>
+  </form>
+
+  {% if page_obj.object_list %}
+    <div class="item-grid">
+      {% for item in page_obj %}
+        {% include "listings/_item_card.html" %}
+      {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+      <div class="flex-between" style="margin-top:32px;">
+        {% if page_obj.has_previous %}
+          <a class="btn btn-outline" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">&larr; Previous</a>
+        {% else %}<span></span>{% endif %}
+        <span class="subtle">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="btn btn-outline" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">Next &rarr;</a>
+        {% else %}<span></span>{% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="empty-state">
+      <h3>No items match your search</h3>
+      <p class="subtle">Try clearing a filter or searching a different term.</p>
+      <a href="{% url 'listings:item_list' %}" class="btn btn-primary">Clear filters</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

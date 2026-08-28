@@ -1,0 +1,36 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4 class="mono">RentPoint</h4>
+        <p class="subtle">A centralised way to list, find, and pay for rentable items and property across {{ PLATFORM_SERVICE_AREA }}, with clear records for every transaction.</p>
+      </div>
+      <div>
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="{% url 'listings:item_list' %}">Browse items</a></li>
+          <li><a href="{% url 'core:how_it_works' %}">How it works</a></li>
+          <li><a href="{% url 'core:about' %}">About RentPoint</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>For item owners</h4>
+        <ul>
+          <li><a href="{% url 'accounts:signup_item_owner' %}">List an item</a></li>
+          <li><a href="{% url 'wallet:earnings' %}">Manage earnings</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>For customers</h4>
+        <ul>
+          <li><a href="{% url 'accounts:signup_customer' %}">Create an account</a></li>
+          <li><a href="{% url 'accounts:login' %}">Log in</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; {% now "Y" %} RentPoint. Built for {{ PLATFORM_SERVICE_AREA }}.</span>
+      <span>Payments processed through a secure electronic payment channel.</span>
+    </div>
+  </div>
+</footer>

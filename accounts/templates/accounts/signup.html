@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Sign up — {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-visual">
+    <div class="brand" style="color:#fff;"><span style="color:#E0A63E;">Rent</span>Point</div>
+    <blockquote>
+      {% if is_item_owner_signup %}
+        "List once, get paid electronically, and always know what you have earned."
+      {% else %}
+        "Compare items, pay with confidence, and keep a record of every rental."
+      {% endif %}
+    </blockquote>
+    <p style="color:rgba(255,255,255,0.75);">Serving {{ PLATFORM_SERVICE_AREA }}</p>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-form-wrap">
+      <h1>{% if is_item_owner_signup %}Create your item owner account{% else %}Create your customer account{% endif %}</h1>
+      <p class="subtle">
+        {% if is_item_owner_signup %}
+          Not looking to list items? <a href="{% url 'accounts:signup_customer' %}">Sign up as a customer instead</a>.
+        {% else %}
+          Have items or property to rent out? <a href="{% url 'accounts:signup_item_owner' %}">Sign up as an item owner instead</a>.
+        {% endif %}
+      </p>
+
+      <form method="post" class="form-card stack" novalidate>
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="field-group">
+            <label for="{{ form.first_name.id_for_label }}">First name</label>
+            {{ form.first_name }}
+            {% for error in form.first_name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+          <div class="field-group">
+            <label for="{{ form.last_name.id_for_label }}">Last name</label>
+            {{ form.last_name }}
+            {% for error in form.last_name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="{{ form.email.id_for_label }}">Email address</label>
+          {{ form.email }}
+          {% for error in form.email.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field-group">
+          <label for="{{ form.phone_number.id_for_label }}">Phone number</label>
+          {{ form.phone_number }}
+          {% for error in form.phone_number.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field-group">
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+          {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label for="{{ form.password1.id_for_label }}">Password</label>
+            {{ form.password1 }}
+            {% for error in form.password1.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+          <div class="field-group">
+            <label for="{{ form.password2.id_for_label }}">Confirm password</label>
+            {{ form.password2 }}
+            {% for error in form.password2.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Create account</button>
+      </form>
+
+      <p class="auth-switch">Already have an account? <a href="{% url 'accounts:login' %}">Log in</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}My transactions — {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">{% if user.is_item_owner %}Item owner{% else %}Customer{% endif %} dashboard</span>
+  <h1 class="mt-0">Transaction records</h1>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% if user.is_item_owner %}
+      {% include "listings/_owner_nav.html" with active="transactions" %}
+    {% endif %}
+
+    <div>
+      {% if transactions %}
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Reference</th><th>Item</th>
+              {% if user.is_item_owner %}<th>Customer</th><th>You earned</th>{% else %}<th>Item owner</th><th>Amount</th>{% endif %}
+              <th>Status</th><th>Date</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for transaction in transactions %}
+              <tr>
+                <td class="mono">{{ transaction.reference }}</td>
+                <td>{{ transaction.item.name }}</td>
+                {% if user.is_item_owner %}
+                  <td>{{ transaction.customer.get_full_name|default:transaction.customer.username }}</td>
+                  <td class="mono">₦{{ transaction.owner_earning|floatformat:2 }}</td>
+                {% else %}
+                  <td>{{ transaction.owner.get_full_name|default:transaction.owner.username }}</td>
+                  <td class="mono">₦{{ transaction.amount|floatformat:2 }}</td>
+                {% endif %}
+                <td>
+                  {% if transaction.status == "paid" %}<span class="badge badge-success">Paid</span>
+                  {% elif transaction.status == "pending" %}<span class="badge badge-warning">Pending</span>
+                  {% else %}<span class="badge badge-danger">{{ transaction.get_status_display }}</span>{% endif %}
+                </td>
+                <td class="subtle">{{ transaction.created_at|date:"d M Y" }}</td>
+                <td><a href="{% url 'transactions:receipt' transaction.reference %}" class="btn btn-sm btn-outline">View</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="empty-state">
+          <h3>No transactions yet</h3>
+          <p class="subtle">{% if user.is_item_owner %}Transactions will appear here once a customer pays for one of your items.{% else %}Rent your first item to see it recorded here.{% endif %}</p>
+          <a href="{% url 'listings:item_list' %}" class="btn btn-primary">Browse items</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

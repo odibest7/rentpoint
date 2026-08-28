@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}How it works — {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">How it works</span>
+  <h1>From browsing to a paid, recorded rental</h1>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="item-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="item-card"><div class="item-card-body" style="padding:22px;">
+        <h3 class="mt-0">1. Browse and choose</h3>
+        <p class="subtle">Search or filter listings by category, location, and price. Every listing shows the owner's description, condition, and rate.</p>
+      </div></div>
+      <div class="item-card"><div class="item-card-body" style="padding:22px;">
+        <h3 class="mt-0">2. Pay securely</h3>
+        <p class="subtle">Set your quantity and rental duration, then complete payment through RentPoint's electronic payment channel.</p>
+      </div></div>
+      <div class="item-card"><div class="item-card-body" style="padding:22px;">
+        <h3 class="mt-0">3. Get your receipt</h3>
+        <p class="subtle">A reference number and dated receipt are generated instantly, and the item owner's earnings update automatically.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="max-width: 760px;">
+    <h2>For item owners</h2>
+    <p>List an item with a description, category, price, and photos. When a customer pays, your earnings balance updates right away. Request a withdrawal at any time above the minimum threshold, and track the status of each request from your dashboard.</p>
+  </div>
+</section>
+{% endblock %}

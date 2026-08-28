@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}About — {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">About</span>
+  <h1>Built for how rentals actually happen in {{ PLATFORM_SERVICE_AREA }}</h1>
+  <p class="hero-lead">Most rentals here still run on phone calls, word of mouth, and paper. RentPoint keeps that same spirit of local, trusted trade, but gives it one shared, transparent record.</p>
+</div>
+
+<section class="section">
+  <div class="container" style="max-width: 760px;">
+    <h2>Why RentPoint exists</h2>
+    <p>Item owners across {{ PLATFORM_SERVICE_AREA }} rent out everything from chairs and canopies to shops and event wear, but customers usually have no single place to compare what is available. Payments happen informally, so neither side always has a reliable record of what was agreed and what was paid.</p>
+    <p>RentPoint gives every item a listing with a clear description and price, every payment a permanent transaction record, and every item owner a running balance of what they have earned and can withdraw.</p>
+
+    <h2>Who it's for</h2>
+    <p><strong>Customers</strong> browse listings, view full item details, and pay electronically instead of relying on scattered enquiries.</p>
+    <p><strong>Item owners</strong> list their rentable items and property, monitor payments as they come in, and request withdrawals of their available earnings.</p>
+
+    <h2>How trust is handled</h2>
+    <p>Every rental payment produces a dated, referenced transaction record that both the customer and the item owner can view. Item owners never handle cash directly through the platform; funds sit in their wallet until they request a withdrawal.</p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ item.name }} — {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<section class="container" style="padding: 40px 0 60px;">
+  <a href="{% url 'listings:item_list' %}" class="subtle">&larr; Back to all items</a>
+
+  <div class="hero-grid" style="margin-top:20px; align-items:start;">
+    <div>
+      <div class="hero-showcase-media" style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}'); background-size:cover; background-position:center;{% endif %} aspect-ratio:4/3;">
+        <span class="hero-showcase-tag">{{ item.category.name }}</span>
+      </div>
+
+      {% if item.images.count > 1 %}
+        <div class="chip-row" style="margin-top:14px;">
+          {% for image in item.images.all %}
+            <img src="{{ image.image.url }}" alt="" style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--color-line);">
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <h1 style="margin-top:24px;">{{ item.name }}</h1>
+      <p class="subtle">{{ item.location }} &middot; Condition: {{ item.get_condition_display }} &middot; Listed by {{ item.owner.get_full_name|default:item.owner.username }}</p>
+      <p>{{ item.description|linebreaks }}</p>
+    </div>
+
+    <aside class="form-card">
+      <div class="flex-between">
+        <span class="item-card-price" style="font-size:1.4rem;">₦{{ item.rental_price|floatformat:2 }} <span>/ {{ item.get_price_unit_display }}</span></span>
+        {% if item.is_available %}<span class="badge badge-success">Available</span>{% else %}<span class="badge badge-neutral">Unavailable</span>{% endif %}
+      </div>
+      <ul style="list-style:none; padding:0; margin:20px 0; display:flex; flex-direction:column; gap:8px;">
+        <li class="subtle">Category: {{ item.category.name }}</li>
+        <li class="subtle">Quantity available: {{ item.quantity_available }}</li>
+        <li class="subtle">Location: {{ item.location }}</li>
+      </ul>
+
+      {% if item.is_available %}
+        {% if user.is_authenticated %}
+          {% if user.is_customer %}
+            <a href="{% url 'transactions:start_rental' item.slug %}" class="btn btn-primary btn-block">Rent this item</a>
+          {% elif item.owner == user %}
+            <a href="{% url 'listings:item_update' item.slug %}" class="btn btn-outline btn-block">Edit this listing</a>
+          {% else %}
+            <p class="subtle">Item owner accounts cannot rent items. Log in with a customer account to continue.</p>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'accounts:login' %}?next={% url 'transactions:start_rental' item.slug %}" class="btn btn-primary btn-block">Log in to rent this item</a>
+          <p class="subtle text-center" style="margin-top:10px;">New here? <a href="{% url 'accounts:signup_customer' %}">Create a customer account</a></p>
+        {% endif %}
+      {% else %}
+        <button class="btn btn-outline btn-block" disabled>Currently unavailable</button>
+      {% endif %}
+    </aside>
+  </div>
+
+  {% if related_items %}
+    <div class="section-head" style="margin-top:56px;">
+      <h2>More in {{ item.category.name }}</h2>
+    </div>
+    <div class="item-grid">
+      {% for related in related_items %}
+        {% include "listings/_item_card.html" with item=related %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

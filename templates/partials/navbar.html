@@ -1,0 +1,39 @@
+{% load static %}
+<header class="navbar">
+  <div class="navbar-inner">
+    <a href="{% url 'core:home' %}" class="brand">
+      <span class="brand-mark">Rent</span>Point
+      <span class="brand-tag">{{ PLATFORM_SERVICE_AREA }}</span>
+    </a>
+
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="{% url 'listings:item_list' %}">Browse items</a></li>
+        <li><a href="{% url 'core:how_it_works' %}">How it works</a></li>
+        <li><a href="{% url 'core:about' %}">About</a></li>
+        {% if user.is_authenticated %}
+          {% if user.is_item_owner %}
+            <li><a href="{% url 'listings:owner_item_list' %}">My listings</a></li>
+            <li><a href="{% url 'wallet:earnings' %}">Earnings</a></li>
+          {% else %}
+            <li><a href="{% url 'transactions:my_transactions' %}">My rentals</a></li>
+          {% endif %}
+        {% endif %}
+      </ul>
+    </nav>
+
+    <div class="nav-actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">{{ user.first_name|default:user.username }}</a>
+        <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline">Log out</button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-outline">Log in</a>
+        <a href="{% url 'accounts:signup_customer' %}" class="btn btn-primary">Sign up</a>
+      {% endif %}
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
