@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}{{ item.name }} — {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}{{ item.name }} | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <section class="container" style="padding: 40px 0 60px;">
   <a href="{% url 'listings:item_list' %}" class="subtle">&larr; Back to all items</a>
