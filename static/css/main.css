@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    RentPoint Design System
    A professional, smart, and modern UI architecture for rental marketplaces.
    ========================================================================== */
@@ -2060,7 +2060,7 @@ input[type="number"], input[type="file"], select, textarea {
 }
 
 @media print {
-  /* Hide absolutely all site UI */
+  /* Hide all site chrome - use explicit named classes only */
   .no-print,
   .navbar,
   .site-footer,
@@ -2070,11 +2070,16 @@ input[type="number"], input[type="file"], select, textarea {
   .modal-close-btn,
   .nav-toggle,
   .alert-list,
-  .alert,
-  section.container > *:not(.receipt-wrapper),
-  .receipt-wrapper > *:not(.receipt-card) {
+  .alert {
     display: none !important;
     visibility: hidden !important;
+  }
+
+  /* Show the receipt wrapper and card explicitly */
+  .receipt-wrapper,
+  .receipt-card {
+    display: block !important;
+    visibility: visible !important;
   }
 
   /* Page setup */
