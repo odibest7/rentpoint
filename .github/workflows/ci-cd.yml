@@ -1,0 +1,102 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/*'
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  security-and-lint:
+    name: Security & Code Quality Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8 bandit pip-audit
+
+      - name: Django System Security Check
+        run: |
+          python manage.py check
+
+      - name: Lint with Flake8
+        run: |
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Exit-zero treats all errors as warnings. Max complexity level set to 10
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Static Security Scan (Bandit)
+        run: |
+          bandit -r . -x ./venv,./.venv,./core/tests.py,./accounts/tests.py,./listings/tests.py,./transactions/tests.py,./wallet/tests.py
+
+      - name: Dependency Security Scan (pip-audit)
+        run: |
+          pip-audit -r requirements.txt --desc || true
+        continue-on-error: true
+
+  test:
+    name: Run Automated Tests
+    needs: security-and-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Django Tests
+        env:
+          SECRET_KEY: 'ci-testing-secret-key-rentpoint'
+          DEBUG: 'True'
+        run: |
+          python manage.py test
+
+  deliver-to-main:
+    name: Deliver Passing Code to Main
+    needs: [security-and-lint, test]
+    if: github.ref != 'refs/heads/main' && success()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deliver / Merge to Main Branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main:main
+          git checkout main
+          git merge --no-ff ${{ github.sha }} -m "ci: auto-deliver verified code to main [skip ci]"
+          git push origin main
