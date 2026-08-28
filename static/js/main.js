@@ -77,7 +77,7 @@ function initConfirmDialogs() {
  */
 function initModalPopups() {
   function openModal(modalId) {
-    const modal = document.getElementById(modalId);
+    var modal = document.getElementById(modalId);
     if (!modal) return;
     modal.classList.add("is-open");
     document.body.style.overflow = "hidden";
@@ -86,7 +86,6 @@ function initModalPopups() {
   function closeModal(modal) {
     if (!modal) return;
     modal.classList.remove("is-open");
-    // Only restore body scrolling if no other modals are open
     if (!document.querySelector(".modal-backdrop.is-open")) {
       document.body.style.overflow = "";
     }
@@ -96,42 +95,75 @@ function initModalPopups() {
   document.querySelectorAll("[data-open-modal]").forEach(function (trigger) {
     trigger.addEventListener("click", function (e) {
       e.preventDefault();
-      const modalId = trigger.getAttribute("data-open-modal");
-      openModal(modalId);
+      openModal(trigger.getAttribute("data-open-modal"));
     });
   });
 
-  // Close modal triggers
+  // Close modal triggers (X button and Close button)
   document.querySelectorAll("[data-close-modal]").forEach(function (btn) {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
-      const modal = btn.closest(".modal-backdrop");
-      closeModal(modal);
+      closeModal(btn.closest(".modal-backdrop"));
     });
   });
 
-  // Click outside dialog to close
+  // Click backdrop (outside dialog) to close
   document.querySelectorAll(".modal-backdrop").forEach(function (modal) {
     modal.addEventListener("click", function (e) {
-      if (e.target === modal) {
-        closeModal(modal);
-      }
+      if (e.target === modal) closeModal(modal);
     });
   });
 
-  // ESC key to close any active modal
+  // ESC key to close
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
-      const activeModal = document.querySelector(".modal-backdrop.is-open");
-      if (activeModal) {
-        closeModal(activeModal);
-      }
+      var activeModal = document.querySelector(".modal-backdrop.is-open");
+      if (activeModal) closeModal(activeModal);
     }
   });
 
-  // Auto-open if URL hash matches a receipt ID (e.g. #receipt-modal-RP-XXXXX)
+  // Auto-open if the URL hash points to a receipt modal
   if (window.location.hash && window.location.hash.startsWith("#receipt-modal-")) {
-    const targetId = window.location.hash.substring(1);
-    openModal(targetId);
+    openModal(window.location.hash.substring(1));
   }
+}
+
+/**
+ * Opens the standalone receipt page in a small popup window and
+ * auto-triggers the browser print dialog from there.
+ *
+ * WHY: window.print() called from inside a modal prints the background
+ * page where the receipt card is inside .no-print, producing a blank PDF.
+ * This function opens the dedicated receipt URL (which has no chrome to hide)
+ * so print output is always clean.
+ *
+ * Template usage:
+ *   <button onclick="printReceiptUrl(this)"
+ *           data-receipt-url="{% url 'transactions:receipt' transaction.reference %}">
+ *     Print Receipt
+ *   </button>
+ */
+function printReceiptUrl(btn) {
+  var url = btn.getAttribute("data-receipt-url");
+  if (!url) return;
+
+  var popup = window.open(
+    url,
+    "rp_receipt_print",
+    "width=920,height=700,scrollbars=yes,resizable=yes"
+  );
+
+  if (!popup) {
+    // Popup was blocked by the browser - open in new tab instead
+    window.open(url, "_blank");
+    return;
+  }
+
+  // Wait for the receipt page to fully load before triggering print
+  popup.addEventListener("load", function () {
+    setTimeout(function () {
+      popup.focus();
+      popup.print();
+    }, 400);
+  });
 }
