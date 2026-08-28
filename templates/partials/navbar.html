@@ -15,6 +15,9 @@
         <li><a href="{% url 'core:how_it_works' %}">How It Works</a></li>
         <li><a href="{% url 'core:about' %}">About</a></li>
         {% if user.is_authenticated %}
+          {% if user.is_staff or user.is_superuser %}
+            <li><a href="{% url 'core:admin_dashboard' %}" class="btn-admin-link">Admin Portal</a></li>
+          {% endif %}
           {% if user.is_item_owner %}
             <li><a href="{% url 'listings:owner_item_list' %}">Dashboard</a></li>
             <li><a href="{% url 'wallet:earnings' %}">Earnings</a></li>

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Listings Moderation | {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">Platform Administration</span>
+  <h1 class="mt-0">Listings Moderation</h1>
+  <p class="subtle">Monitor and toggle availability for all property &amp; item listings in {{ PLATFORM_SERVICE_AREA }}.</p>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% include "site_admin/_admin_nav.html" with active="listings" %}
+
+    <div class="dashboard-content">
+      <form method="get" class="form-card" style="margin-bottom: 24px; padding: 20px;">
+        <div class="form-row">
+          <div class="field-group" style="margin: 0;">
+            <label for="q">Search Listings</label>
+            <input type="text" name="q" id="q" value="{{ query }}" placeholder="Search item name, location, owner...">
+          </div>
+          <div class="field-group" style="margin: 0;">
+            <label for="category">Category</label>
+            <select name="category" id="category" onchange="this.form.submit()">
+              <option value="">All Categories</option>
+              {% for c in categories %}
+                <option value="{{ c.id }}" {% if category_id == c.id|stringformat:"i" %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </form>
+
+      {% if items %}
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Listing</th>
+                <th>Category</th>
+                <th>Owner</th>
+                <th>Rate</th>
+                <th>Status</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in items %}
+                <tr>
+                  <td>
+                    <a href="{{ item.get_absolute_url }}" class="table-link-title">{{ item.name }}</a>
+                    <div class="subtle text-xs">{{ item.location }}</div>
+                  </td>
+                  <td><span class="table-tag">{{ item.category.name }}</span></td>
+                  <td>{{ item.owner.get_full_name|default:item.owner.username }}</td>
+                  <td class="mono font-semibold">₦{{ item.rental_price|floatformat:0 }} <span class="table-unit">/ {{ item.get_price_unit_display }}</span></td>
+                  <td>
+                    {% if item.is_available %}
+                      <span class="badge badge-success"><span class="badge-dot"></span>Available</span>
+                    {% else %}
+                      <span class="badge badge-neutral"><span class="badge-dot"></span>Unavailable</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-right">
+                    <form action="{% url 'core:admin_listing_toggle_available' item.slug %}" method="post" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline">
+                        {% if item.is_available %}Disable{% else %}Enable{% endif %}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h3>No listings match your search</h3>
+          <p class="subtle">Try clearing filters or searching for another item name.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

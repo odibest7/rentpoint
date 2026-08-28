@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Transaction Oversight | {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header container">
+  <span class="eyebrow">Platform Administration</span>
+  <h1 class="mt-0">System Transaction Oversight</h1>
+  <p class="subtle">Audit and verify electronic payment records across all customer rentals.</p>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% include "site_admin/_admin_nav.html" with active="transactions" %}
+
+    <div class="dashboard-content">
+      <form method="get" class="form-card" style="margin-bottom: 24px; padding: 20px;">
+        <div class="form-row">
+          <div class="field-group" style="margin: 0;">
+            <label for="q">Search Reference or Item</label>
+            <input type="text" name="q" id="q" value="{{ query }}" placeholder="Search TX reference, item name, customer...">
+          </div>
+          <div class="field-group" style="margin: 0;">
+            <label for="status">Payment Status</label>
+            <select name="status" id="status" onchange="this.form.submit()">
+              <option value="">All Statuses</option>
+              <option value="paid" {% if status_filter == "paid" %}selected{% endif %}>Paid</option>
+              <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending</option>
+              <option value="failed" {% if status_filter == "failed" %}selected{% endif %}>Failed</option>
+            </select>
+          </div>
+        </div>
+      </form>
+
+      {% if transactions %}
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Item</th>
+                <th>Customer</th>
+                <th>Owner Earning</th>
+                <th>Total Paid</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th class="text-right">Receipt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for tx in transactions %}
+                <tr>
+                  <td class="mono font-medium text-xs">{{ tx.reference }}</td>
+                  <td class="font-medium">{{ tx.item.name }}</td>
+                  <td>{{ tx.customer.username }}</td>
+                  <td class="mono">₦{{ tx.owner_earning|floatformat:2 }}</td>
+                  <td class="mono font-semibold">₦{{ tx.amount|floatformat:2 }}</td>
+                  <td>
+                    {% if tx.status == "paid" %}
+                      <span class="badge badge-success"><span class="badge-dot"></span>Paid</span>
+                    {% elif tx.status == "pending" %}
+                      <span class="badge badge-warning"><span class="badge-dot"></span>Pending</span>
+                    {% else %}
+                      <span class="badge badge-danger"><span class="badge-dot"></span>Failed</span>
+                    {% endif %}
+                  </td>
+                  <td class="subtle text-xs">{{ tx.created_at|date:"d M Y" }}</td>
+                  <td class="text-right">
+                    <a href="{% url 'transactions:receipt' tx.reference %}" class="btn btn-sm btn-outline">Receipt</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h3>No transactions found</h3>
+          <p class="subtle">Try clearing filters or searching for a different reference code.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
