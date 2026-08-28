@@ -1195,6 +1195,88 @@ input[type="number"], input[type="file"], select, textarea {
 
 .mt-0 { margin-top: 0; }
 
+/* ---------- Auth Pages (Login and Sign Up) ---------- */
+.auth-shell {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 73px);
+}
+
+.auth-visual {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 56px;
+  background: linear-gradient(160deg, var(--color-primary-navy-dark) 0%, var(--color-primary-navy) 60%, var(--color-primary-navy-light) 100%);
+  color: #fff;
+  gap: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-visual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 80% 20%, rgba(0, 168, 150, 0.18) 0%, transparent 50%),
+    radial-gradient(circle at 10% 80%, rgba(14, 165, 233, 0.12) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.auth-visual .brand {
+  font-size: 1.5rem;
+  font-weight: 800;
+  position: relative;
+}
+
+.auth-visual blockquote {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  max-width: 30ch;
+  line-height: 1.35;
+  color: #E2E8F0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  position: relative;
+}
+
+.auth-visual p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  position: relative;
+}
+
+.auth-form-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px;
+  background: var(--color-bg);
+}
+
+.auth-form-wrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-form-wrap h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--color-primary-navy);
+  margin-bottom: 6px;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: var(--color-ink-soft);
+}
+
 /* ---------- Footer (Distinct Deep Navy Color Design) ---------- */
 .site-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -1314,7 +1396,6 @@ input[type="number"], input[type="file"], select, textarea {
 .alert-danger, .alert-error { background: var(--color-danger-tint); color: var(--color-danger); border-color: rgba(220, 38, 38, 0.2); }
 .alert-info { background: var(--color-accent-teal-subtle); color: var(--color-accent-teal-dark); border-color: var(--color-accent-teal-border); }
 
-/* ---------- Responsive Breakpoints ---------- */
 @media (max-width: 1024px) {
   .item-grid { grid-template-columns: repeat(3, 1fr); }
   .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -1326,6 +1407,8 @@ input[type="number"], input[type="file"], select, textarea {
   .dashboard-nav { position: static; flex-direction: row; overflow-x: auto; }
   .stat-row { grid-template-columns: 1fr; }
   .role-grid { grid-template-columns: 1fr; }
+  .auth-shell { grid-template-columns: 1fr; }
+  .auth-visual { display: none; }
 }
 
 @media (max-width: 680px) {
@@ -1351,3 +1434,4 @@ input[type="number"], input[type="file"], select, textarea {
   .hero { padding: 48px 0 32px; }
   .section { padding: 44px 0; }
 }
+
