@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Request a withdrawal | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div class="container">
+<div class="page-header text-center">
+  <div class="container" style="max-width: 560px;">
     <a href="{% url 'wallet:earnings' %}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to earnings</a>
-    <span class="eyebrow">Owner Payout</span>
+    <div style="display:block;">
+      <span class="eyebrow">Owner Payout</span>
+    </div>
     <h1 class="mt-0">Request a Withdrawal</h1>
-    <p class="subtle">Available balance: <strong class="mono" style="color:#FFFFFF;">₦{{ wallet.balance|floatformat:2 }}</strong></p>
+    <p class="subtle" style="margin: 0 auto;">Available balance: <strong class="mono" style="color:#2DD4BF;">₦{{ wallet.balance|floatformat:2 }}</strong></p>
   </div>
 </div>
 

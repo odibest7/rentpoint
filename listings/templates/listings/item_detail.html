@@ -4,8 +4,11 @@
 {% block content %}
 <div class="page-header">
   <div class="container">
-    <a href="{% url 'listings:item_list' %}" class="btn btn-sm btn-outline" style="margin-bottom:14px;">&larr; Back to all items</a>
-    <span class="eyebrow">{{ item.category.name }}</span>
+    <a href="{% url 'listings:item_list' %}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to all items</a>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
+      <span class="eyebrow" style="margin-bottom:0;">{{ item.category.name }}</span>
+      {% if item.is_available %}<span class="badge badge-success"><span class="badge-dot"></span>Available</span>{% else %}<span class="badge badge-neutral"><span class="badge-dot"></span>Unavailable</span>{% endif %}
+    </div>
     <h1 class="mt-0">{{ item.name }}</h1>
     <p class="subtle">{{ item.location }} &middot; Condition: {{ item.get_condition_display }} &middot; Listed by {{ item.owner.get_full_name|default:item.owner.username }}</p>
   </div>
