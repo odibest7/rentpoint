@@ -47,7 +47,7 @@ jobs:
 
       - name: Static Security Scan (Bandit)
         run: |
-          bandit -r . -x ./venv,./.venv,./core/tests.py,./accounts/tests.py,./listings/tests.py,./transactions/tests.py,./wallet/tests.py
+          bandit -r . -x ./venv,./.venv
 
       - name: Dependency Security Scan (pip-audit)
         run: |
