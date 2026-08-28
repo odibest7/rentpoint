@@ -31,11 +31,23 @@ def start_rental(request, slug):
         return redirect("listings:item_detail", slug=slug)
 
     if request.method == "POST":
-        form = RentalRequestForm(request.POST, item=item)
+        form = RentalRequestForm(request.POST, item=item, user=request.user)
         if form.is_valid():
             quantity = form.cleaned_data["quantity"]
             duration = form.cleaned_data["duration"]
             amount = item.rental_price * quantity * duration
+            contact_phone = form.cleaned_data["contact_phone"]
+            delivery_address = form.cleaned_data.get("delivery_address", "")
+            delivery_option = form.cleaned_data["delivery_option"]
+            pickup_notes = form.cleaned_data.get("pickup_notes", "")
+
+            # Automatically persist contact details to user profile if empty
+            if not request.user.phone_number and contact_phone:
+                request.user.phone_number = contact_phone
+                request.user.save(update_fields=["phone_number"])
+            if not request.user.address and delivery_address:
+                request.user.address = delivery_address
+                request.user.save(update_fields=["address"])
 
             transaction = Transaction.objects.create(
                 customer=request.user,
@@ -44,10 +56,14 @@ def start_rental(request, slug):
                 quantity=quantity,
                 duration=duration,
                 amount=amount,
+                delivery_option=delivery_option,
+                delivery_address=delivery_address,
+                contact_phone=contact_phone,
+                pickup_notes=pickup_notes,
             )
             return redirect("transactions:checkout", reference=transaction.reference)
     else:
-        form = RentalRequestForm(item=item)
+        form = RentalRequestForm(item=item, user=request.user)
 
     return render(request, "transactions/start_rental.html", {"form": form, "item": item})
 

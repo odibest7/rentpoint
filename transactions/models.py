@@ -20,6 +20,10 @@ class Transaction(models.Model):
         FAILED = "failed", "Failed"
         CANCELLED = "cancelled", "Cancelled"
 
+    class DeliveryOption(models.TextChoices):
+        PICKUP = "pickup", "Self-Pickup at Owner Location"
+        DELIVERY = "delivery", "Direct Delivery to Customer Address"
+
     reference = models.CharField(max_length=40, unique=True, editable=False)
     customer = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="purchases"
@@ -33,6 +37,18 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Total amount paid by the customer.")
     commission_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     owner_earning = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    delivery_option = models.CharField(
+        max_length=20, choices=DeliveryOption.choices, default=DeliveryOption.PICKUP
+    )
+    delivery_address = models.CharField(
+        max_length=255, blank=True, help_text="Customer delivery address or area."
+    )
+    contact_phone = models.CharField(
+        max_length=30, blank=True, help_text="Direct phone number for pickup/delivery coordination."
+    )
+    pickup_notes = models.TextField(
+        blank=True, help_text="Special instructions, pickup time, or handover details."
+    )
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
     payment_provider = models.CharField(max_length=30, blank=True)
     provider_reference = models.CharField(max_length=100, blank=True)

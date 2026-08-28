@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{{ item.name }} | {{ PLATFORM_NAME }}{% endblock %}
+
 {% block content %}
 <div class="page-header">
   <div class="container">
@@ -22,32 +23,62 @@
       </div>
 
       {% if item.images.count > 1 %}
-        <div class="chip-row" style="margin-top:14px;">
+        <div class="chip-row" style="margin-top:14px; display:flex; gap:10px; overflow-x:auto;">
           {% for image in item.images.all %}
-            <img src="{{ image.image.url }}" alt="" style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--color-border);">
+            <img src="{{ image.image.url }}" alt="{{ item.name }}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--color-border); flex-shrink:0;">
           {% endfor %}
         </div>
       {% endif %}
 
       <div style="margin-top:32px;">
-        <h2 style="font-size:1.4rem;">Description</h2>
-        <p>{{ item.description|linebreaks }}</p>
+        <h2 style="font-size:1.35rem; margin-bottom:12px;">Item Description</h2>
+        <div class="subtle" style="line-height:1.7; font-size:0.975rem;">
+          {{ item.description|linebreaks }}
+        </div>
+      </div>
+
+      <!-- Item Location & Fulfillment Overview -->
+      <div class="card" style="margin-top: 32px; padding: 22px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
+        <h3 class="mt-0" style="font-size: 1.1rem; color: var(--color-primary-navy); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Location &amp; Fulfillment Information
+        </h3>
+        <p class="subtle" style="margin: 0 0 12px; font-size: 0.925rem;">
+          This item is located in <strong>{{ item.location }}</strong> ({{ PLATFORM_SERVICE_AREA }}).
+        </p>
+        <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.875rem; color:var(--color-ink-soft);">
+          <li style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <strong>Self-Pickup:</strong> Collect directly from the owner in {{ item.location }} after payment.
+          </li>
+          <li style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <strong>Direct Delivery:</strong> You can enter your delivery address at checkout to coordinate handover.
+          </li>
+          <li style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <strong>Transparent Receipts:</strong> Full owner contact details and pickup addresses are issued on confirmed receipts.
+          </li>
+        </ul>
       </div>
     </div>
 
-    <aside class="form-card">
+    <aside class="form-card" style="padding:28px;">
       <div class="flex-between">
         <span class="item-card-price" style="font-size:1.4rem;">
-          <span class="price-amount" style="font-size:1.6rem;">₦{{ item.rental_price|floatformat:2 }}</span>
+          <span class="price-amount" style="font-size:1.75rem;">₦{{ item.rental_price|floatformat:2 }}</span>
           <span class="price-unit">/ {{ item.get_price_unit_display }}</span>
         </span>
         {% if item.is_available %}<span class="badge badge-success"><span class="badge-dot"></span>Available</span>{% else %}<span class="badge badge-neutral"><span class="badge-dot"></span>Unavailable</span>{% endif %}
       </div>
-      <ul style="list-style:none; padding:0; margin:20px 0; display:flex; flex-direction:column; gap:10px;">
-        <li class="subtle"><strong>Category:</strong> {{ item.category.name }}</li>
-        <li class="subtle"><strong>Quantity available:</strong> {{ item.quantity_available }}</li>
-        <li class="subtle"><strong>Location:</strong> {{ item.location }}</li>
-      </ul>
+      
+      <div style="margin:20px 0; padding:16px 0; border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border); display:flex; flex-direction:column; gap:10px; font-size:0.9rem;">
+        <div class="flex-between"><span class="subtle">Category</span><span class="font-semibold">{{ item.category.name }}</span></div>
+        <div class="flex-between"><span class="subtle">Quantity Available</span><span class="font-semibold">{{ item.quantity_available }} in stock</span></div>
+        <div class="flex-between"><span class="subtle">Item Location</span><span class="font-semibold" style="color:var(--color-primary-navy);">{{ item.location }}</span></div>
+        <div class="flex-between"><span class="subtle">Item Condition</span><span class="font-semibold">{{ item.get_condition_display }}</span></div>
+        <div class="flex-between"><span class="subtle">Owner</span><span class="font-semibold">{{ item.owner.get_full_name|default:item.owner.username }}</span></div>
+      </div>
 
       {% if item.is_available %}
         {% if user.is_authenticated %}
@@ -56,7 +87,7 @@
           {% elif item.owner == user %}
             <a href="{% url 'listings:item_update' item.slug %}" class="btn btn-outline btn-block">Edit this listing</a>
           {% else %}
-            <p class="subtle">Item owner accounts cannot rent items. Log in with a customer account to continue.</p>
+            <p class="subtle" style="font-size:0.875rem;">Item owner accounts cannot rent items. Log in with a customer account to rent this item.</p>
           {% endif %}
         {% else %}
           <a href="{% url 'accounts:login' %}?next={% url 'transactions:start_rental' item.slug %}" class="btn btn-primary btn-block btn-lg">Log in to Rent Now</a>
