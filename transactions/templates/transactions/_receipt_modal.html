@@ -1,0 +1,174 @@
+<!-- Popup Receipt Modal for Transaction #{{ transaction.reference }} -->
+<div id="receipt-modal-{{ transaction.reference }}" class="modal-backdrop receipt-modal no-print" role="dialog" aria-modal="true" aria-labelledby="receipt-title-{{ transaction.reference }}">
+  <div class="receipt-modal-dialog">
+    <button type="button" class="modal-close-btn no-print" data-close-modal title="Close receipt popup">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="receipt-card" style="box-shadow:none; border:none; padding: 36px 36px 28px;">
+      <!-- Receipt Document Header -->
+      <div class="receipt-header">
+        <div>
+          <div class="receipt-brand-mark">
+            <span class="brand-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </span>
+            <span>Rent<span style="color:var(--color-accent-teal);">Point</span></span>
+          </div>
+          <div class="mono text-xs" style="color:var(--color-ink-muted); margin-top:4px;">
+            Settlement Region: {{ PLATFORM_SERVICE_AREA }}
+          </div>
+        </div>
+
+        <div class="receipt-doc-badge">
+          <h2 id="receipt-title-{{ transaction.reference }}" class="receipt-doc-title">OFFICIAL RECEIPT</h2>
+          <div class="receipt-ref-code">{{ transaction.reference }}</div>
+          <div class="subtle text-xs" style="margin-top: 4px;">
+            Issued: {{ transaction.paid_at|default:transaction.created_at|date:"d M Y, h:i A" }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction Status Banner -->
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-radius: var(--radius-sm); margin-bottom: 20px; {% if transaction.status == 'paid' %}background: var(--color-success-tint); border: 1px solid rgba(5, 150, 105, 0.25); color: var(--color-success);{% elif transaction.status == 'pending' %}background: var(--color-warning-tint); border: 1px solid rgba(217, 119, 6, 0.25); color: var(--color-warning);{% else %}background: var(--color-danger-tint); border: 1px solid rgba(220, 38, 38, 0.25); color: var(--color-danger);{% endif %}">
+        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.85rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          PAYMENT STATUS: {{ transaction.get_status_display|upper }}
+        </div>
+        <div class="mono text-xs" style="font-weight: 600;">
+          {% if transaction.provider_reference %}Ref: {{ transaction.provider_reference }}{% else %}Channel: Electronic Escrow{% endif %}
+        </div>
+      </div>
+
+      <!-- Parties Overview: Customer & Item Owner -->
+      <div class="receipt-parties-grid">
+        <div class="receipt-party-col">
+          <h4>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Customer Information
+          </h4>
+          <div class="receipt-party-name">{{ transaction.customer.get_full_name|default:transaction.customer.username }}</div>
+          <div class="receipt-party-detail"><strong>Phone:</strong> <span class="mono">{{ transaction.contact_phone|default:transaction.customer.phone_number|default:"Not specified" }}</span></div>
+          <div class="receipt-party-detail"><strong>Email:</strong> {{ transaction.customer.email }}</div>
+          {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
+            <div class="receipt-party-detail"><strong>Delivery Address:</strong> {{ transaction.delivery_address }}</div>
+          {% endif %}
+        </div>
+
+        <div class="receipt-party-col">
+          <h4>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Host / Owner Information
+          </h4>
+          <div class="receipt-party-name">{{ transaction.owner.get_full_name|default:transaction.owner.username }}</div>
+          <div class="receipt-party-detail"><strong>Phone:</strong> <span class="mono">{{ transaction.owner.phone_number|default:"Verified Host" }}</span></div>
+          <div class="receipt-party-detail"><strong>Item Area:</strong> {{ transaction.item.location }}</div>
+          {% if transaction.owner.address %}
+            <div class="receipt-party-detail"><strong>Address:</strong> {{ transaction.owner.address }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Itemized Rental Breakdown Table -->
+      <table class="receipt-table">
+        <thead>
+          <tr>
+            <th>Item &amp; Description</th>
+            <th class="text-center">Rate</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-center">Duration</th>
+            <th class="text-right">Total (NGN)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="font-bold" style="color: var(--color-primary-navy);">{{ transaction.item.name }}</div>
+              <div class="subtle text-xs" style="margin-top: 2px;">
+                Category: {{ transaction.item.category.name }} &middot; Condition: {{ transaction.item.get_condition_display }}
+              </div>
+            </td>
+            <td class="text-center mono">₦{{ transaction.item.rental_price|floatformat:2 }}</td>
+            <td class="text-center">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</td>
+            <td class="text-center">{{ transaction.duration }} {{ transaction.item.get_price_unit_display }}</td>
+            <td class="text-right mono font-bold" style="color: var(--color-primary-navy);">₦{{ transaction.amount|floatformat:2 }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Handover & Fulfillment Instructions Box -->
+      <div class="receipt-handover-box">
+        <h4 class="receipt-handover-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Fulfillment &amp; Handover Details
+        </h4>
+        <div class="receipt-handover-grid">
+          <div class="receipt-handover-item">
+            <span>Method</span>
+            <span>{{ transaction.get_delivery_option_display }}</span>
+          </div>
+          <div class="receipt-handover-item">
+            <span>Location</span>
+            <span>{{ transaction.item.location }}{% if transaction.owner.address %} &middot; {{ transaction.owner.address }}{% endif %}</span>
+          </div>
+          {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
+            <div class="receipt-handover-item" style="grid-column: span 2;">
+              <span>Delivery Destination</span>
+              <span>{{ transaction.delivery_address }}</span>
+            </div>
+          {% endif %}
+          {% if transaction.pickup_notes %}
+            <div class="receipt-handover-item" style="grid-column: span 2;">
+              <span>Renter Notes / Schedule</span>
+              <span>{{ transaction.pickup_notes }}</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Financial Totals Summary -->
+      <div class="receipt-summary-box">
+        <div class="receipt-summary-row">
+          <span>Subtotal</span>
+          <span class="mono">₦{{ transaction.amount|floatformat:2 }}</span>
+        </div>
+        <div class="receipt-summary-row">
+          <span>Escrow Protection</span>
+          <span class="mono" style="color:var(--color-success); font-weight:600;">Included (Free)</span>
+        </div>
+        <div class="receipt-summary-total">
+          <span>Total Paid</span>
+          <span class="total-figure">₦{{ transaction.amount|floatformat:2 }}</span>
+        </div>
+      </div>
+
+      <!-- Security & Legal Ledger Verification -->
+      <div class="receipt-security-footer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Official RentPoint Electronic Ledger &middot; Verified Transaction</span>
+        </div>
+        <div class="mono text-xs">
+          TX-ID: {{ transaction.reference }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer Controls -->
+    <div class="modal-footer-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 36px; background: var(--color-bg); border-top: 1px solid var(--color-border); border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+      <button type="button" class="btn btn-sm btn-outline" data-close-modal>
+        Close
+      </button>
+      <div style="display: flex; gap: 10px;">
+        <a href="{% url 'transactions:receipt' transaction.reference %}" class="btn btn-sm btn-outline" target="_blank" title="Open full receipt page">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open Page
+        </a>
+        <button type="button" onclick="window.print()" class="btn btn-sm btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+          Print Receipt
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
