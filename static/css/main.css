@@ -427,7 +427,7 @@ img {
 
 /* ---------- Hero Section (Deep Navy Distinct Hero Design) ---------- */
 .hero {
-  padding: 76px 0 60px;
+  padding: 64px 0 52px;
   background: 
     radial-gradient(circle at 85% 20%, rgba(0, 168, 150, 0.20) 0%, transparent 45%),
     radial-gradient(circle at 15% 85%, rgba(14, 165, 233, 0.14) 0%, transparent 40%),
@@ -441,37 +441,46 @@ img {
 .hero-grid {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
-  gap: 52px;
+  gap: 48px;
   align-items: center;
 }
 
 .hero h1 {
   color: #FFFFFF;
+  font-size: clamp(1.9rem, 1.4rem + 1.5vw, 2.65rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  margin-bottom: 14px;
 }
 
 .hero .hero-lead {
-  color: #E2E8F0;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #CBD5E1;
+  max-width: 48ch;
+  margin-bottom: 0;
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #2DD4BF;
   background: rgba(0, 168, 150, 0.18);
   border: 1px solid rgba(45, 212, 191, 0.45);
   border-radius: var(--radius-full);
-  padding: 6px 16px;
-  margin-bottom: 20px;
+  padding: 5px 14px;
+  margin-bottom: 14px;
 }
 
 .eyebrow-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #2DD4BF;
   box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
@@ -479,30 +488,31 @@ img {
 
 .hero-actions {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   flex-wrap: wrap;
-  margin: 32px 0 36px;
+  margin: 28px 0 32px;
 }
 
 .hero-stats {
   display: flex;
-  gap: 36px;
+  gap: 32px;
   flex-wrap: wrap;
-  padding-top: 24px;
+  padding-top: 22px;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .hero-stat strong {
   display: block;
   font-family: var(--font-display);
-  font-size: 1.85rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: #FFFFFF;
   letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 
 .hero-stat span {
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   color: #94A3B8;
   font-weight: 500;
 }
@@ -1109,19 +1119,27 @@ input[type="number"], input[type="file"], select, textarea {
 
 /* ---------- Page Header Hero Section (Distinct Deep Navy Banner) ---------- */
 .page-header {
-  padding: 52px 0 46px;
+  padding: 40px 0 34px;
   background: 
     radial-gradient(circle at 85% 20%, rgba(0, 168, 150, 0.18) 0%, transparent 45%),
     radial-gradient(circle at 10% 80%, rgba(14, 165, 233, 0.12) 0%, transparent 40%),
     linear-gradient(135deg, #061528 0%, #0A2342 55%, #0F3560 100%);
   color: #FFFFFF;
-  margin-bottom: 40px;
+  margin-bottom: 36px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
 }
 
-.page-header h1,
+.page-header h1 {
+  color: #FFFFFF;
+  font-size: clamp(1.5rem, 1.25rem + 0.8vw, 1.95rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
 .page-header h2,
 .page-header h3 {
   color: #FFFFFF;
@@ -1131,12 +1149,19 @@ input[type="number"], input[type="file"], select, textarea {
 .page-header .subtle,
 .page-header .hero-lead {
   color: #CBD5E1;
+  font-size: 0.925rem;
+  line-height: 1.6;
+  max-width: 60ch;
+  margin: 0;
 }
 
 .page-header .eyebrow {
   background: rgba(0, 168, 150, 0.18);
   border: 1px solid rgba(45, 212, 191, 0.45);
   color: #2DD4BF;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  margin-bottom: 12px;
 }
 
 .page-header .eyebrow-dot {
