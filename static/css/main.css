@@ -1166,18 +1166,24 @@ input[type="number"], input[type="file"], select, textarea {
 
 .mt-0 { margin-top: 0; }
 
-/* ---------- Footer ---------- */
+/* ---------- Footer (Distinct Deep Navy Color Design) ---------- */
 .site-footer {
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: 
+    radial-gradient(circle at 10% 90%, rgba(0, 168, 150, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(14, 165, 233, 0.08) 0%, transparent 35%),
+    linear-gradient(180deg, #071930 0%, #051224 100%);
+  color: #CBD5E1;
   margin-top: 80px;
-  padding: 64px 0 32px;
+  padding: 68px 0 36px;
+  position: relative;
+  overflow: hidden;
 }
 
 .footer-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  gap: 40px;
+  gap: 44px;
   margin-bottom: 48px;
 }
 
@@ -1187,18 +1193,35 @@ input[type="number"], input[type="file"], select, textarea {
   gap: 14px;
 }
 
+.footer-brand .brand-icon {
+  background: rgba(0, 168, 150, 0.18);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  color: #2DD4BF;
+  box-shadow: 0 0 16px rgba(0, 168, 150, 0.15);
+}
+
+.footer-brand .brand-text {
+  color: #FFFFFF;
+}
+
+.footer-brand .brand-accent {
+  color: #2DD4BF;
+}
+
 .footer-desc {
   font-size: 0.9rem;
   max-width: 34ch;
-  line-height: 1.6;
+  line-height: 1.65;
+  color: #94A3B8;
 }
 
 .footer-grid h4 {
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-primary-navy);
-  margin-bottom: 16px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 18px;
 }
 
 .footer-grid ul {
@@ -1207,36 +1230,38 @@ input[type="number"], input[type="file"], select, textarea {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .footer-grid a {
-  color: var(--color-ink-soft);
+  color: #CBD5E1;
   font-size: 0.925rem;
   font-weight: 500;
+  transition: all 0.18s ease;
 }
 
 .footer-grid a:hover {
-  color: var(--color-accent-teal-dark);
+  color: #2DD4BF;
+  transform: translateX(2px);
 }
 
 .footer-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 24px;
-  border-top: 1px solid var(--color-border);
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.85rem;
-  color: var(--color-ink-muted);
+  color: #94A3B8;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
 }
 
 .footer-secure {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--color-accent-teal-dark);
+  gap: 8px;
+  color: #2DD4BF;
   font-weight: 600;
 }
 
