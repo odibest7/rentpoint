@@ -27,6 +27,8 @@ def how_it_works(request):
 
 @login_required
 def redirect_after_login(request):
+    if request.user.is_staff or request.user.is_superuser:
+        return redirect("core:admin_dashboard")
     if request.user.is_item_owner:
         return redirect("listings:owner_item_list")
     return redirect("listings:item_list")
