@@ -47,7 +47,7 @@
             <tbody>
               {% for u in users %}
                 <tr>
-                  <td>
+                  <td data-label="User">
                     <div style="display:flex; align-items:center; gap:10px;">
                       <span class="avatar">{{ u.first_name|default:u.username|slice:":1"|upper }}</span>
                       <div>
@@ -56,28 +56,28 @@
                       </div>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Role">
                     {% if u.is_item_owner %}
                       <span class="badge badge-warning">Item Owner</span>
                     {% else %}
                       <span class="badge badge-success">Customer</span>
                     {% endif %}
                   </td>
-                  <td>
+                  <td data-label="Email / phone">
                     <div class="text-xs">
                       <div>{{ u.email|default:"No email" }}</div>
                       <div class="subtle mono">{{ u.phone_number|default:"-" }}</div>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Staff status">
                     {% if u.is_staff %}
                       <span class="badge badge-neutral"><span class="badge-dot"></span>Staff Admin</span>
                     {% else %}
                       <span class="subtle text-xs">Standard</span>
                     {% endif %}
                   </td>
-                  <td class="subtle text-xs">{{ u.date_joined|date:"d M Y" }}</td>
-                  <td class="text-right">
+                  <td data-label="Joined" class="subtle text-xs">{{ u.date_joined|date:"d M Y" }}</td>
+                  <td data-label="Actions" class="text-right">
                     {% if u != request.user %}
                       <form action="{% url 'core:admin_user_toggle_staff' u.id %}" method="post" style="display:inline;">
                         {% csrf_token %}

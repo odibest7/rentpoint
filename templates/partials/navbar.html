@@ -25,6 +25,12 @@
             <li><a href="{% url 'transactions:my_transactions' %}">My Rentals</a></li>
           {% endif %}
         {% endif %}
+        {% if not user.is_authenticated %}
+          <li class="mobile-auth-links">
+            <a href="{% url 'accounts:login' %}" class="btn btn-ghost">Log in</a>
+            <a href="{% url 'accounts:signup_customer' %}" class="btn btn-primary">Sign up</a>
+          </li>
+        {% endif %}
       </ul>
     </nav>
 

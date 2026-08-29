@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Owner Verifications | {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <span class="eyebrow">Platform Administration</span>
+    <h1 class="mt-0">Owner Identity Verifications</h1>
+    <p class="subtle">
+      Review each item owner's legal name, typed NIN, live selfie, and both sides of the physical NIN card, then approve or reject. These sensitive images are visible only to staff.
+    </p>
+  </div>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% include "site_admin/_admin_nav.html" with active="verifications" %}
+
+    <div class="dashboard-content">
+      <form method="get" class="form-card" style="margin-bottom: 24px; padding: 20px;">
+        <div class="field-group" style="margin: 0; max-width: 240px;">
+          <label for="status">Status Filter</label>
+          <select name="status" id="status" onchange="this.form.submit()">
+            <option value="">All Submissions</option>
+            <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending Review</option>
+            <option value="verified" {% if status_filter == "verified" %}selected{% endif %}>Verified</option>
+            <option value="rejected" {% if status_filter == "rejected" %}selected{% endif %}>Rejected</option>
+          </select>
+        </div>
+      </form>
+
+      {% if submissions %}
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Selfie</th>
+                <th>NIN Card</th>
+                <th>Item Owner</th>
+                <th>Legal Name Submitted</th>
+                <th>NIN</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for submission in submissions %}
+                <tr>
+                  <td data-label="Selfie">
+                    {% if submission.selfie_image %}
+                      <a href="{{ submission.selfie_image.url }}" target="_blank" rel="noopener">
+                        <img src="{{ submission.selfie_image.url }}" alt="Selfie submitted by {{ submission.owner.username }}" style="width:48px; height:48px; object-fit:cover; border-radius:50%; border:2px solid var(--color-border);">
+                      </a>
+                    {% else %}
+                      <span class="subtle text-xs">No photo</span>
+                    {% endif %}
+                  </td>
+                  <td data-label="NIN card">
+                    <div class="verification-image-pair">
+                      {% if submission.nin_front_image %}<a href="{{ submission.nin_front_image.url }}" target="_blank" rel="noopener"><img src="{{ submission.nin_front_image.url }}" alt="Front of NIN card for {{ submission.owner.username }}" class="verification-thumb"></a>{% endif %}
+                      {% if submission.nin_back_image %}<a href="{{ submission.nin_back_image.url }}" target="_blank" rel="noopener"><img src="{{ submission.nin_back_image.url }}" alt="Back of NIN card for {{ submission.owner.username }}" class="verification-thumb"></a>{% endif %}
+                    </div>
+                  </td>
+                  <td data-label="Item owner">
+                    <strong style="display:block; color:var(--color-ink);">{{ submission.owner.get_full_name|default:submission.owner.username }}</strong>
+                    <span class="subtle text-xs">@{{ submission.owner.username }}</span>
+                  </td>
+                  <td data-label="Legal name">{{ submission.full_legal_name }}</td>
+                  <td data-label="NIN" class="mono">{{ submission.nin }}</td>
+                  <td data-label="Status">
+                    {% if submission.owner.verification_status == "verified" %}
+                      <span class="badge badge-success"><span class="badge-dot"></span>Verified</span>
+                    {% elif submission.owner.verification_status == "pending" %}
+                      <span class="badge badge-warning"><span class="badge-dot"></span>Pending Review</span>
+                    {% else %}
+                      <span class="badge badge-danger"><span class="badge-dot"></span>Rejected</span>
+                    {% endif %}
+                    {% if submission.reviewed_by %}
+                      <div class="subtle text-xs" style="margin-top:4px;">by {{ submission.reviewed_by.username }} &middot; {{ submission.reviewed_at|date:"d M Y" }}</div>
+                    {% endif %}
+                  </td>
+                  <td data-label="Submitted" class="subtle text-xs">{{ submission.submitted_at|date:"d M Y, H:i" }}</td>
+                  <td data-label="Actions" class="text-right">
+                    {% if submission.owner.verification_status == "pending" %}
+                      <div class="table-actions">
+                        <form action="{% url 'core:admin_verification_action' submission.id 'approve' %}" method="post" style="display:inline;">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-sm btn-primary">Approve</button>
+                        </form>
+                        <button type="button" class="btn btn-sm btn-ghost btn-danger-text" data-open-modal="reject-modal-{{ submission.id }}">Reject</button>
+                      </div>
+                    {% else %}
+                      <span class="subtle text-xs">Processed</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h3>No verification submissions found</h3>
+          <p class="subtle">When item owners submit their NIN for identity verification, they will appear here for review.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- One small reject-reason modal per pending submission -->
+{% for submission in submissions %}
+  {% if submission.owner.verification_status == "pending" %}
+    <div id="reject-modal-{{ submission.id }}" class="modal-backdrop no-print" role="dialog" aria-modal="true">
+      <div class="receipt-modal-dialog" style="max-width: 440px;">
+        <button type="button" class="modal-close-btn no-print" data-close-modal title="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <form action="{% url 'core:admin_verification_action' submission.id 'reject' %}" method="post" style="padding: 32px 32px 24px;">
+          {% csrf_token %}
+          <h3 class="mt-0">Reject {{ submission.owner.username }}'s submission</h3>
+          <div class="field-group">
+            <label for="reason-{{ submission.id }}">Reason (shown to the item owner)</label>
+            <textarea class="field-input" id="reason-{{ submission.id }}" name="reason" rows="3" placeholder="e.g. The name entered doesn't match the NIN on record."></textarea>
+          </div>
+          <button type="submit" class="btn btn-danger btn-block">Reject submission</button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+{% endfor %}
+{% endblock %}

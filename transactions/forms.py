@@ -10,7 +10,7 @@ class RentalRequestForm(forms.Form):
     ]
 
     quantity = forms.IntegerField(min_value=1, initial=1, label="Quantity")
-    duration = forms.IntegerField(min_value=1, initial=1, label="Duration")
+    duration = forms.IntegerField(min_value=1, max_value=365, initial=1, label="Duration")
     delivery_option = forms.ChoiceField(
         choices=DELIVERY_CHOICES,
         initial="pickup",

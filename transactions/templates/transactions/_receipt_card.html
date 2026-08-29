@@ -4,7 +4,11 @@
     <div>
       <div class="receipt-brand-mark">
         <span class="brand-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
         </span>
         <span>Rent<span style="color:var(--color-accent-teal);">Point</span></span>
       </div>
@@ -23,13 +27,18 @@
   </div>
 
   <!-- Transaction Status Banner -->
-  <div class="receipt-status-banner {% if transaction.status == 'paid' %}status-paid{% elif transaction.status == 'pending' %}status-pending{% else %}status-failed{% endif %}">
+  <div
+    class="receipt-status-banner {% if transaction.status == 'paid' %}status-paid{% elif transaction.status == 'pending' %}status-pending{% else %}status-failed{% endif %}">
     <div class="status-title">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+      </svg>
       PAYMENT STATUS: {{ transaction.get_status_display|upper }}
     </div>
     <div class="status-ref">
-      {% if transaction.provider_reference %}Ref: {{ transaction.provider_reference }}{% else %}Channel: Electronic Escrow{% endif %}
+      {% if transaction.provider_reference %}Ref: {{ transaction.provider_reference }}{% else %}Channel: Electronic
+      Escrow{% endif %}
     </div>
   </div>
 
@@ -37,27 +46,46 @@
   <div class="receipt-parties-grid">
     <div class="receipt-party-col">
       <div class="receipt-party-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
         CUSTOMER / RENTER
       </div>
-      <div class="receipt-party-name">{{ transaction.customer.get_full_name|default:transaction.customer.username }}</div>
+      <div class="receipt-party-name">{{ transaction.customer.get_full_name|default:transaction.customer.username }}
+      </div>
       <div class="receipt-party-detail"><span>Phone:</span> <strong class="mono">{{ transaction.contact_phone|default:transaction.customer.phone_number|default:"Not specified" }}</strong></div>
       <div class="receipt-party-detail"><span>Email:</span> {{ transaction.customer.email }}</div>
       {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
-        <div class="receipt-party-detail"><span>Delivery:</span> {{ transaction.delivery_address }}</div>
+      <div class="receipt-party-detail"><span>Delivery:</span> {{ transaction.delivery_address }}</div>
       {% endif %}
     </div>
 
     <div class="receipt-party-col">
       <div class="receipt-party-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
         HOST / ITEM OWNER
       </div>
-      <div class="receipt-party-name">{{ transaction.owner.get_full_name|default:transaction.owner.username }}</div>
-      <div class="receipt-party-detail"><span>Phone:</span> <strong class="mono">{{ transaction.owner.phone_number|default:"Verified Host" }}</strong></div>
+      <div class="receipt-party-name">
+        {{ transaction.owner.get_full_name|default:transaction.owner.username }}
+        {% if transaction.owner.is_verified %}
+        <span class="verified-tag" title="Item owner's identity has been verified by RentPoint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+            stroke-linecap="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+          Verified
+        </span>
+        {% endif %}
+      </div>
+      <div class="receipt-party-detail"><span>Phone:</span> <strong class="mono">{{ transaction.owner.phone_number|default:"Not provided" }}</strong></div>
       <div class="receipt-party-detail"><span>Item Area:</span> {{ transaction.item.location }}</div>
       {% if transaction.owner.address %}
-        <div class="receipt-party-detail"><span>Address:</span> {{ transaction.owner.address }}</div>
+      <div class="receipt-party-detail"><span>Address:</span> {{ transaction.owner.address }}</div>
       {% endif %}
     </div>
   </div>
@@ -66,11 +94,11 @@
   <div class="receipt-table-wrapper">
     <table class="receipt-table">
       <colgroup>
-        <col style="width: 40%;">
-        <col style="width: 18%;">
-        <col style="width: 12%;">
+        <col style="width: 34%;">
+        <col style="width: 16%;">
+        <col style="width: 10%;">
         <col style="width: 15%;">
-        <col style="width: 15%;">
+        <col style="width: 25%;">
       </colgroup>
       <thead>
         <tr>
@@ -78,7 +106,7 @@
           <th class="text-right">Unit Rate</th>
           <th class="text-center">Qty</th>
           <th class="text-center">Duration</th>
-          <th class="text-right">Amount (NGN)</th>
+          <th class="text-right">Amount</th>
         </tr>
       </thead>
       <tbody>
@@ -97,11 +125,16 @@
       </tbody>
     </table>
   </div>
+  <p class="receipt-currency-note">All amounts shown in Nigerian Naira (₦).</p>
 
   <!-- Handover & Fulfillment Instructions Box -->
   <div class="receipt-handover-box">
     <div class="receipt-handover-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round">
+        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+        <circle cx="12" cy="10" r="3" />
+      </svg>
       FULFILLMENT &amp; HANDOVER PROTOCOL
     </div>
     <div class="receipt-handover-grid">
@@ -114,16 +147,16 @@
         <span class="val">{{ transaction.item.location }}{% if transaction.owner.address %} &middot; {{ transaction.owner.address }}{% endif %}</span>
       </div>
       {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
-        <div class="receipt-handover-item full-width">
-          <span class="label">Delivery Destination</span>
-          <span class="val">{{ transaction.delivery_address }}</span>
-        </div>
+      <div class="receipt-handover-item full-width">
+        <span class="label">Delivery Destination</span>
+        <span class="val">{{ transaction.delivery_address }}</span>
+      </div>
       {% endif %}
       {% if transaction.pickup_notes %}
-        <div class="receipt-handover-item full-width">
-          <span class="label">Renter Notes / Schedule</span>
-          <span class="val">{{ transaction.pickup_notes }}</span>
-        </div>
+      <div class="receipt-handover-item full-width">
+        <span class="label">Renter Notes / Schedule</span>
+        <span class="val">{{ transaction.pickup_notes }}</span>
+      </div>
       {% endif %}
     </div>
   </div>
@@ -147,7 +180,9 @@
   <!-- Security & Legal Ledger Verification -->
   <div class="receipt-security-footer">
     <div class="security-stamp">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
       <span>Official RentPoint Electronic Ledger &middot; Verified Transaction</span>
     </div>
     <div class="security-ref mono text-xs">

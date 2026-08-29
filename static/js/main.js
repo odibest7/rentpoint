@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
   initFormsetAdd();
   initConfirmDialogs();
   initModalPopups();
+  initSelfieCapture();
+  initVerificationCardPreviews();
 });
 
 function initMobileNav() {
@@ -50,7 +52,10 @@ function initFormsetAdd() {
     const newIndex = parseInt(totalForms.value, 10);
     const newRow = lastRow.cloneNode(true);
 
-    newRow.innerHTML = newRow.innerHTML.replace(/images-(\d+)-/g, "images-" + newIndex + "-");
+    newRow.innerHTML = newRow.innerHTML.replace(
+      /images-(\d+)-/g,
+      "images-" + newIndex + "-",
+    );
     newRow.querySelectorAll("input").forEach(function (input) {
       if (input.type === "file") input.value = "";
       if (input.type === "number") input.value = "0";
@@ -123,7 +128,10 @@ function initModalPopups() {
   });
 
   // Auto-open if the URL hash points to a receipt modal
-  if (window.location.hash && window.location.hash.startsWith("#receipt-modal-")) {
+  if (
+    window.location.hash &&
+    window.location.hash.startsWith("#receipt-modal-")
+  ) {
     openModal(window.location.hash.substring(1));
   }
 }
@@ -150,7 +158,7 @@ function printReceiptUrl(btn) {
   var popup = window.open(
     url,
     "rp_receipt_print",
-    "width=920,height=700,scrollbars=yes,resizable=yes"
+    "width=920,height=700,scrollbars=yes,resizable=yes",
   );
 
   if (!popup) {
@@ -166,4 +174,192 @@ function printReceiptUrl(btn) {
       popup.print();
     }, 400);
   });
+}
+
+/**
+ * Live selfie capture for owner identity verification.
+ *
+ * Uses only the browser's built-in getUserMedia and canvas APIs. The
+ * captured frame is placed into a hidden form field; there is no manual
+ * upload fallback because verification requires a live selfie.
+ *
+ * getUserMedia requires a secure context (HTTPS, or localhost during
+ * development). Unsupported browsers, unavailable hardware, and denied
+ * permissions show an explicit retry state.
+ */
+function initVerificationCardPreviews() {
+  document.querySelectorAll("[data-card-upload]").forEach(function (card) {
+    const input = card.querySelector('input[type="file"]');
+    const dropzone = card.querySelector("[data-card-dropzone]");
+    const selected = card.querySelector("[data-card-selected]");
+    const preview = card.querySelector("[data-card-preview]");
+    const action = card.querySelector("[data-card-action]");
+    const remove = card.querySelector("[data-card-remove]");
+    if (!input || !dropzone || !selected || !preview) return;
+
+    function clearSelection() {
+      input.value = "";
+      preview.hidden = true;
+      preview.removeAttribute("src");
+      selected.hidden = true;
+      dropzone.hidden = false;
+      if (action)
+        action.textContent = dropzone.htmlFor.includes("front")
+          ? "Tap to upload front of NIN card"
+          : "Tap to upload back of NIN card";
+    }
+
+    input.addEventListener("change", function () {
+      const file = input.files && input.files[0];
+      if (!file) return clearSelection();
+      preview.src = URL.createObjectURL(file);
+      preview.hidden = false;
+      selected.hidden = false;
+      dropzone.hidden = true;
+    });
+
+    dropzone.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        input.click();
+      }
+    });
+    if (remove) remove.addEventListener("click", clearSelection);
+  });
+}
+
+function initSelfieCapture() {
+  const widget = document.querySelector("[data-selfie-capture]");
+  if (!widget) return;
+
+  const video = widget.querySelector(".selfie-video");
+  const canvas = widget.querySelector(".selfie-canvas");
+  const resultImg = widget.querySelector(".selfie-result-img");
+  const placeholder = widget.querySelector(".selfie-placeholder");
+  const statusEl = widget.querySelector(".selfie-status");
+  const startBtn = widget.querySelector("[data-selfie-start]");
+  const snapBtn = widget.querySelector("[data-selfie-snap]");
+  const retakeBtn = widget.querySelector("[data-selfie-retake]");
+  const fileInput = document.getElementById("id_selfie_image");
+  const errorEl = widget.querySelector(".selfie-error");
+  const retryBtn = widget.querySelector("[data-selfie-retry]");
+
+  if (!video || !canvas || !fileInput) return;
+
+  let stream = null;
+
+  function setStatus(text, ok) {
+    if (!statusEl) return;
+    statusEl.textContent = text;
+    statusEl.classList.toggle("selfie-status-ok", Boolean(ok));
+  }
+
+  function showOnly(element) {
+    [video, resultImg, placeholder].forEach(function (el) {
+      if (el) el.hidden = el !== element;
+    });
+    widget.classList.toggle("is-live", element === video);
+    widget.classList.toggle("is-captured", element === resultImg);
+  }
+
+  function setButtons(active) {
+    startBtn.hidden = active !== startBtn;
+    snapBtn.hidden = active !== snapBtn;
+    retakeBtn.hidden = active !== retakeBtn;
+    retryBtn.hidden = active !== retryBtn;
+  }
+
+  function showError(message) {
+    stopCamera();
+    showOnly(placeholder);
+    setButtons(retryBtn);
+    errorEl.hidden = false;
+    setStatus(message, false);
+  }
+
+  async function startCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showError("Your browser does not support live camera capture.");
+      return;
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+        audio: false,
+      });
+      video.srcObject = stream;
+      showOnly(video);
+      errorEl.hidden = true;
+      setButtons(snapBtn);
+      setStatus("Camera on. Frame your face and capture when ready.", false);
+    } catch (error) {
+      showError(
+        "Camera access is required. Please allow camera access and try again.",
+      );
+    }
+  }
+
+  function stopCamera() {
+    if (stream) {
+      stream.getTracks().forEach(function (track) {
+        track.stop();
+      });
+      stream = null;
+    }
+  }
+
+  function captureFrame() {
+    const width = video.videoWidth || 480;
+    const height = video.videoHeight || 360;
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+    // Mirror the capture to match the mirrored live preview, so the
+    // saved photo looks the way the person actually saw themselves.
+    context.translate(width, 0);
+    context.scale(-1, 1);
+    context.drawImage(video, 0, 0, width, height);
+
+    canvas.toBlob(
+      function (blob) {
+        if (!blob) {
+          setStatus("Could not capture a photo. Please try again.", false);
+          return;
+        }
+        const file = new File([blob], "selfie.jpg", { type: "image/jpeg" });
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        fileInput.files = transfer.files;
+
+        resultImg.src = URL.createObjectURL(blob);
+        showOnly(resultImg);
+        errorEl.hidden = true;
+        setButtons(retakeBtn);
+        setStatus("Selfie captured. You're ready to submit.", true);
+
+        stopCamera();
+      },
+      "image/jpeg",
+      0.9,
+    );
+  }
+
+  function retake() {
+    fileInput.value = "";
+    showOnly(placeholder);
+    errorEl.hidden = true;
+    setButtons(startBtn);
+    setStatus("Take a live selfie to continue.", false);
+    startCamera();
+  }
+
+  if (startBtn) setButtons(startBtn);
+  showOnly(placeholder);
+  startBtn.addEventListener("click", startCamera);
+  if (snapBtn) snapBtn.addEventListener("click", captureFrame);
+  if (retakeBtn) retakeBtn.addEventListener("click", retake);
+  retryBtn.addEventListener("click", startCamera);
+
+  window.addEventListener("beforeunload", stopCamera);
 }

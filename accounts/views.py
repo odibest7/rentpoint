@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import redirect, render
 
-from .forms import LoginForm, ProfileForm, SignUpForm
-from .models import User
+from .forms import LoginForm, OwnerVerificationForm, ProfileForm, SignUpForm
+from .models import OwnerVerification, User
+from .verification import get_verification_provider
 
 
 def signup_customer(request):
@@ -61,3 +62,49 @@ def profile(request):
         form = ProfileForm(instance=request.user)
 
     return render(request, "accounts/profile.html", {"form": form})
+
+
+@login_required
+def verification(request):
+    """Lets an item owner submit their NIN for identity verification, and
+    shows them the current status of that submission. A customer account
+    has no verification of its own — verification exists to answer the
+    question a customer asks before paying a stranger: "can I trust this
+    item owner?" — so this page is item-owner only."""
+    if not request.user.is_item_owner:
+        messages.error(request, "Identity verification is only for item owner accounts.")
+        return redirect("core:redirect_after_login")
+
+    existing = OwnerVerification.objects.filter(owner=request.user).first()
+    can_submit = request.user.verification_status in (
+        User.VerificationStatus.UNVERIFIED,
+        User.VerificationStatus.REJECTED,
+    )
+
+    if request.method == "POST" and can_submit:
+        form = OwnerVerificationForm(request.POST, request.FILES, instance=existing)
+        if form.is_valid():
+            submission = form.save(commit=False)
+            submission.owner = request.user
+            submission.reviewed_at = None
+            submission.reviewed_by = None
+            submission.rejection_reason = ""
+            submission.save()
+
+            result = get_verification_provider().check(
+                full_legal_name=submission.full_legal_name, nin=submission.nin
+            )
+            request.user.verification_status = User.VerificationStatus.PENDING
+            request.user.save(update_fields=["verification_status"])
+
+            messages.success(request, result.message)
+            return redirect("accounts:verification")
+    else:
+        form = OwnerVerificationForm(instance=existing if can_submit else None)
+
+    context = {
+        "form": form,
+        "existing": existing,
+        "can_submit": can_submit,
+    }
+    return render(request, "accounts/verification.html", context)

@@ -1,20 +1,35 @@
 {% load static %}
 <article class="item-card">
-  <a href="{{ item.get_absolute_url }}" class="item-card-media" style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}');{% endif %}">
+  <a href="{{ item.get_absolute_url }}" class="item-card-media"
+    style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}');{% endif %}">
     <span class="item-card-category">{{ item.category.name }}</span>
     {% if item.is_available %}
-      <span class="badge badge-success item-card-badge"><span class="badge-dot"></span>Available</span>
+    <span class="badge badge-success item-card-badge"><span class="badge-dot"></span>Available</span>
     {% else %}
-      <span class="badge badge-neutral item-card-badge"><span class="badge-dot"></span>Unavailable</span>
+    <span class="badge badge-neutral item-card-badge"><span class="badge-dot"></span>Unavailable</span>
     {% endif %}
   </a>
   <div class="item-card-body">
     <h3 class="item-card-title"><a href="{{ item.get_absolute_url }}">{{ item.name }}</a></h3>
     <div class="item-card-meta">
       <span class="item-card-location">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
         {{ item.location }}
       </span>
+      {% if item.owner.is_verified %}
+      <span class="verified-tag" title="Item owner's identity has been verified by RentPoint">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+          stroke-linecap="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+        Verified owner
+      </span>
+      {% endif %}
     </div>
     <div class="item-card-footer">
       <div class="item-card-price">

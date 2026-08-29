@@ -1,13 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-
+from core.utils import is_item_owner_request
 from .forms import WithdrawalRequestForm
 from .models import Wallet, WithdrawalRequest
 
 
 def _require_item_owner(request):
-    return request.user.is_authenticated and request.user.is_item_owner
+    return is_item_owner_request(request)
 
 
 @login_required

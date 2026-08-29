@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db import transaction as db_transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-
+from core.utils import is_item_owner_request
 from .forms import ItemForm, ItemImageFormSet, ItemSearchForm
 from .models import Category, Item
 
@@ -52,7 +53,7 @@ def item_detail(request, slug):
 
 
 def _require_item_owner(request):
-    return request.user.is_authenticated and request.user.is_item_owner
+    return is_item_owner_request(request)
 
 
 @login_required
@@ -73,16 +74,16 @@ def item_create(request):
 
     if request.method == "POST":
         form = ItemForm(request.POST)
-        if form.is_valid():
-            item = form.save(commit=False)
-            item.owner = request.user
-            item.save()
-            formset = ItemImageFormSet(request.POST, request.FILES, instance=item)
-            if formset.is_valid():
+        formset = ItemImageFormSet(request.POST, request.FILES)
+        if form.is_valid() and formset.is_valid():
+            with db_transaction.atomic():
+                item = form.save(commit=False)
+                item.owner = request.user
+                item.save()
+                formset.instance = item
                 formset.save()
             messages.success(request, f'"{item.name}" has been listed.')
             return redirect("listings:owner_item_list")
-        formset = ItemImageFormSet(request.POST, request.FILES)
     else:
         form = ItemForm()
         formset = ItemImageFormSet()
@@ -92,6 +93,10 @@ def item_create(request):
 
 @login_required
 def item_update(request, slug):
+    if not _require_item_owner(request):
+        messages.error(request, "Only item owner accounts can manage listings.")
+        return redirect("core:redirect_after_login")
+
     item = get_object_or_404(Item, slug=slug, owner=request.user)
 
     if request.method == "POST":
