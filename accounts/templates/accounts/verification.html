@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Identity verification | {{ PLATFORM_NAME }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <span class="eyebrow">Owner Account</span>
+    <h1 class="mt-0">Identity verification</h1>
+    <p class="subtle">
+      Verified item owners carry a badge that customers see on every listing, item page, and
+      receipt. It tells a customer paying a stranger in {{ PLATFORM_SERVICE_AREA }} that RentPoint
+      staff have checked this owner's National Identification Number against the name on their account.
+    </p>
+  </div>
+</div>
+
+<section class="container" style="padding-bottom:60px;">
+  <div class="dashboard-shell">
+    {% include "listings/_owner_nav.html" with active="verification" %}
+
+    <div class="dashboard-content" style="max-width: 520px;">
+
+  {% if user.verification_status == "verified" %}
+    <div class="form-card text-center">
+      {% if existing.selfie_image %}
+        <img src="{{ existing.selfie_image.url }}" alt="Your submitted selfie" style="width:88px; height:88px; object-fit:cover; border-radius:50%; border:3px solid var(--color-accent-teal); margin: 0 auto 14px;">
+      {% endif %}
+      <span class="badge badge-success" style="font-size: 0.85rem; padding: 8px 16px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Verified owner
+      </span>
+      <h3 style="margin-top: 18px;">You're verified</h3>
+      <p class="subtle">
+        Reviewed {{ existing.reviewed_at|date:"d M Y" }}. Your listings, item pages, and receipts now
+        show a verified badge to customers.
+      </p>
+      {% if existing %}
+        <p class="subtle mono" style="font-size: 0.82rem;">NIN on file: {{ existing.masked_nin }}</p>
+      {% endif %}
+    </div>
+
+  {% elif user.verification_status == "pending" %}
+    <div class="form-card text-center">
+      {% if existing.selfie_image %}
+        <img src="{{ existing.selfie_image.url }}" alt="Your submitted selfie" style="width:88px; height:88px; object-fit:cover; border-radius:50%; border:3px solid var(--color-warning); margin: 0 auto 14px;">
+      {% endif %}
+      <span class="badge badge-warning" style="font-size: 0.85rem; padding: 8px 16px;">Pending review</span>
+      <h3 style="margin-top: 18px;">Your submission is being reviewed</h3>
+      <p class="subtle">
+        Submitted {{ existing.submitted_at|date:"d M Y" }}. RentPoint staff review verification
+        submissions by hand, so this can take a little time. You'll see your badge appear here as
+        soon as it's approved.
+      </p>
+      <p class="subtle mono" style="font-size: 0.82rem;">Name on file: {{ existing.full_legal_name }} &middot; NIN: {{ existing.masked_nin }}</p>
+    </div>
+
+  {% else %}
+    {% if user.verification_status == "rejected" %}
+      <div class="alert alert-danger" style="margin-bottom: 20px;">
+        <strong>Your last submission was rejected.</strong>
+        {% if existing.rejection_reason %}{{ existing.rejection_reason }}{% else %}Please check your details and try again.{% endif %}
+      </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="form-card stack" novalidate data-verification-form>
+      {% csrf_token %}
+      <div class="field-group">
+        <label for="{{ form.full_legal_name.id_for_label }}">Full legal name</label>
+        {{ form.full_legal_name }}
+        <p class="field-hint">Must match the name on your National ID exactly.</p>
+        {% for error in form.full_legal_name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field-group">
+        <label for="{{ form.nin.id_for_label }}">National Identification Number (NIN)</label>
+        {{ form.nin }}
+        <p class="field-hint">11 digits, exactly as printed on your NIN slip or card.</p>
+        {% for error in form.nin.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="field-group">
+        <label>Live selfie</label>
+        <div class="selfie-capture" data-selfie-capture>
+          <div class="selfie-preview-wrap">
+            <video class="selfie-video" autoplay playsinline muted hidden></video>
+            <canvas class="selfie-canvas" hidden></canvas>
+            <img class="selfie-result-img" alt="Your captured selfie" hidden>
+            <div class="selfie-face-guide" aria-hidden="true"></div>
+            <div class="selfie-placeholder">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>No photo taken yet</span>
+            </div>
+          </div>
+          <p class="selfie-status" aria-live="polite">Take a live selfie to continue.</p>
+          <div class="selfie-error" role="alert" hidden>
+            <strong>Camera access is required</strong>
+            <span>Allow camera access in your browser and try again. Live capture is the only way to provide this selfie.</span>
+          </div>
+          <div class="selfie-controls">
+            <button type="button" class="btn btn-primary" data-selfie-start>Turn on camera</button>
+            <button type="button" class="btn btn-primary" data-selfie-snap hidden>Capture selfie</button>
+            <button type="button" class="btn btn-outline" data-selfie-retake hidden>Retake</button>
+            <button type="button" class="btn btn-outline selfie-retry" data-selfie-retry hidden>Try again</button>
+          </div>
+          <div class="selfie-upload-source" hidden>{{ form.selfie_image }}</div>
+          {% for error in form.selfie_image.errors %}<p class="field-error text-center">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <p class="field-hint">
+        Your NIN and selfie are stored for verification only. Everywhere on RentPoint other than
+        this staff review process, only the last four digits of your NIN are ever shown, and your
+        selfie is never shown to customers.
+      </p>
+      <button type="submit" class="btn btn-primary">Submit for verification</button>
+    </form>
+  {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

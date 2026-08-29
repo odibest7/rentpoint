@@ -42,16 +42,16 @@
             <tbody>
               {% for w in withdrawals %}
                 <tr>
-                  <td>
+                  <td data-label="Item owner">
                     <strong style="display:block; color:var(--color-ink);">{{ w.owner.get_full_name|default:w.owner.username }}</strong>
                     <span class="subtle text-xs">@{{ w.owner.username }}</span>
                   </td>
-                  <td class="mono font-semibold" style="font-size:1.05rem;">₦{{ w.amount|floatformat:2 }}</td>
-                  <td>
+                  <td data-label="Amount" class="mono font-semibold" style="font-size:1.05rem;">₦{{ w.amount|floatformat:2 }}</td>
+                  <td data-label="Bank & account">
                     <div class="font-medium">{{ w.bank_name }}</div>
                     <div class="subtle mono text-xs">{{ w.account_number }}</div>
                   </td>
-                  <td>
+                  <td data-label="Status">
                     {% if w.status == "approved" %}
                       <span class="badge badge-success"><span class="badge-dot"></span>Approved &amp; Paid</span>
                     {% elif w.status == "pending" %}
@@ -60,8 +60,8 @@
                       <span class="badge badge-danger"><span class="badge-dot"></span>Rejected</span>
                     {% endif %}
                   </td>
-                  <td class="subtle text-xs">{{ w.requested_at|date:"d M Y, H:i" }}</td>
-                  <td class="text-right">
+                  <td data-label="Date requested" class="subtle text-xs">{{ w.requested_at|date:"d M Y, H:i" }}</td>
+                  <td data-label="Actions" class="text-right">
                     {% if w.status == "pending" %}
                       <div class="table-actions">
                         <form action="{% url 'core:admin_withdrawal_action' w.id 'approve' %}" method="post" style="display:inline;">

@@ -21,4 +21,6 @@ urlpatterns = [
     path("site-admin/withdrawals/<int:withdrawal_id>/<str:action>/", admin_views.admin_withdrawal_action, name="admin_withdrawal_action"),
     path("site-admin/categories/", admin_views.admin_categories, name="admin_categories"),
     path("site-admin/categories/<int:category_id>/delete/", admin_views.admin_category_delete, name="admin_category_delete"),
+    path("site-admin/verifications/", admin_views.admin_verifications, name="admin_verifications"),
+    path("site-admin/verifications/<int:submission_id>/<str:action>/", admin_views.admin_verification_action, name="admin_verification_action"),
 ]

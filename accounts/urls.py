@@ -10,4 +10,5 @@ urlpatterns = [
     path("login/", views.RentPointLoginView.as_view(), name="login"),
     path("logout/", views.RentPointLogoutView.as_view(), name="logout"),
     path("profile/", views.profile, name="profile"),
+    path("verification/", views.verification, name="verification"),
 ]

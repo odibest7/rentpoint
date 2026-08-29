@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
-from .models import User
+from .models import OwnerVerification, User
 
 
 class SignUpForm(UserCreationForm):
@@ -80,3 +80,47 @@ class ProfileForm(forms.ModelForm):
             "phone_number": forms.TextInput(attrs={"class": "field-input"}),
             "address": forms.TextInput(attrs={"class": "field-input"}),
         }
+
+
+class OwnerVerificationForm(forms.ModelForm):
+    selfie_image = forms.ImageField(
+        required=True,
+        widget=forms.FileInput(
+            attrs={"id": "id_selfie_image", "accept": "image/*", "tabindex": "-1"}
+        ),
+    )
+    """Lets an item owner submit (or resubmit, after a rejection) their
+    NIN and a live selfie for review. The NIN and selfie are deliberately
+    never pre-filled from an existing submission, so a resubmission
+    always requires the owner to provide fresh copies rather than
+    trusting whatever is already on file."""
+
+    class Meta:
+        model = OwnerVerification
+        fields = ["full_legal_name", "nin", "selfie_image"]
+        widgets = {
+            "full_legal_name": forms.TextInput(
+                attrs={"class": "field-input", "placeholder": "Full name as shown on your National ID"}
+            ),
+            "nin": forms.TextInput(
+                attrs={
+                    "class": "field-input",
+                    "placeholder": "11-digit NIN",
+                    "inputmode": "numeric",
+                    "maxlength": "11",
+                    "autocomplete": "off",
+                }
+            ),
+        }
+
+    def clean_nin(self):
+        nin = self.cleaned_data["nin"].strip()
+        if not nin.isdigit() or len(nin) != 11:
+            raise forms.ValidationError("Enter the 11-digit NIN exactly as issued, digits only.")
+        return nin
+
+    def clean_selfie_image(self):
+        selfie = self.cleaned_data.get("selfie_image")
+        if not selfie:
+            raise forms.ValidationError("A live selfie is required so a reviewer can confirm your identity.")
+        return selfie

@@ -75,7 +75,7 @@
               <tbody>
                 {% for transaction in transactions %}
                   <tr>
-                    <td>
+                    <td data-label="Item">
                       <div class="table-item-cell">
                         {% if transaction.item.primary_image %}
                           <img src="{{ transaction.item.primary_image.image.url }}" alt="{{ transaction.item.name }}" class="item-mini-thumb">
@@ -93,23 +93,23 @@
                         </div>
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Reference">
                       <span class="badge-code">{{ transaction.reference }}</span>
                       <div class="subtle text-xs" style="margin-top:2px;">{{ transaction.created_at|date:"d M Y" }}</div>
                     </td>
-                    <td>
+                    <td data-label="Customer">
                       <div class="font-medium text-sm">{{ transaction.customer.get_full_name|default:transaction.customer.username }}</div>
                       <div class="subtle text-xs">{{ transaction.customer.email }}</div>
                     </td>
-                    <td>
+                    <td data-label="Rental details">
                       <div class="text-sm font-medium">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</div>
                       <div class="subtle text-xs">{{ transaction.duration }} {{ transaction.item.get_price_unit_display }}</div>
                     </td>
-                    <td>
-                      <div class="mono font-semibold" style="color:var(--color-primary-navy);">₦{{ transaction.owner_earning|floatformat:2 }}</div>
-                      <div class="subtle text-xs">Total: ₦{{ transaction.amount|floatformat:0 }}</div>
+                    <td data-label="Earning">
+                      <div class="table-total mono">₦{{ transaction.owner_earning|floatformat:2 }}</div>
+                      <div class="table-secondary">Your earning · Total paid ₦{{ transaction.amount|floatformat:0 }}</div>
                     </td>
-                    <td>
+                    <td data-label="Status">
                       {% if transaction.status == "paid" %}
                         <span class="badge badge-success"><span class="badge-dot"></span>Paid</span>
                       {% elif transaction.status == "pending" %}
@@ -118,7 +118,7 @@
                         <span class="badge badge-danger"><span class="badge-dot"></span>{{ transaction.get_status_display }}</span>
                       {% endif %}
                     </td>
-                    <td class="text-right">
+                    <td data-label="Receipt" class="text-right">
                       <a href="{% url 'transactions:receipt' transaction.reference %}" data-open-modal="receipt-modal-{{ transaction.reference }}" class="btn btn-sm btn-outline">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                         Receipt
@@ -234,15 +234,15 @@
                     <span class="badge-code">{{ transaction.reference }}</span>
                     <div class="subtle text-xs" style="margin-top:2px;">{{ transaction.created_at|date:"d M Y, h:i A" }}</div>
                   </td>
-                  <td>
+                  <td data-label="Owner">
                     <div class="font-medium text-sm">{{ transaction.owner.get_full_name|default:transaction.owner.username }}</div>
-                    <div class="subtle text-xs">Verified Owner</div>
+                    {% if transaction.owner.is_verified %}<div class="subtle text-xs">Verified Owner</div>{% endif %}
                   </td>
                   <td>
                     <div class="text-sm font-medium">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</div>
                     <div class="subtle text-xs">{{ transaction.duration }} {{ transaction.item.get_price_unit_display }}</div>
                   </td>
-                  <td>
+                  <td data-label="Amount paid">
                     <div class="mono font-semibold" style="color:var(--color-primary-navy);">₦{{ transaction.amount|floatformat:2 }}</div>
                     <div class="subtle text-xs">₦{{ transaction.item.rental_price|floatformat:0 }} / {{ transaction.item.get_price_unit_display }}</div>
                   </td>
@@ -255,7 +255,7 @@
                       <span class="badge badge-danger"><span class="badge-dot"></span>{{ transaction.get_status_display }}</span>
                     {% endif %}
                   </td>
-                  <td class="text-right">
+                  <td data-label="Receipt" class="text-right">
                     {% if transaction.status == "paid" %}
                       <a href="{% url 'transactions:receipt' transaction.reference %}" data-open-modal="receipt-modal-{{ transaction.reference }}" class="btn btn-sm btn-outline">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>

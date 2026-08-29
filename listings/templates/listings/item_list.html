@@ -45,11 +45,11 @@
     {% if page_obj.has_other_pages %}
       <div class="flex-between" style="margin-top:32px;">
         {% if page_obj.has_previous %}
-          <a class="btn btn-outline" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">&larr; Previous</a>
+          <a class="btn btn-outline" href="?{% if request.GET.q %}q={{ request.GET.q|urlencode }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category|urlencode }}&{% endif %}{% if request.GET.location %}location={{ request.GET.location|urlencode }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">&larr; Previous</a>
         {% else %}<span></span>{% endif %}
         <span class="subtle">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-          <a class="btn btn-outline" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">Next &rarr;</a>
+          <a class="btn btn-outline" href="?{% if request.GET.q %}q={{ request.GET.q|urlencode }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category|urlencode }}&{% endif %}{% if request.GET.location %}location={{ request.GET.location|urlencode }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Next &rarr;</a>
         {% else %}<span></span>{% endif %}
       </div>
     {% endif %}

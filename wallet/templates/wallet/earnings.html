@@ -71,14 +71,14 @@
             <tbody>
               {% for withdrawal in withdrawals %}
                 <tr>
-                  <td class="mono font-semibold">₦{{ withdrawal.amount|floatformat:2 }}</td>
-                  <td>
+                  <td data-label="Amount" class="mono font-semibold">₦{{ withdrawal.amount|floatformat:2 }}</td>
+                  <td data-label="Destination bank">
                     <div class="bank-cell">
                       <span class="font-medium">{{ withdrawal.bank_name }}</span>
                       <span class="subtle mono text-xs">{{ withdrawal.account_number }}</span>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Status">
                     {% if withdrawal.status == "approved" %}
                       <span class="badge badge-success"><span class="badge-dot"></span>Approved &amp; Paid</span>
                     {% elif withdrawal.status == "pending" %}
@@ -87,7 +87,7 @@
                       <span class="badge badge-danger"><span class="badge-dot"></span>Rejected</span>
                     {% endif %}
                   </td>
-                  <td class="subtle">{{ withdrawal.requested_at|date:"d M Y" }}</td>
+                  <td data-label="Date requested" class="subtle">{{ withdrawal.requested_at|date:"d M Y" }}</td>
                 </tr>
               {% endfor %}
             </tbody>

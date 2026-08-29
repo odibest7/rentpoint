@@ -23,7 +23,7 @@
         </div>
         <div>
           <div class="font-semibold text-sm" style="color:var(--color-primary-navy);">Item Location: {{ item.location }}</div>
-          <div class="subtle text-xs">Listed by {{ item.owner.get_full_name|default:item.owner.username }} &middot; Verified Owner</div>
+          <div class="subtle text-xs">Listed by {{ item.owner.get_full_name|default:item.owner.username }}{% if item.owner.is_verified %} &middot; Verified Owner{% endif %}</div>
         </div>
       </div>
       <span class="badge badge-success"><span class="badge-dot"></span>Available</span>
@@ -32,7 +32,7 @@
 
   <form method="post" class="form-card stack" novalidate style="padding: 28px;">
     {% csrf_token %}
-    
+
     <h3 class="mt-0" style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin-bottom: 18px;">
       1. Rental Quantity &amp; Duration
     </h3>

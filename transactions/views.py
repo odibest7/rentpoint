@@ -128,35 +128,31 @@ def receipt(request, reference):
 @login_required
 def my_transactions(request):
     if request.user.is_item_owner:
-        transactions = (
+        transactions = list(
             Transaction.objects.filter(owner=request.user)
             .select_related("item", "customer", "item__category")
             .prefetch_related("item__images")
         )
-        total_earnings = sum(t.owner_earning for t in transactions if t.status == Transaction.Status.PAID)
-        paid_count = sum(1 for t in transactions if t.status == Transaction.Status.PAID)
-        pending_count = sum(1 for t in transactions if t.status == Transaction.Status.PENDING)
+        paid_transactions = [t for t in transactions if t.status == Transaction.Status.PAID]
         context = {
             "transactions": transactions,
-            "total_earnings": total_earnings,
-            "paid_count": paid_count,
-            "pending_count": pending_count,
+            "total_earnings": sum(t.owner_earning for t in paid_transactions),
+            "paid_count": len(paid_transactions),
+            "pending_count": sum(1 for t in transactions if t.status == Transaction.Status.PENDING),
             "total_count": len(transactions),
         }
     else:
-        transactions = (
+        transactions = list(
             Transaction.objects.filter(customer=request.user)
             .select_related("item", "owner", "item__category")
             .prefetch_related("item__images")
         )
-        total_spent = sum(t.amount for t in transactions if t.status == Transaction.Status.PAID)
-        paid_count = sum(1 for t in transactions if t.status == Transaction.Status.PAID)
-        pending_count = sum(1 for t in transactions if t.status == Transaction.Status.PENDING)
+        paid_transactions = [t for t in transactions if t.status == Transaction.Status.PAID]
         context = {
             "transactions": transactions,
-            "total_spent": total_spent,
-            "paid_count": paid_count,
-            "pending_count": pending_count,
+            "total_spent": sum(t.amount for t in paid_transactions),
+            "paid_count": len(paid_transactions),
+            "pending_count": sum(1 for t in transactions if t.status == Transaction.Status.PENDING),
             "total_count": len(transactions),
         }
     return render(request, "transactions/transaction_list.html", context)

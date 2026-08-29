@@ -37,19 +37,19 @@
             <tbody>
               {% for item in items %}
                 <tr>
-                  <td>
+                  <td data-label="Item">
                     <a href="{{ item.get_absolute_url }}" class="table-link-title">{{ item.name }}</a>
                   </td>
-                  <td><span class="table-tag">{{ item.category.name }}</span></td>
-                  <td class="mono font-semibold">₦{{ item.rental_price|floatformat:0 }} <span class="table-unit">/ {{ item.get_price_unit_display }}</span></td>
-                  <td>
+                  <td data-label="Category"><span class="table-tag">{{ item.category.name }}</span></td>
+                  <td data-label="Price rate" class="mono font-semibold">₦{{ item.rental_price|floatformat:0 }} <span class="table-unit">/ {{ item.get_price_unit_display }}</span></td>
+                  <td data-label="Status">
                     {% if item.is_available %}
                       <span class="badge badge-success"><span class="badge-dot"></span>Available</span>
                     {% else %}
                       <span class="badge badge-neutral"><span class="badge-dot"></span>Unavailable</span>
                     {% endif %}
                   </td>
-                  <td class="text-right">
+                  <td data-label="Actions" class="text-right">
                     <div class="table-actions">
                       <a href="{% url 'listings:item_update' item.slug %}" class="btn btn-sm btn-outline">Edit</a>
                       <a href="{% url 'listings:item_delete' item.slug %}" class="btn btn-sm btn-ghost btn-danger-text">Remove</a>

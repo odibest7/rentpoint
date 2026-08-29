@@ -14,7 +14,7 @@
     {% include "site_admin/_admin_nav.html" with active="categories" %}
 
     <div class="dashboard-content">
-      <div style="display:grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: start;">
+      <div class="categories-layout">
         <div>
           {% if categories %}
             <div class="table-responsive">
@@ -30,12 +30,12 @@
                 <tbody>
                   {% for c in categories %}
                     <tr>
-                      <td class="font-semibold">{{ c.name }}</td>
-                      <td>
+                      <td data-label="Category name" class="font-semibold">{{ c.name }}</td>
+                      <td data-label="Listings count">
                         <span class="badge badge-neutral">{{ c.item_count }} listings</span>
                       </td>
-                      <td class="subtle text-xs mono">{{ c.icon|default:"standard" }}</td>
-                      <td class="text-right">
+                      <td data-label="Description" class="subtle text-xs mono">{{ c.icon|default:"standard" }}</td>
+                      <td data-label="Actions" class="text-right">
                         {% if c.item_count == 0 %}
                           <form action="{% url 'core:admin_category_delete' c.id %}" method="post" style="display:inline;">
                             {% csrf_token %}

@@ -1,10 +1,12 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db import transaction as db_transaction
 from django.db.models import Count, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.text import slugify
 
-from accounts.models import User
+from accounts.models import OwnerVerification, User
 from listings.models import Category, Item
 from transactions.models import Transaction
 from wallet.models import Wallet, WithdrawalRequest
@@ -15,21 +17,28 @@ def admin_dashboard(request):
     total_users = User.objects.count()
     customer_count = User.objects.filter(role=User.Role.CUSTOMER).count()
     owner_count = User.objects.filter(role=User.Role.ITEM_OWNER).count()
-    
+
     total_items = Item.objects.count()
     available_items = Item.objects.filter(is_available=True).count()
-    
+
     total_volume = Transaction.objects.filter(status=Transaction.Status.PAID).aggregate(
         total=Sum("amount")
     )["total"] or 0
-    
+
     pending_withdrawals_count = WithdrawalRequest.objects.filter(
         status=WithdrawalRequest.Status.PENDING
     ).count()
-    
+
     pending_withdrawals_sum = WithdrawalRequest.objects.filter(
         status=WithdrawalRequest.Status.PENDING
     ).aggregate(total=Sum("amount"))["total"] or 0
+
+    pending_verifications_count = User.objects.filter(
+        verification_status=User.VerificationStatus.PENDING
+    ).count()
+    verified_owner_count = User.objects.filter(
+        verification_status=User.VerificationStatus.VERIFIED
+    ).count()
 
     recent_transactions = Transaction.objects.select_related("item", "customer", "owner")[:6]
     recent_users = User.objects.order_by("-date_joined")[:5]
@@ -43,6 +52,8 @@ def admin_dashboard(request):
         "total_volume": total_volume,
         "pending_withdrawals_count": pending_withdrawals_count,
         "pending_withdrawals_sum": pending_withdrawals_sum,
+        "pending_verifications_count": pending_verifications_count,
+        "verified_owner_count": verified_owner_count,
         "recent_transactions": recent_transactions,
         "recent_users": recent_users,
     }
@@ -176,15 +187,23 @@ def admin_withdrawal_action(request, withdrawal_id, action):
         messages.warning(request, "This withdrawal request has already been processed.")
         return redirect("core:admin_withdrawals")
 
-    wallet, _ = Wallet.objects.get_or_create(owner=withdrawal.owner)
-
     if action == "approve":
-        withdrawal.status = WithdrawalRequest.Status.APPROVED
-        withdrawal.save()
-        wallet.total_withdrawn += withdrawal.amount
-        wallet.save()
+        with db_transaction.atomic():
+            withdrawal = WithdrawalRequest.objects.select_for_update().get(pk=withdrawal.pk)
+            wallet, _ = Wallet.objects.select_for_update().get_or_create(owner=withdrawal.owner)
+            if withdrawal.status != WithdrawalRequest.Status.PENDING:
+                messages.warning(request, "This withdrawal request has already been processed.")
+                return redirect("core:admin_withdrawals")
+            if wallet.balance < withdrawal.amount:
+                messages.error(request, "This withdrawal cannot be approved because the owner's balance is insufficient.")
+                return redirect("core:admin_withdrawals")
+            withdrawal.status = WithdrawalRequest.Status.APPROVED
+            withdrawal.resolved_at = timezone.now()
+            withdrawal.save(update_fields=["status", "resolved_at"])
+            wallet.debit(withdrawal.amount)
         messages.success(request, f"Approved payout of ₦{withdrawal.amount:,.2f} for {withdrawal.owner.username}.")
     elif action == "reject":
+        wallet, _ = Wallet.objects.get_or_create(owner=withdrawal.owner)
         withdrawal.status = WithdrawalRequest.Status.REJECTED
         withdrawal.save()
         # Refund balance back to owner wallet
@@ -227,3 +246,59 @@ def admin_category_delete(request, category_id):
             category.delete()
             messages.success(request, f"Category '{name}' deleted.")
     return redirect("core:admin_categories")
+
+
+@staff_member_required
+def admin_verifications(request):
+    """The identity-verification review queue: every item owner who has
+    submitted a NIN, filterable by where their submission currently
+    stands. This is a manual review by design (see accounts/verification.py)
+    — nothing here is auto-approved."""
+    status_filter = request.GET.get("status", "").strip()
+
+    submissions = OwnerVerification.objects.select_related("owner", "reviewed_by").order_by("-submitted_at")
+    if status_filter in [
+        User.VerificationStatus.PENDING,
+        User.VerificationStatus.VERIFIED,
+        User.VerificationStatus.REJECTED,
+    ]:
+        submissions = submissions.filter(owner__verification_status=status_filter)
+
+    context = {
+        "submissions": submissions,
+        "status_filter": status_filter,
+    }
+    return render(request, "site_admin/verifications.html", context)
+
+
+@staff_member_required
+def admin_verification_action(request, submission_id, action):
+    if request.method != "POST":
+        return redirect("core:admin_verifications")
+
+    submission = get_object_or_404(OwnerVerification, id=submission_id)
+    owner = submission.owner
+
+    if owner.verification_status != User.VerificationStatus.PENDING:
+        messages.warning(request, "This submission has already been reviewed.")
+        return redirect("core:admin_verifications")
+
+    submission.reviewed_at = timezone.now()
+    submission.reviewed_by = request.user
+
+    if action == "approve":
+        owner.verification_status = User.VerificationStatus.VERIFIED
+        submission.rejection_reason = ""
+        messages.success(request, f"{owner.get_full_name() or owner.username} is now a verified owner.")
+    elif action == "reject":
+        reason = request.POST.get("reason", "").strip()
+        owner.verification_status = User.VerificationStatus.REJECTED
+        submission.rejection_reason = reason or "The submitted details could not be confirmed."
+        messages.info(request, f"Verification for {owner.username} was rejected.")
+    else:
+        messages.error(request, "Unknown verification action.")
+        return redirect("core:admin_verifications")
+
+    owner.save(update_fields=["verification_status"])
+    submission.save(update_fields=["reviewed_at", "reviewed_by", "rejection_reason"])
+    return redirect("core:admin_verifications")

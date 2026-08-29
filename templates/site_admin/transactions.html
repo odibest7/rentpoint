@@ -50,15 +50,15 @@
             <tbody>
               {% for tx in transactions %}
                 <tr>
-                  <td class="mono font-medium text-xs">{{ tx.reference }}</td>
-                  <td>
+                  <td data-label="Reference" class="mono font-medium text-xs">{{ tx.reference }}</td>
+                  <td data-label="Item">
                     <div class="font-medium">{{ tx.item.name }}</div>
                     <div class="subtle text-xs">{{ tx.item.location }} &middot; {{ tx.get_delivery_option_display }}</div>
                   </td>
-                  <td>{{ tx.customer.get_full_name|default:tx.customer.username }}</td>
-                  <td class="mono">₦{{ tx.owner_earning|floatformat:2 }}</td>
-                  <td class="mono font-semibold">₦{{ tx.amount|floatformat:2 }}</td>
-                  <td>
+                  <td data-label="Customer">{{ tx.customer.get_full_name|default:tx.customer.username }}</td>
+                  <td data-label="Owner earning" class="mono">₦{{ tx.owner_earning|floatformat:2 }}</td>
+                  <td data-label="Total paid" class="mono font-semibold">₦{{ tx.amount|floatformat:2 }}</td>
+                  <td data-label="Status">
                     {% if tx.status == "paid" %}
                       <span class="badge badge-success"><span class="badge-dot"></span>Paid</span>
                     {% elif tx.status == "pending" %}
@@ -67,8 +67,8 @@
                       <span class="badge badge-danger"><span class="badge-dot"></span>Failed</span>
                     {% endif %}
                   </td>
-                  <td class="subtle text-xs">{{ tx.created_at|date:"d M Y" }}</td>
-                  <td class="text-right">
+                  <td data-label="Date" class="subtle text-xs">{{ tx.created_at|date:"d M Y" }}</td>
+                  <td data-label="Receipt" class="text-right">
                     <a href="{% url 'transactions:receipt' tx.reference %}" data-open-modal="receipt-modal-{{ tx.reference }}" class="btn btn-sm btn-outline">Receipt</a>
                   </td>
                 </tr>
