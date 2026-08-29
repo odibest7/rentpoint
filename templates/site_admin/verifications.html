@@ -6,9 +6,7 @@
     <span class="eyebrow">Platform Administration</span>
     <h1 class="mt-0">Owner Identity Verifications</h1>
     <p class="subtle">
-      Review each item owner's submitted NIN and legal name, then approve or reject. Approving
-      is the only thing that puts a "Verified" badge in front of customers, so check the name
-      against the NIN carefully before approving.
+      Review each item owner's legal name, typed NIN, live selfie, and both sides of the physical NIN card, then approve or reject. These sensitive images are visible only to staff.
     </p>
   </div>
 </div>
@@ -36,6 +34,7 @@
             <thead>
               <tr>
                 <th>Selfie</th>
+                <th>NIN Card</th>
                 <th>Item Owner</th>
                 <th>Legal Name Submitted</th>
                 <th>NIN</th>
@@ -55,6 +54,12 @@
                     {% else %}
                       <span class="subtle text-xs">No photo</span>
                     {% endif %}
+                  </td>
+                  <td data-label="NIN card">
+                    <div class="verification-image-pair">
+                      {% if submission.nin_front_image %}<a href="{{ submission.nin_front_image.url }}" target="_blank" rel="noopener"><img src="{{ submission.nin_front_image.url }}" alt="Front of NIN card for {{ submission.owner.username }}" class="verification-thumb"></a>{% endif %}
+                      {% if submission.nin_back_image %}<a href="{{ submission.nin_back_image.url }}" target="_blank" rel="noopener"><img src="{{ submission.nin_back_image.url }}" alt="Back of NIN card for {{ submission.owner.username }}" class="verification-thumb"></a>{% endif %}
+                    </div>
                   </td>
                   <td data-label="Item owner">
                     <strong style="display:block; color:var(--color-ink);">{{ submission.owner.get_full_name|default:submission.owner.username }}</strong>

@@ -925,6 +925,125 @@ img {
   display: none !important;
 }
 
+.verification-card-uploads {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.verification-card-upload {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-hover);
+}
+
+.verification-card-label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--color-primary-navy);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.verification-dropzone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 112px;
+  padding: 16px;
+  border: 1.5px dashed var(--color-accent-teal-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.verification-dropzone:hover,
+.verification-dropzone:focus-visible {
+  border-color: var(--color-accent-teal);
+  background: var(--color-accent-teal-subtle);
+  box-shadow: 0 0 0 3px var(--color-accent-teal-subtle);
+  outline: none;
+}
+
+.verification-dropzone-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 32px;
+  flex: 0 0 auto;
+  border: 2px solid var(--color-accent-teal);
+  border-radius: 5px;
+  color: var(--color-accent-teal-dark);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.verification-dropzone-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-size: 0.74rem;
+  color: var(--color-ink-muted);
+}
+
+.verification-dropzone-copy strong {
+  color: var(--color-primary-navy);
+  font-size: 0.82rem;
+}
+
+.verification-dropzone input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.verification-card-upload > .field-hint {
+  margin: 8px 0 0;
+}
+
+.verification-card-selected {
+  display: grid;
+  gap: 8px;
+}
+
+.verification-card-selected .btn {
+  justify-self: start;
+}
+
+.verification-card-preview {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.verification-image-pair {
+  display: flex;
+  gap: 6px;
+}
+
+.verification-thumb {
+  width: 64px;
+  height: 48px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  transition: transform 0.15s ease;
+}
+
+.verification-thumb:hover {
+  transform: scale(1.08);
+}
+
 [hidden],
 .selfie-capture [hidden] {
   display: none !important;
@@ -2596,6 +2715,10 @@ select:focus {
    RESPONSIVE: stack parties grid on mobile
    ---------------------------------------------------------- */
 @media (max-width: 680px) {
+  .verification-card-uploads {
+    grid-template-columns: 1fr;
+  }
+
   .receipt-modal-dialog {
     max-width: calc(100vw - 24px);
   }

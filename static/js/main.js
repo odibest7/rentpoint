@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initConfirmDialogs();
   initModalPopups();
   initSelfieCapture();
+  initVerificationCardPreviews();
 });
 
 function initMobileNav() {
@@ -186,6 +187,47 @@ function printReceiptUrl(btn) {
  * development). Unsupported browsers, unavailable hardware, and denied
  * permissions show an explicit retry state.
  */
+function initVerificationCardPreviews() {
+  document.querySelectorAll("[data-card-upload]").forEach(function (card) {
+    const input = card.querySelector('input[type="file"]');
+    const dropzone = card.querySelector("[data-card-dropzone]");
+    const selected = card.querySelector("[data-card-selected]");
+    const preview = card.querySelector("[data-card-preview]");
+    const action = card.querySelector("[data-card-action]");
+    const remove = card.querySelector("[data-card-remove]");
+    if (!input || !dropzone || !selected || !preview) return;
+
+    function clearSelection() {
+      input.value = "";
+      preview.hidden = true;
+      preview.removeAttribute("src");
+      selected.hidden = true;
+      dropzone.hidden = false;
+      if (action)
+        action.textContent = dropzone.htmlFor.includes("front")
+          ? "Tap to upload front of NIN card"
+          : "Tap to upload back of NIN card";
+    }
+
+    input.addEventListener("change", function () {
+      const file = input.files && input.files[0];
+      if (!file) return clearSelection();
+      preview.src = URL.createObjectURL(file);
+      preview.hidden = false;
+      selected.hidden = false;
+      dropzone.hidden = true;
+    });
+
+    dropzone.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        input.click();
+      }
+    });
+    if (remove) remove.addEventListener("click", clearSelection);
+  });
+}
+
 function initSelfieCapture() {
   const widget = document.querySelector("[data-selfie-capture]");
   if (!widget) return;

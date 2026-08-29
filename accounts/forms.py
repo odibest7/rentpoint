@@ -84,20 +84,27 @@ class ProfileForm(forms.ModelForm):
 
 class OwnerVerificationForm(forms.ModelForm):
     selfie_image = forms.ImageField(
-        required=True,
+        required=False,
         widget=forms.FileInput(
             attrs={"id": "id_selfie_image", "accept": "image/*", "tabindex": "-1"}
         ),
     )
-    """Lets an item owner submit (or resubmit, after a rejection) their
-    NIN and a live selfie for review. The NIN and selfie are deliberately
-    never pre-filled from an existing submission, so a resubmission
-    always requires the owner to provide fresh copies rather than
-    trusting whatever is already on file."""
+    nin_front_image = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={"accept": "image/*", "capture": "environment"}),
+    )
+    nin_back_image = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={"accept": "image/*", "capture": "environment"}),
+    )
+    """Collects sensitive NIN details, a live selfie, and both sides of the
+    physical NIN card. New submissions require all three images; rejected
+    owners may resubmit while retaining existing images unless replacements
+    are supplied."""
 
     class Meta:
         model = OwnerVerification
-        fields = ["full_legal_name", "nin", "selfie_image"]
+        fields = ["full_legal_name", "nin", "selfie_image", "nin_front_image", "nin_back_image"]
         widgets = {
             "full_legal_name": forms.TextInput(
                 attrs={"class": "field-input", "placeholder": "Full name as shown on your National ID"}
@@ -119,8 +126,23 @@ class OwnerVerificationForm(forms.ModelForm):
             raise forms.ValidationError("Enter the 11-digit NIN exactly as issued, digits only.")
         return nin
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if not self.instance.pk:
+            required = {
+                "selfie_image": "A live selfie is required.",
+                "nin_front_image": "A front photo of the NIN card is required.",
+                "nin_back_image": "A back photo of the NIN card is required.",
+            }
+            for field_name, message in required.items():
+                if not cleaned_data.get(field_name):
+                    self.add_error(field_name, message)
+        return cleaned_data
     def clean_selfie_image(self):
-        selfie = self.cleaned_data.get("selfie_image")
-        if not selfie:
-            raise forms.ValidationError("A live selfie is required so a reviewer can confirm your identity.")
-        return selfie
+        return self.cleaned_data.get("selfie_image")
+
+    def clean_nin_front_image(self):
+        return self.cleaned_data.get("nin_front_image")
+
+    def clean_nin_back_image(self):
+        return self.cleaned_data.get("nin_back_image")

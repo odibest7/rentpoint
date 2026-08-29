@@ -27,20 +27,32 @@ class OwnerVerificationAdmin(admin.ModelAdmin):
     approval is never automated.
     """
 
-    list_display = ("owner", "full_legal_name", "nin", "selfie_thumbnail", "owner_status", "submitted_at", "reviewed_by")
+    list_display = ("owner", "full_legal_name", "nin", "selfie_thumbnail", "nin_front_thumbnail", "nin_back_thumbnail", "owner_status", "submitted_at", "reviewed_by")
     list_filter = ("owner__verification_status",)
     search_fields = ("owner__username", "full_legal_name", "nin")
-    readonly_fields = ("submitted_at", "updated_at", "selfie_thumbnail")
+    readonly_fields = ("submitted_at", "updated_at", "selfie_thumbnail", "nin_front_thumbnail", "nin_back_thumbnail")
 
     @admin.display(description="Status")
     def owner_status(self, obj):
         return obj.owner.get_verification_status_display()
 
-    @admin.display(description="Selfie")
-    def selfie_thumbnail(self, obj):
-        if not obj.selfie_image:
+    def _image_thumbnail(self, image, alt):
+        if not image:
             return "—"
         return format_html(
-            '<img src="{}" style="width:44px;height:44px;object-fit:cover;border-radius:50%;">',
-            obj.selfie_image.url,
+            '<a href="{0}" target="_blank" rel="noopener"><img src="{0}" alt="{1}" style="width:64px;height:48px;object-fit:cover;border-radius:4px;"></a>',
+            image.url,
+            alt,
         )
+
+    @admin.display(description="Selfie")
+    def selfie_thumbnail(self, obj):
+        return self._image_thumbnail(obj.selfie_image, "Live selfie")
+
+    @admin.display(description="NIN front")
+    def nin_front_thumbnail(self, obj):
+        return self._image_thumbnail(obj.nin_front_image, "Front of NIN card")
+
+    @admin.display(description="NIN back")
+    def nin_back_thumbnail(self, obj):
+        return self._image_thumbnail(obj.nin_back_image, "Back of NIN card")

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 
@@ -58,6 +59,11 @@ class User(AbstractUser):
         return self.get_full_name() or self.username
 
 
+def validate_verification_image_size(image):
+    "Keep sensitive identity images reasonably small for secure storage."
+    if image.size > 5 * 1024 * 1024:
+        raise ValidationError("Verification images must be 5 MB or smaller.")
+
 class OwnerVerification(models.Model):
     """
     An item owner's identity verification submission: the NIN (National
@@ -70,10 +76,9 @@ class OwnerVerification(models.Model):
     national ID or SSN elsewhere), so nothing outside this model or the
     Django admin should ever read the `nin` field directly. Use
     `masked_nin` everywhere else — item cards, dashboards, the
-    verification status page shown back to the owner themselves. The
-    selfie photo is treated with the same care: it is only ever shown on
-    the staff review queue and in the Django admin, never to customers or
-    on any public page.
+    verification status page shown back to the owner themselves. The selfie photo and both physical NIN-card photographs are treated with
+    the same care: they are only ever shown on the staff review queue and in
+    the Django admin, never to customers or on any public page.
     """
 
     owner = models.OneToOneField(
@@ -93,7 +98,21 @@ class OwnerVerification(models.Model):
     )
     selfie_image = models.ImageField(
         upload_to="verifications/selfies/",
+        validators=[validate_verification_image_size],
+        blank=True,
         help_text="A live selfie taken during submission, for a reviewer to compare against the NIN.",
+    )
+    nin_front_image = models.ImageField(
+        upload_to="verifications/nin-cards/front/",
+        validators=[validate_verification_image_size],
+        blank=True,
+        help_text="Front photograph of the owner's physical NIN card.",
+    )
+    nin_back_image = models.ImageField(
+        upload_to="verifications/nin-cards/back/",
+        validators=[validate_verification_image_size],
+        blank=True,
+        help_text="Back photograph of the owner's physical NIN card.",
     )
     submitted_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
