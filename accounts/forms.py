@@ -41,12 +41,24 @@ class SignUpForm(UserCreationForm):
             "password1": "Create a password",
             "password2": "Repeat your password",
         }
+        autocomplete_map = {
+            "first_name": "given-name",
+            "last_name": "family-name",
+            "email": "email",
+            "phone_number": "tel",
+            "username": "username",
+            "password1": "new-password",
+            "password2": "new-password",
+        }
         for field_name, field in self.fields.items():
+            classes = ["field-input"]
+            if field_name in {"password1", "password2"}:
+                classes.append("password-toggle-input")
             field.widget.attrs.update(
                 {
-                    "class": "field-input",
+                    "class": " ".join(classes),
                     "placeholder": placeholders.get(field_name, ""),
-                    "autocomplete": "off",
+                    "autocomplete": autocomplete_map.get(field_name, "off"),
                 }
             )
 
@@ -62,10 +74,19 @@ class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["username"].widget.attrs.update(
-            {"class": "field-input", "placeholder": "Username", "autofocus": True}
+            {
+                "class": "field-input",
+                "placeholder": "Username",
+                "autofocus": True,
+                "autocomplete": "username",
+            }
         )
         self.fields["password"].widget.attrs.update(
-            {"class": "field-input", "placeholder": "Password"}
+            {
+                "class": "field-input password-toggle-input",
+                "placeholder": "Password",
+                "autocomplete": "current-password",
+            }
         )
 
 
