@@ -207,47 +207,23 @@ If you have a custom domain, add it to the allowed hosts and trusted origins as 
 
 ---
 
-## 7. Run database migrations after deployment
+## 7. Run the required deploy commands on Render
 
-Render does not automatically run Django migrations unless you create a deploy command that does it.
-
-There are two common approaches:
-
-### Option A: Run once after deployment from the Render shell
-
-1. Open your Render service
-2. Open the Shell tab
-3. Run:
+For a free Render instance, the deployment must be explicit and minimal. The commands you need are:
 
 ```bash
 python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py create_superuser_from_env
 ```
 
-### Option B: Set a one-time custom deploy command
+Run them once in the Render shell after deployment, or include the same sequence in a one-time deploy step before launch.
 
-Use this in a deploy command or shell before launching the app:
-
-```bash
-python manage.py migrate && python manage.py collectstatic --noinput
-```
-
-For most setups, it is safe to run migration once from the shell before the first live launch.
+This project already includes the dedicated command to create the admin user from environment variables, so you do not need to type a password interactively.
 
 ---
 
-## 8. Create a superuser on Render
-
-If the app needs an admin login, open Render Shell and run:
-
-```bash
-python manage.py createsuperuser
-```
-
-Then follow the prompts to create the admin account.
-
----
-
-## 9. Check the app is live
+## 8. Check the app is live
 
 After deployment succeeds, Render will provide a public URL such as:
 
@@ -313,66 +289,81 @@ and verify the domain matches your actual deployed URL.
 
 ---
 
-## 11. Recommended final production setup
+## 9. Recommended final production setup for free Render
 
-For a stable live deployment, the final setup should be:
+For a free Render instance, use this exact setup:
 
 - Render Web Service for Django app
 - Render PostgreSQL database
 - `DJANGO_DEBUG=False`
 - `DB_ENGINE=postgres`
 - `DATABASE_URL` from Render Postgres
-- `PAYSTACK_SECRET_KEY` and `PAYSTACK_PUBLIC_KEY` from the correct live Paystack account
-- custom domain configured if needed
+- `DJANGO_ALLOWED_HOSTS` set to your Render URL
+- `DJANGO_CSRF_TRUSTED_ORIGINS` set to your Render HTTPS URL
+- `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL`, and `DJANGO_SUPERUSER_PASSWORD` set in the environment
+- `PAYSTACK_SECRET_KEY` and `PAYSTACK_PUBLIC_KEY` from the correct Paystack account
 
 ---
 
-## 12. Summary
+## 10. Exact deployment flow for free Render
 
-The deployment flow is:
+Use this exact sequence:
 
-1. push repo to GitHub
-2. create Postgres database on Render
-3. create web service on Render
-4. set build command and start command
-5. add environment variables
-6. run migrations
-7. create admin user
-8. deploy and test the app
-
-That is the full Render deployment flow for this project.
-
----
-
-## 13. Example final Render setup
-
-Build command:
+1. Push the repo to GitHub.
+2. Create a PostgreSQL database on Render.
+3. Create a Web Service on Render and connect the repo.
+4. Set the build command:
 
 ```bash
-pip install -r requirements.txt && python manage.py collectstatic --noinput
+pip install -r requirements.txt
 ```
 
-Start command:
+5. Set the start command:
 
 ```bash
 gunicorn config.wsgi:application
 ```
 
-Environment variables:
+6. Add the environment variables in Render:
 
 ```env
-DJANGO_SECRET_KEY=replace-me
+DJANGO_SECRET_KEY=replace-with-a-long-random-string
 DJANGO_DEBUG=False
-DJANGO_ALLOWED_HOSTS=rentpoint.onrender.com
-DJANGO_CSRF_TRUSTED_ORIGINS=https://rentpoint.onrender.com
+DJANGO_ALLOWED_HOSTS=your-render-url.onrender.com
+DJANGO_CSRF_TRUSTED_ORIGINS=https://your-render-url.onrender.com
 DB_ENGINE=postgres
-DATABASE_URL=postgresql://... 
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_EMAIL=admin@example.com
+DJANGO_SUPERUSER_PASSWORD=StrongPassword123!
 PLATFORM_NAME=RentPoint
 PLATFORM_SERVICE_AREA=Nsukka Urban
 PLATFORM_COMMISSION_PERCENT=8
 MINIMUM_WITHDRAWAL_AMOUNT=1000
-PAYSTACK_SECRET_KEY=sk_live_...
-PAYSTACK_PUBLIC_KEY=pk_live_...
+PAYSTACK_SECRET_KEY=sk_live_xxx
+PAYSTACK_PUBLIC_KEY=pk_live_xxx
 ```
 
-Use the exact values from your Render database and Paystack dashboard.
+7. After the service starts, run the required commands in the Render Shell:
+
+```bash
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py create_superuser_from_env
+```
+
+8. Open the live URL and test login.
+
+---
+
+## 11. Summary
+
+For this free Render deployment, the commands that matter are only these:
+
+```bash
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py create_superuser_from_env
+```
+
+Use those in the Render shell after deployment, and make sure the superuser variables are set in the Render environment.
