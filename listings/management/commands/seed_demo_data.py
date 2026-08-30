@@ -6,6 +6,8 @@ Usage: python manage.py seed_demo_data
 Safe to re-run: existing records are matched by name and left untouched.
 """
 
+import os
+
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
@@ -80,9 +82,43 @@ DEMO_ITEMS = [
 
 
 class Command(BaseCommand):
-    help = "Seed RentPoint with demo categories, a demo item owner, and sample listings."
+    help = "Seed RentPoint with demo categories, a demo item owner, sample listings, and a superuser from environment variables."
 
     def handle(self, *args, **options):
+        username = (os.getenv("DJANGO_SUPERUSER_USERNAME") or "admin").strip() or "admin"
+        email = (os.getenv("DJANGO_SUPERUSER_EMAIL") or "admin@example.com").strip() or "admin@example.com"
+        password = os.getenv("DJANGO_SUPERUSER_PASSWORD") or "Admin@1234"
+
+        admin_user, admin_created = User.objects.get_or_create(
+            username=username,
+            defaults={
+                "email": email,
+                "is_staff": True,
+                "is_superuser": True,
+            },
+        )
+
+        needs_admin_update = (
+            admin_created
+            or admin_user.email != email
+            or not admin_user.is_staff
+            or not admin_user.is_superuser
+            or not admin_user.check_password(password)
+        )
+
+        if needs_admin_update:
+            admin_user.email = email
+            admin_user.is_staff = True
+            admin_user.is_superuser = True
+            admin_user.set_password(password)
+            admin_user.save()
+            self.stdout.write(
+                self.style.SUCCESS(
+                    "Ensured seeded superuser exists "
+                    f"(username: {username}, email: {email})."
+                )
+            )
+
         for name, icon in CATEGORIES:
             Category.objects.get_or_create(name=name, defaults={"icon": icon})
         self.stdout.write(self.style.SUCCESS(f"Ensured {len(CATEGORIES)} categories exist."))
