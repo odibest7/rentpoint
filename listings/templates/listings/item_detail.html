@@ -31,19 +31,23 @@
 <section class="container" style="padding-bottom: 60px;">
   <div class="hero-grid" style="align-items:start;">
     <div>
-      <div class="hero-showcase-media"
-        style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}'); background-size:cover; background-position:center;{% endif %} aspect-ratio:4/3; border-radius:var(--radius-lg);">
-        <span class="hero-showcase-tag">{{ item.category.name }}</span>
-      </div>
+      <div class="item-gallery" data-item-gallery>
+        <button type="button" class="hero-showcase-media item-gallery-hero" data-gallery-open="0" aria-label="View photos of {{ item.name }}"
+          style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}'); background-size:cover; background-position:center;{% endif %} aspect-ratio:4/3; border-radius:var(--radius-lg);">
+          <span class="hero-showcase-tag">{{ item.category.name }}</span>
+          {% if item.images.count > 1 %}<span class="item-gallery-count">{{ item.images.count }} photos</span>{% endif %}
+        </button>
 
-      {% if item.images.count > 1 %}
-      <div class="chip-row" style="margin-top:14px; display:flex; gap:10px; overflow-x:auto;">
-        {% for image in item.images.all %}
-        <img src="{{ image.image.url }}" alt="{{ item.name }}"
-          style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--color-border); flex-shrink:0;">
-        {% endfor %}
+        {% if item.images.count > 1 %}
+        <div class="item-gallery-thumbs" aria-label="Item photo thumbnails">
+          {% for image in item.images.all %}
+          <button type="button" class="item-gallery-thumb" data-gallery-open="{{ forloop.counter0 }}" aria-label="View photo {{ forloop.counter }} of {{ item.images.count }}">
+            <img src="{{ image.image.url }}" alt="{{ item.name }} photo {{ forloop.counter }}">
+          </button>
+          {% endfor %}
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
 
       <div style="margin-top:32px;">
         <h2 style="font-size:1.35rem; margin-bottom:12px;">Item Description</h2>
@@ -165,4 +169,16 @@
   </div>
   {% endif %}
 </section>
+
+{% if item.images %}
+  <div class="item-gallery-modal modal-backdrop" data-gallery-modal role="dialog" aria-modal="true" aria-label="Item photo viewer" hidden>
+    <div class="item-gallery-dialog">
+      <button type="button" class="modal-close-btn" data-gallery-close aria-label="Close photo viewer">&times;</button>
+      <button type="button" class="item-gallery-nav item-gallery-prev" data-gallery-prev aria-label="Previous photo">&#8592;</button>
+      <img class="item-gallery-modal-image" data-gallery-image alt="">
+      <button type="button" class="item-gallery-nav item-gallery-next" data-gallery-next aria-label="Next photo">&#8594;</button>
+      <p class="item-gallery-caption" data-gallery-caption></p>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}

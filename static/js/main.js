@@ -4,6 +4,7 @@
  */
 document.addEventListener("DOMContentLoaded", function () {
   initMobileNav();
+  initItemGallery();
   initAlertDismiss();
   initFormsetAdd();
   initConfirmDialogs();
@@ -21,6 +22,74 @@ function initMobileNav() {
     navbar.classList.toggle("nav-open");
     const expanded = navbar.classList.contains("nav-open");
     toggle.setAttribute("aria-expanded", String(expanded));
+  });
+}
+
+function initItemGallery() {
+  const modal = document.querySelector("[data-gallery-modal]");
+  const gallery = document.querySelector("[data-item-gallery]");
+  if (!modal || !gallery) return;
+
+  const images = [...gallery.querySelectorAll(".item-gallery-thumb img")].map(
+    (img) => ({ src: img.src, alt: img.alt }),
+  );
+  const hero = gallery.querySelector(".item-gallery-hero");
+  if (hero && !images.length) {
+    const background = hero.style.backgroundImage.match(
+      /url\\(["']?(.*?)["']?\\)/,
+    );
+    if (background)
+      images.push({
+        src: background[1],
+        alt: hero.getAttribute("aria-label") || "Item photo",
+      });
+  }
+  if (!images.length) return;
+
+  const imageEl = modal.querySelector("[data-gallery-image]");
+  const caption = modal.querySelector("[data-gallery-caption]");
+  let index = 0;
+
+  function render() {
+    const current = images[index];
+    imageEl.src = current.src;
+    imageEl.alt = current.alt;
+    caption.textContent = `Photo ${index + 1} of ${images.length}`;
+  }
+  function openAt(nextIndex) {
+    index = (nextIndex + images.length) % images.length;
+    render();
+    modal.hidden = false;
+    modal.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+  }
+  function close() {
+    modal.classList.remove("is-open");
+    modal.hidden = true;
+    document.body.style.overflow = "";
+  }
+  gallery
+    .querySelectorAll("[data-gallery-open]")
+    .forEach((button) =>
+      button.addEventListener("click", () =>
+        openAt(Number(button.dataset.galleryOpen)),
+      ),
+    );
+  modal.querySelector("[data-gallery-close]").addEventListener("click", close);
+  modal
+    .querySelector("[data-gallery-prev]")
+    .addEventListener("click", () => openAt(index - 1));
+  modal
+    .querySelector("[data-gallery-next]")
+    .addEventListener("click", () => openAt(index + 1));
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (!modal.classList.contains("is-open")) return;
+    if (event.key === "Escape") close();
+    if (event.key === "ArrowLeft") openAt(index - 1);
+    if (event.key === "ArrowRight") openAt(index + 1);
   });
 }
 
