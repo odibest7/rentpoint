@@ -13,13 +13,13 @@ it day to day.
 The report's scope defines five objectives. Each one maps directly onto a
 part of this codebase:
 
-| Report objective | Where it lives |
-|---|---|
-| Web platform for presenting/managing rentable items and properties | `listings` app |
-| Item owners list items; customers view details and prices | `listings` app (owner CRUD + public catalogue) |
-| Secure electronic payment mechanism | `transactions` app + `transactions/services.py` |
-| Transaction management for recording/monitoring payments | `transactions` app (`Transaction` model, receipts, history) |
-| Withdrawal mechanism for item owners | `wallet` app (`Wallet`, `WithdrawalRequest`) |
+| Report objective                                                   | Where it lives                                              |
+| ------------------------------------------------------------------ | ----------------------------------------------------------- |
+| Web platform for presenting/managing rentable items and properties | `listings` app                                              |
+| Item owners list items; customers view details and prices          | `listings` app (owner CRUD + public catalogue)              |
+| Secure electronic payment mechanism                                | `transactions` app + `transactions/services.py`             |
+| Transaction management for recording/monitoring payments           | `transactions` app (`Transaction` model, receipts, history) |
+| Withdrawal mechanism for item owners                               | `wallet` app (`Wallet`, `WithdrawalRequest`)                |
 
 The two operational user types from the report — **customer** and **item
 owner** — are modelled as a single `role` field on a custom `User` model
@@ -32,12 +32,10 @@ Django admin site, rather than a third custom role.
 
 - **Payment gateway is abstracted**, not hard-coded. `transactions/services.py`
   defines a small `BasePaymentGateway` interface with `charge()` and
-  `verify()`. The only implementation shipped is `MockPaymentGateway`, which
-  simulates an approved payment instantly so the entire rental-to-earnings
-  flow can be reviewed and marked without a live payment gateway account.
-  Swapping in a real Nigerian provider (Paystack, Flutterwave, etc.) means
-  writing one new class and changing `PAYMENT_GATEWAY_PROVIDER` in settings
-  — no other code changes. See §6.
+  `verify()`. The live implementation is `PaystackGateway`, which handles
+  the hosted checkout and verification flow against Paystack's API. The
+  project is intentionally configured as Paystack-only, with no mock or
+  alternate provider in normal operation. See §6.
 - **Money math happens in one place.** `transactions/views.py::_mark_transaction_paid`
   is the only function that marks a transaction paid, calculates the
   platform commission, and credits the item owner's wallet. It runs inside
@@ -94,6 +92,7 @@ imports the `Item` model from `listings` and the `Wallet` model from
 ## 3. Running it locally
 
 ### Requirements
+
 - Python 3.11 or later
 - pip
 
@@ -135,20 +134,19 @@ for the administrator area.
 All configuration lives in environment variables (see `.env.example`), so
 the same codebase runs in development and production without code changes.
 
-| Variable | Purpose | Default |
-|---|---|---|
-| `DJANGO_SECRET_KEY` | Cryptographic signing key | insecure dev key (change before deploying) |
-| `DJANGO_DEBUG` | Verbose error pages | `True` |
-| `DJANGO_ALLOWED_HOSTS` | Comma-separated allowed hostnames | `127.0.0.1,localhost,testserver` |
-| `DJANGO_CSRF_TRUSTED_ORIGINS` | Comma-separated trusted origins for CSRF (needed behind HTTPS proxies) | empty |
-| `DB_ENGINE` | `sqlite` (default) or `mysql` | `sqlite` |
-| `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` | MySQL connection details (only read when `DB_ENGINE=mysql`) | — |
-| `PLATFORM_NAME` | Brand name shown across the site | `RentPoint` |
-| `PLATFORM_SERVICE_AREA` | Location text shown across the site | `Nsukka Urban` |
-| `PLATFORM_COMMISSION_PERCENT` | Platform's cut of each paid transaction | `8` |
-| `MINIMUM_WITHDRAWAL_AMOUNT` | Smallest withdrawal an item owner can request | `1000` |
-| `PAYMENT_GATEWAY_PROVIDER` | `mock` (default) or a real provider once implemented | `mock` |
-| `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY` | Reserved for a future Paystack integration | empty |
+| Variable                                                  | Purpose                                                                | Default                                    |
+| --------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------ |
+| `DJANGO_SECRET_KEY`                                       | Cryptographic signing key                                              | insecure dev key (change before deploying) |
+| `DJANGO_DEBUG`                                            | Verbose error pages                                                    | `True`                                     |
+| `DJANGO_ALLOWED_HOSTS`                                    | Comma-separated allowed hostnames                                      | `127.0.0.1,localhost,testserver`           |
+| `DJANGO_CSRF_TRUSTED_ORIGINS`                             | Comma-separated trusted origins for CSRF (needed behind HTTPS proxies) | empty                                      |
+| `DB_ENGINE`                                               | `sqlite` (default) or `mysql`                                          | `sqlite`                                   |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` | MySQL connection details (only read when `DB_ENGINE=mysql`)            | —                                          |
+| `PLATFORM_NAME`                                           | Brand name shown across the site                                       | `RentPoint`                                |
+| `PLATFORM_SERVICE_AREA`                                   | Location text shown across the site                                    | `Nsukka Urban`                             |
+| `PLATFORM_COMMISSION_PERCENT`                             | Platform's cut of each paid transaction                                | `8`                                        |
+| `MINIMUM_WITHDRAWAL_AMOUNT`                               | Smallest withdrawal an item owner can request                          | `1000`                                     |
+| `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY`              | Paystack API credentials used by the app                               | empty                                      |
 
 ---
 
@@ -182,21 +180,14 @@ No application code changes are required; `config/settings.py` reads
 
 ## 6. Connecting a real payment gateway
 
-Today, `PAYMENT_GATEWAY_PROVIDER=mock` simulates every payment as
-successful, which is intentional: it lets the full flow (rent an item, pay,
-receive a receipt, see the owner's wallet credited) be reviewed without a
-live merchant account.
+The app is configured to use Paystack as the only payment provider.
 
-To go live with a real gateway:
+To work with a real gateway:
 
-1. Open `transactions/services.py`.
-2. Add a new class, e.g. `PaystackGateway(BasePaymentGateway)`, implementing
-   `charge()` (initiate a payment and return a `PaymentResult`) and
-   `verify()` (confirm a payment reference with the provider's API).
-3. Register it in `get_gateway()`.
-4. Set `PAYMENT_GATEWAY_PROVIDER=paystack` (or your provider's name) and
-   fill in the relevant API key environment variables.
-5. No view, template, or model needs to change — `transactions/views.py`
+1. Fill in the valid Paystack secret/public key values in `.env`.
+2. The callback URL is generated dynamically from the current request, so
+   there is no separate `.env` value to maintain for it.
+3. No view, template, or model needs to change — `transactions/views.py`
    only ever calls `get_gateway().charge(...)`.
 
 ---
@@ -248,7 +239,7 @@ development, not just written and assumed to work:
 
 ## 9. Suggested next steps before a public launch
 
-- Replace the mock payment gateway with a real provider (see §6).
+- Keep the Paystack test/live keys aligned with the correct account and mode.
 - Add automated tests (`accounts/tests.py`, `listings/tests.py`, etc. are
   present as empty files, ready to be filled in) so future changes cannot
   silently break the payment or withdrawal flow.

@@ -1,11 +1,15 @@
+import logging
 from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction as db_transaction
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_GET, require_POST
 
 from listings.models import Item
 from wallet.models import Wallet
@@ -13,6 +17,8 @@ from wallet.models import Wallet
 from .forms import RentalRequestForm
 from .models import Transaction
 from .services import get_gateway
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -75,23 +81,37 @@ def checkout(request, reference):
     if transaction.status == Transaction.Status.PAID:
         return redirect("transactions:receipt", reference=transaction.reference)
 
-    if request.method == "POST":
-        gateway = get_gateway()
-        result = gateway.charge(
-            amount=transaction.amount,
-            email=request.user.email,
-            reference=transaction.reference,
-        )
-        if result.success:
-            _mark_transaction_paid(transaction, gateway.provider_name, result.provider_reference)
-            messages.success(request, "Payment successful. Your receipt is ready below.")
-            return redirect("transactions:receipt", reference=transaction.reference)
-
-        transaction.status = Transaction.Status.FAILED
-        transaction.save(update_fields=["status"])
-        messages.error(request, "The payment could not be completed. Please try again.")
-
     return render(request, "transactions/checkout.html", {"transaction": transaction})
+
+
+@require_POST
+@login_required
+def paystack_verify(request):
+    reference = request.POST.get("reference") or request.GET.get("reference")
+    if not reference:
+        return JsonResponse({"success": False, "message": "Missing payment reference."}, status=400)
+
+    transaction = get_object_or_404(Transaction, reference=reference, customer=request.user)
+    if transaction.status == Transaction.Status.PAID:
+        return JsonResponse({"success": True, "redirect_url": reverse("transactions:receipt", args=[transaction.reference])})
+
+    gateway = get_gateway()
+    result = gateway.verify(reference)
+    if result.success:
+        _mark_transaction_paid(transaction, gateway.provider_name, result.provider_reference)
+        return JsonResponse({"success": True, "redirect_url": reverse("transactions:receipt", args=[transaction.reference])})
+
+    logger.error(
+        "Paystack verification failed via AJAX for transaction=%s gateway=%s provider_reference=%s message=%s",
+        transaction.reference,
+        gateway.provider_name,
+        result.provider_reference,
+        result.message,
+    )
+    # A failed verification can be a transient provider or network error.
+    # Keep the order pending so the customer can retry instead of turning a
+    # successfully paid Paystack transaction into a terminal failed state.
+    return JsonResponse({"success": False, "message": result.message}, status=400)
 
 
 def _mark_transaction_paid(transaction, provider_name, provider_reference):
@@ -115,6 +135,34 @@ def _mark_transaction_paid(transaction, provider_name, provider_reference):
         wallet, _created = Wallet.objects.get_or_create(owner=transaction.owner)
         wallet.credit(owner_earning)
 
+
+@require_GET
+def paystack_callback(request):
+    reference = request.GET.get("reference") or request.GET.get("trxref")
+    transaction = get_object_or_404(Transaction, reference=reference)
+    if transaction.status == Transaction.Status.PAID:
+        return redirect("transactions:receipt", reference=transaction.reference)
+
+    gateway = get_gateway()
+    if gateway.provider_name != "paystack":
+        messages.error(request, "Paystack callback received while Paystack is not the active gateway.")
+        return redirect("transactions:checkout", reference=transaction.reference)
+
+    result = gateway.verify(reference)
+    if result.success:
+        _mark_transaction_paid(transaction, gateway.provider_name, result.provider_reference)
+        messages.success(request, "Payment verified successfully. Your receipt is ready below.")
+        return redirect("transactions:receipt", reference=transaction.reference)
+
+    logger.error(
+        "Paystack verification failed for transaction=%s gateway=%s provider_reference=%s message=%s",
+        transaction.reference,
+        gateway.provider_name,
+        result.provider_reference,
+        result.message,
+    )
+    messages.error(request, f"Paystack could not verify this payment: {result.message}")
+    return redirect("transactions:checkout", reference=transaction.reference)
 
 @login_required
 def receipt(request, reference):
