@@ -58,13 +58,13 @@ jobs:
       - name: Static Security Scan (Bandit)
         run: |
           bandit -r . \
-            --exclude ./venv,./.venv,./core/tests.py,./accounts/tests.py,./listings/tests.py,./transactions/tests.py,./wallet/tests.py \
-            --severity-level medium \
-                  --confidence-level medium
-            - name: Dependency Security Scan (pip-audit)
+          --exclude ./venv,./.venv,./core/tests.py,./accounts/tests.py,./listings/tests.py,./transactions/tests.py,./wallet/tests.py \
+          --severity-level medium \
+          --confidence-level medium
+
+      - name: Dependency Security Scan (pip-audit)
         run: |
-          pip-audit -r requirements.txt --desc || true
-        continue-on-error: true
+          pip-audit -r requirements.txt --desc
 
   test:
     name: Run Automated Tests
