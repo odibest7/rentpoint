@@ -2,7 +2,7 @@
 Django==6.1.*
 
 # Image handling for item listing photos
-Pillow==11.*
+Pillow>=12.3.0
 
 # Production WSGI server (only needed for deployment, see docs/RUNBOOK.md)
 gunicorn==23.*
