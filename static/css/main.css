@@ -1821,6 +1821,72 @@ textarea {
   transition: all 0.15s ease;
 }
 
+.password-toggle-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.password-toggle-input {
+  padding-right: 52px !important;
+}
+
+.password-toggle-button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-muted);
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.password-toggle-button:hover,
+.password-toggle-button:focus-visible {
+  background: rgba(0, 168, 150, 0.08);
+  color: var(--color-accent-teal-dark);
+  outline: none;
+}
+
+@media (max-width: 480px) {
+  .password-toggle-input {
+    padding-right: 48px !important;
+  }
+
+  .password-toggle-button {
+    right: 8px;
+    width: 34px;
+    height: 34px;
+  }
+}
+
+.password-toggle-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.password-toggle-icon-hide {
+  display: none;
+}
+
+.password-toggle-button.is-visible .password-toggle-icon-show {
+  display: none;
+}
+
+.password-toggle-button.is-visible .password-toggle-icon-hide {
+  display: block;
+}
+
 .field-input:focus,
 textarea:focus,
 select:focus {

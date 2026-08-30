@@ -3,6 +3,7 @@
  * Kept dependency-free: plain DOM APIs only, no build step required.
  */
 document.addEventListener("DOMContentLoaded", function () {
+  initPasswordVisibilityToggles();
   initMobileNav();
   initItemGallery();
   initAlertDismiss();
@@ -12,6 +13,70 @@ document.addEventListener("DOMContentLoaded", function () {
   initSelfieCapture();
   initVerificationCardPreviews();
 });
+
+function initPasswordVisibilityToggles() {
+  document
+    .querySelectorAll('input[type="password"].password-toggle-input')
+    .forEach(function (input) {
+      if (
+        input.parentElement &&
+        input.parentElement.classList.contains("password-toggle-wrap")
+      ) {
+        return;
+      }
+
+      const wrap = document.createElement("div");
+      wrap.className = "password-toggle-wrap";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "password-toggle-button";
+      button.setAttribute("aria-label", "Show password");
+      button.setAttribute("aria-pressed", "false");
+      button.title = "Show password";
+      button.innerHTML = `
+      <svg class="password-toggle-icon password-toggle-icon-show" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M1.5 12S5.25 5.25 12 5.25 22.5 12 22.5 12 18.75 18.75 12 18.75 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="12" r="3.15" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      </svg>
+      <svg class="password-toggle-icon password-toggle-icon-hide" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M3 3L21 21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M10.58 10.58A2 2 0 0 1 13.42 13.42" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M9.88 4.22A9.54 9.54 0 0 1 12 4.5c6.75 0 10.5 7.5 10.5 7.5a17.86 17.86 0 0 1-4.2 5.23M6.2 6.2A17.75 17.75 0 0 0 1.5 12S5.25 18.75 12 18.75A9.37 9.37 0 0 0 15.48 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        const isHidden = input.type === "password";
+
+        input.type = isHidden ? "text" : "password";
+        button.setAttribute(
+          "aria-label",
+          isHidden ? "Hide password" : "Show password",
+        );
+        button.setAttribute("aria-pressed", String(isHidden));
+        button.title = isHidden ? "Hide password" : "Show password";
+        button.classList.toggle("is-visible", isHidden);
+
+        requestAnimationFrame(function () {
+          input.focus();
+          if (typeof start === "number" && typeof end === "number") {
+            input.setSelectionRange(start, end);
+          }
+        });
+      });
+
+      input.parentNode.insertBefore(wrap, input);
+      wrap.appendChild(input);
+      wrap.appendChild(button);
+      input.setAttribute("data-password-toggle-bound", "true");
+    });
+}
 
 function initMobileNav() {
   const toggle = document.querySelector(".nav-toggle");
