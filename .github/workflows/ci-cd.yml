@@ -60,10 +60,8 @@ jobs:
           bandit -r . \
             --exclude ./venv,./.venv,./core/tests.py,./accounts/tests.py,./listings/tests.py,./transactions/tests.py,./wallet/tests.py \
             --severity-level medium \
-            --confidence-level medium
-        continue-on-error: true
-
-      - name: Dependency Security Scan (pip-audit)
+                  --confidence-level medium
+            - name: Dependency Security Scan (pip-audit)
         run: |
           pip-audit -r requirements.txt --desc || true
         continue-on-error: true

@@ -22,6 +22,7 @@ from dataclasses import dataclass
 import urllib.request
 import urllib.error
 import json
+from urllib.parse import urlsplit
 
 from django.conf import settings
 
@@ -112,6 +113,8 @@ class PaystackGateway(BasePaymentGateway):
     def _request(self, method, path, body=None):
         """Minimal HTTP helper — avoids adding requests as a dependency."""
         url = f"{self._BASE}{path}"
+        if urlsplit(url).scheme.lower() not in {"http", "https"}:
+            raise ValueError("Payment gateway URL must use HTTP or HTTPS.")
         data = json.dumps(body).encode() if body else None
         req = urllib.request.Request(
             url,
@@ -123,7 +126,8 @@ class PaystackGateway(BasePaymentGateway):
             method=method,
         )
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            opener = urllib.request.build_opener()
+            with opener.open(req, timeout=15) as resp:
                 return json.loads(resp.read())
         except urllib.error.HTTPError as exc:
             return json.loads(exc.read())
