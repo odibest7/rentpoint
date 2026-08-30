@@ -9,6 +9,7 @@ def site_settings(request):
         "PLATFORM_NAME": settings.PLATFORM_NAME,
         "PLATFORM_SERVICE_AREA": settings.PLATFORM_SERVICE_AREA,
         "PLATFORM_COMMISSION_PERCENT": settings.PLATFORM_COMMISSION_PERCENT,
+        "PAYSTACK_PUBLIC_KEY": settings.PAYSTACK_PUBLIC_KEY,
         "pending_withdrawals_count": WithdrawalRequest.objects.filter(
             status=WithdrawalRequest.Status.PENDING
         ).count(),

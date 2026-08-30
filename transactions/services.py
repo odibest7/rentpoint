@@ -6,23 +6,23 @@ tying the system to one specific provider. This module keeps that
 decision out of the views: a view calls ``get_gateway()`` and works
 against a small, provider-independent interface.
 
-Providers
----------
-mock     — simulates a successful payment with no real money. Default for
-           local development and coursework evaluation.
-paystack — live Paystack payments (Nigerian NGN). Set
-           PAYMENT_GATEWAY_PROVIDER=paystack and supply real API keys.
-           The Paystack flow is redirect-based (initialize -> redirect to
-           Paystack checkout page -> callback URL -> verify).
+Provider
+--------
+paystack — live Paystack payments (Nigerian NGN). Supply the real API
+           keys in the environment, then initialize hosted checkout,
+           redirect back to the callback URL, and verify the payment.
 """
 
+import json
+import logging
 import uuid
 from dataclasses import dataclass
-
-import urllib.request
-import urllib.error
-import json
 from urllib.parse import urlsplit
+import urllib.error
+import urllib.request
+
+
+logger = logging.getLogger(__name__)
 
 from django.conf import settings
 
@@ -39,7 +39,7 @@ class PaymentResult:
 class BasePaymentGateway:
     provider_name = "base"
 
-    def charge(self, *, amount, email, reference) -> PaymentResult:
+    def charge(self, *, amount, email, reference, callback_url=None) -> PaymentResult:
         """
         Initiate payment.
         For inline gateways: performs the charge immediately.
@@ -52,31 +52,6 @@ class BasePaymentGateway:
         raise NotImplementedError
 
 
-class MockPaymentGateway(BasePaymentGateway):
-    """
-    Simulates an electronic payment channel. Every charge succeeds
-    immediately, which is appropriate for demonstrations, coursework
-    evaluation, and local development. Nothing here touches real money.
-    """
-
-    provider_name = "mock"
-
-    def charge(self, *, amount, email, reference):
-        provider_reference = f"MOCK-{uuid.uuid4().hex[:12].upper()}"
-        return PaymentResult(
-            success=True,
-            provider_reference=provider_reference,
-            message="Payment approved by simulated gateway.",
-        )
-
-    def verify(self, provider_reference):
-        return PaymentResult(
-            success=True,
-            provider_reference=provider_reference,
-            message="Payment verified.",
-        )
-
-
 class PaystackGateway(BasePaymentGateway):
     """
     Live Paystack integration (https://paystack.com).
@@ -86,8 +61,7 @@ class PaystackGateway(BasePaymentGateway):
        and returns a redirect_url pointing to Paystack's hosted checkout.
     2. The view redirects the customer to redirect_url.
     3. After the customer pays (or cancels), Paystack redirects back to
-       the callback URL you set in your Paystack dashboard, or to the
-       PAYSTACK_CALLBACK_URL env variable.
+       the callback URL for this app, generated from the current request.
     4. The callback view calls verify() with the Paystack reference to
        confirm the payment was actually successful.
 
@@ -95,8 +69,6 @@ class PaystackGateway(BasePaymentGateway):
         PAYSTACK_SECRET_KEY   — starts with sk_live_... (production)
                                 or sk_test_... (testing mode)
         PAYSTACK_PUBLIC_KEY   — starts with pk_live_... or pk_test_...
-        PAYSTACK_CALLBACK_URL — full URL where Paystack should redirect after
-                                payment, e.g. https://yourdomain.com/transactions/paystack/callback/
     """
 
     provider_name = "paystack"
@@ -108,8 +80,9 @@ class PaystackGateway(BasePaymentGateway):
             raise ValueError(
                 "PAYSTACK_SECRET_KEY is not set. Add it to your .env file."
             )
+        if not key.startswith(("sk_test_", "sk_live_")):
+            raise ValueError("PAYSTACK_SECRET_KEY must be a Paystack test or live secret key.")
         return key
-
     def _request(self, method, path, body=None):
         """Minimal HTTP helper — avoids adding requests as a dependency."""
         url = f"{self._BASE}{path}"
@@ -122,22 +95,63 @@ class PaystackGateway(BasePaymentGateway):
             headers={
                 "Authorization": f"Bearer {self._secret_key()}",
                 "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": "RentPoint/1.0 (+https://rentpoint.example)",
             },
             method=method,
         )
         try:
             opener = urllib.request.build_opener()
             with opener.open(req, timeout=15) as resp:
-                return json.loads(resp.read())
+                raw_body = resp.read()
+                return self._decode_response(raw_body, status=getattr(resp, "status", 200))
         except urllib.error.HTTPError as exc:
-            return json.loads(exc.read())
+            raw_body = exc.read()
+            decoded = self._decode_response(raw_body, status=exc.code)
+            logger.error(
+                "Paystack API request failed: method=%s path=%s http_status=%s response_body=%s",
+                method,
+                path,
+                exc.code,
+                raw_body.decode("utf-8", errors="replace"),
+                exc_info=True,
+            )
+            decoded.setdefault("http_status", exc.code)
+            decoded.setdefault("raw_body", raw_body.decode("utf-8", errors="replace"))
+            return decoded
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            reason = getattr(exc, "reason", str(exc))
+            message = f"Paystack connection failed: {reason}"
+            logger.error(
+                "Paystack API connection error: method=%s path=%s error=%s",
+                method,
+                path,
+                exc,
+                exc_info=True,
+            )
+            return {"status": False, "message": message, "http_status": None, "raw_body": str(exc)}
 
-    def charge(self, *, amount, email, reference):
+    @staticmethod
+    def _decode_response(raw_body, status=200):
+        try:
+            return json.loads(raw_body)
+        except (TypeError, ValueError):
+            return {
+                "status": False,
+                "message": f"Paystack returned an invalid response (HTTP {status}).",
+            }
+
+    def charge(self, *, amount, email, reference, callback_url=None):
         """
         Initialize a Paystack transaction.
         amount must be in Naira; this converts to kobo before sending.
+        The callback URL is generated from the current request so we do not
+        require an extra env var for hosted-checkout redirects.
         """
-        callback_url = getattr(settings, "PAYSTACK_CALLBACK_URL", "")
+        if callback_url:
+            parsed_callback = urlsplit(callback_url)
+            if parsed_callback.scheme.lower() not in {"http", "https"} or not parsed_callback.netloc:
+                raise ValueError("callback_url must be an absolute HTTP(S) URL.")
         payload = {
             "email": email,
             "amount": int(amount * 100),   # Paystack expects kobo (1 NGN = 100 kobo)
@@ -158,6 +172,12 @@ class PaystackGateway(BasePaymentGateway):
                 redirect_url=auth_data.get("authorization_url", ""),
             )
 
+        logger.error(
+            "Paystack initialization failed for %s: payload=%s response=%s",
+            reference,
+            payload,
+            data,
+        )
         return PaymentResult(
             success=False,
             provider_reference=str(reference),
@@ -175,20 +195,19 @@ class PaystackGateway(BasePaymentGateway):
                 message="Payment confirmed by Paystack.",
             )
 
+        logger.error(
+            "Paystack verification failed for %s: response=%s",
+            provider_reference,
+            data,
+        )
+        details = data.get("data") or {}
+        message = details.get("gateway_response") or data.get("message") or "Payment not confirmed."
         return PaymentResult(
             success=False,
             provider_reference=provider_reference,
-            message=data.get("data", {}).get("gateway_response", "Payment not confirmed."),
+            message=message,
         )
 
 
 def get_gateway() -> BasePaymentGateway:
-    provider = getattr(settings, "PAYMENT_GATEWAY_PROVIDER", "mock")
-    if provider == "mock":
-        return MockPaymentGateway()
-    if provider == "paystack":
-        return PaystackGateway()
-    raise NotImplementedError(
-        f"Payment provider '{provider}' is not wired up yet. "
-        "Implement it in transactions/services.py and register it in get_gateway()."
-    )
+    return PaystackGateway()

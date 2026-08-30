@@ -1545,6 +1545,112 @@ img {
   margin-bottom: 8px;
 }
 
+/* ---------- Checkout Summary ---------- */
+.checkout-card {
+  padding: 32px;
+  overflow: hidden;
+}
+
+.checkout-card-header {
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.checkout-card-header h2 {
+  margin-bottom: 6px;
+  color: var(--color-primary-navy);
+  font-size: 1.45rem;
+}
+
+.checkout-card-header p {
+  margin: 0;
+  font-size: 0.86rem;
+}
+
+.checkout-section {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.checkout-section h3 {
+  margin: 0 0 14px;
+  color: var(--color-primary-navy);
+  font-size: 0.96rem;
+}
+
+.checkout-details {
+  display: grid;
+  gap: 4px;
+}
+
+.checkout-detail-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.75fr) minmax(0, 1.25fr);
+  gap: 20px;
+  align-items: center;
+  min-height: 38px;
+}
+
+.checkout-label {
+  color: var(--color-ink-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.checkout-value {
+  min-width: 0;
+  color: var(--color-ink);
+  font-size: 0.9rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.checkout-item-name,
+.checkout-value-emphasis {
+  color: var(--color-primary-navy);
+  font-weight: 700;
+}
+
+.checkout-detail-row-long {
+  align-items: start;
+  padding-top: 8px;
+}
+
+.checkout-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 0;
+}
+
+.checkout-total span {
+  color: var(--color-ink-soft);
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.checkout-total strong {
+  color: var(--color-primary-navy);
+  font-size: 1.65rem;
+  font-weight: 800;
+}
+
+.checkout-payment-form {
+  width: 100%;
+}
+
+.checkout-security-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  color: var(--color-ink-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
 /* ---------- Forms & Inputs ---------- */
 .form-card {
   background: var(--color-surface);
@@ -1979,6 +2085,36 @@ select:focus {
 }
 
 @media (max-width: 680px) {
+
+  .checkout-card {
+    padding: 24px 20px;
+  }
+
+  .checkout-detail-row {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    align-items: start;
+    padding: 8px 0;
+  }
+
+  .checkout-value {
+    font-size: 0.9rem;
+  }
+
+  .checkout-total {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .checkout-total strong {
+    font-size: 1.5rem;
+  }
+
+  .checkout-card .btn-lg {
+    min-height: 52px;
+    white-space: normal;
+  }
 
   main {
     overflow-x: clip;

@@ -16,6 +16,16 @@ import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Load the local .env without requiring an additional dependency. Existing
+# process environment variables always win, which keeps deployment secrets
+# supplied by the host authoritative.
+_env_file = BASE_DIR / ".env"
+if _env_file.exists():
+    for _line in _env_file.read_text(encoding="utf-8").splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _name, _value = _line.split("=", 1)
+            os.environ.setdefault(_name.strip(), _value.strip().strip('"').strip("'"))
 
 
 def env_bool(name, default=False):
@@ -203,16 +213,12 @@ PLATFORM_SERVICE_AREA = os.environ.get("PLATFORM_SERVICE_AREA", "Nsukka Urban")
 PLATFORM_COMMISSION_PERCENT = float(os.environ.get("PLATFORM_COMMISSION_PERCENT", "8"))
 MINIMUM_WITHDRAWAL_AMOUNT = float(os.environ.get("MINIMUM_WITHDRAWAL_AMOUNT", "1000"))
 
-# Payment gateway is abstracted behind transactions.services.PaymentGateway.
-# The default "mock" provider simulates a successful electronic payment so
-# the whole rental flow can be reviewed without live payment credentials.
-# Swap PAYMENT_GATEWAY_PROVIDER to "paystack" once real keys are supplied.
-PAYMENT_GATEWAY_PROVIDER = os.environ.get("PAYMENT_GATEWAY_PROVIDER", "mock")
+# Paystack is the only payment provider for this project. Keep the value
+# explicit so runtime configuration is visible and never silently falls back
+# to a mock gateway.
+PAYMENT_GATEWAY_PROVIDER = os.environ.get("PAYMENT_GATEWAY_PROVIDER", "paystack").strip().lower()
 PAYSTACK_SECRET_KEY = os.environ.get("PAYSTACK_SECRET_KEY", "")
 PAYSTACK_PUBLIC_KEY = os.environ.get("PAYSTACK_PUBLIC_KEY", "")
-# Full callback URL Paystack will redirect to after payment.
-# Example: https://rentpoint.onrender.com/transactions/paystack/callback/
-PAYSTACK_CALLBACK_URL = os.environ.get("PAYSTACK_CALLBACK_URL", "")
 
 MESSAGE_TAGS = {
     10: "info",

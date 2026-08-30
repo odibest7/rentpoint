@@ -6,54 +6,133 @@
   <div class="container" style="max-width: 580px;">
     <span class="eyebrow">Checkout &amp; Escrow</span>
     <h1 class="mt-0">Complete Your Payment</h1>
-    <p class="subtle" style="margin: 0 auto;">Review order details, location handover, and finalize your rental payment.</p>
+    <p class="subtle" style="margin: 0 auto;">Review order details and pay securely using Paystack.</p>
   </div>
 </div>
 
 <section class="container" style="padding-bottom:70px; max-width:560px;">
-  <div class="form-card" style="padding: 28px;">
-    <h3 class="mt-0" style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin-bottom: 16px;">
-      Order Summary
-    </h3>
-
-    <div class="receipt-rows" style="padding:0 0 16px;">
-      <div class="receipt-row"><span>Item</span><span class="font-semibold" style="color:var(--color-primary-navy);">{{ transaction.item.name }}</span></div>
-      <div class="receipt-row"><span>Quantity</span><span>{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</span></div>
-      <div class="receipt-row"><span>Duration</span><span>{{ transaction.duration }} &times; {{ transaction.item.get_price_unit_display }}</span></div>
-      <div class="receipt-row"><span>Reference Code</span><span class="badge-code">{{ transaction.reference }}</span></div>
+  <div class="form-card checkout-card">
+    <div class="checkout-card-header">
+      <span class="eyebrow">Payment review</span>
+      <h2 class="mt-0">Order Summary</h2>
+      <p>Check the rental details before confirming your secure payment.</p>
     </div>
 
-    <h3 style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin: 16px 0 14px;">
-      Location &amp; Handover
-    </h3>
+    <section class="checkout-section" aria-labelledby="checkout-order-heading">
+      <h3 id="checkout-order-heading">Rental details</h3>
+      <div class="checkout-details">
+        <div class="checkout-detail-row"><span class="checkout-label">Item</span><span class="checkout-value checkout-item-name">{{ transaction.item.name }}</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Quantity</span><span class="checkout-value">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Duration</span><span class="checkout-value">{{ transaction.duration }} &times; {{ transaction.item.get_price_unit_display }}</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Reference code</span><span class="checkout-value"><span class="badge-code">{{ transaction.reference }}</span></span></div>
+      </div>
+    </section>
 
-    <div class="receipt-rows" style="padding:0 0 16px;">
-      <div class="receipt-row"><span>Fulfillment Method</span><span class="font-semibold">{{ transaction.get_delivery_option_display }}</span></div>
-      <div class="receipt-row"><span>Item Location</span><span>{{ transaction.item.location }}</span></div>
-      {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
-        <div class="receipt-row"><span>Delivery Address</span><span>{{ transaction.delivery_address }}</span></div>
-      {% endif %}
-      <div class="receipt-row"><span>Coordination Phone</span><span class="mono">{{ transaction.contact_phone|default:user.phone_number }}</span></div>
-      {% if transaction.pickup_notes %}
-        <div class="receipt-row"><span>Handover Notes</span><span>{{ transaction.pickup_notes }}</span></div>
-      {% endif %}
+    <section class="checkout-section" aria-labelledby="checkout-handover-heading">
+      <h3 id="checkout-handover-heading">Location &amp; handover</h3>
+      <div class="checkout-details">
+        <div class="checkout-detail-row"><span class="checkout-label">Fulfillment method</span><span class="checkout-value checkout-value-emphasis">{{ transaction.get_delivery_option_display }}</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Item location</span><span class="checkout-value">{{ transaction.item.location }}</span></div>
+        {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
+          <div class="checkout-detail-row"><span class="checkout-label">Delivery address</span><span class="checkout-value">{{ transaction.delivery_address }}</span></div>
+        {% endif %}
+        <div class="checkout-detail-row"><span class="checkout-label">Coordination phone</span><span class="checkout-value mono">{{ transaction.contact_phone|default:user.phone_number }}</span></div>
+        {% if transaction.pickup_notes %}
+          <div class="checkout-detail-row checkout-detail-row-long"><span class="checkout-label">Handover notes</span><span class="checkout-value">{{ transaction.pickup_notes }}</span></div>
+        {% endif %}
+      </div>
+    </section>
+
+    <div class="checkout-total" aria-label="Total amount due">
+      <span>Total amount due</span>
+      <strong class="mono">₦{{ transaction.amount|floatformat:2 }}</strong>
     </div>
 
-    <div class="flex-between" style="padding:16px 0; border-top:1px dashed var(--color-border); margin-bottom:20px;">
-      <span class="font-semibold" style="font-size: 1rem;">Total Amount Due</span>
-      <span class="mono font-bold" style="font-size:1.4rem; color:var(--color-primary-navy);">₦{{ transaction.amount|floatformat:2 }}</span>
-    </div>
+    <button id="paystack-pay-btn" type="button" class="btn btn-primary btn-block btn-lg">
+      Pay ₦{{ transaction.amount|floatformat:2 }} Now
+    </button>
 
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-primary btn-block btn-lg">
-        Pay ₦{{ transaction.amount|floatformat:2 }} Now
-      </button>
-    </form>
-    <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:16px; color:var(--color-ink-muted); font-size:0.8rem;">
+    <div class="checkout-security-note">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Secured with electronic escrow records &middot; Serving {{ PLATFORM_SERVICE_AREA }}
+      Secured with Paystack &middot; Serving {{ PLATFORM_SERVICE_AREA }}
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const button = document.getElementById('paystack-pay-btn');
+    if (!button) return;
+
+    const publicKey = '{{ PAYSTACK_PUBLIC_KEY|escapejs }}';
+    const email = '{{ request.user.email|escapejs }}';
+    const amount = Math.round(parseFloat('{{ transaction.amount|floatformat:2 }}') * 100);
+    const reference = '{{ transaction.reference|escapejs }}';
+    const verifyUrl = '{% url "transactions:paystack_verify" %}';
+    const csrfToken = '{{ csrf_token }}';
+    const receiptUrl = '{% url "transactions:receipt" reference=transaction.reference %}';
+
+    button.addEventListener('click', function () {
+      if (!publicKey) {
+        alert('Paystack public key is missing. Add PAYSTACK_PUBLIC_KEY to your environment settings.');
+        return;
+      }
+
+      const handler = PaystackPop.setup({
+        key: publicKey,
+        email: email,
+        amount: amount,
+        currency: 'NGN',
+        ref: reference,
+        callback: function (response) {
+          const resolvedReference = response && response.reference ? response.reference : reference;
+
+          /*
+           * Keep the UX smooth by immediately showing the modal is processing, but
+           * only redirect to the receipt after the backend confirms the payment.
+           */
+          button.disabled = true;
+          button.textContent = 'Verifying payment...';
+
+          fetch(verifyUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+              'X-CSRFToken': csrfToken,
+            },
+            body: new URLSearchParams({ reference: resolvedReference })
+          })
+          .then(function (res) {
+            return res.json().then(function (payload) {
+              if (!res.ok) {
+                throw new Error(payload.message || 'Payment could not be verified. Please try again.');
+              }
+              return payload;
+            });
+          })
+          .then(function (payload) {
+            if (!payload || !payload.success || !payload.redirect_url) {
+              throw new Error(payload && payload.message ? payload.message : 'Payment could not be verified. Please try again.');
+            }
+
+            window.location.href = payload.redirect_url;
+          })
+          .catch(function (error) {
+            button.disabled = false;
+            button.textContent = 'Pay ₦{{ transaction.amount|floatformat:2 }} Now';
+            alert(error.message || 'Payment could not be verified. Please try again.');
+          });
+        },
+        onClose: function () {
+          console.info('Paystack payment modal closed without completing the payment.');
+        }
+      });
+
+      handler.openIframe();
+    });
+  });
+</script>
 {% endblock %}
