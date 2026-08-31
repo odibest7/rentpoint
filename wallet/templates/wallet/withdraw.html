@@ -1,40 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Request a withdrawal | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Request Payout | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="page-header text-center">
   <div class="container" style="max-width: 560px;">
-    <a href="{% url 'wallet:earnings' %}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to earnings</a>
+    <a href="{% url 'wallet:earnings' %}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to Earnings</a>
     <div style="display:block;">
-      <span class="eyebrow">Owner Payout</span>
+      <span class="eyebrow">Bank Settlement</span>
     </div>
-    <h1 class="mt-0">Request a Withdrawal</h1>
-    <p class="subtle" style="margin: 0 auto;">Available balance: <strong class="mono" style="color:#2DD4BF;">₦{{ wallet.balance|floatformat:2 }}</strong></p>
+    <h1 class="mt-0">Request Bank Payout</h1>
+    <p class="subtle" style="margin: 0 auto;">Available balance: <strong class="mono" style="color:var(--color-primary-navy);">₦{{ wallet.balance|floatformat:2 }}</strong></p>
   </div>
 </div>
 
-<section class="container" style="padding-bottom:60px; max-width:520px;">
+<section class="container" style="padding-bottom:60px; max-width:500px;">
   <form method="post" class="form-card stack" novalidate>
     {% csrf_token %}
     <div class="field-group">
-      <label for="{{ form.amount.id_for_label }}">Amount (₦)</label>
+      <label for="{{ form.amount.id_for_label }}">Payout Amount (₦)</label>
       {{ form.amount }}
       {% for error in form.amount.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
     <div class="field-group">
-      <label for="{{ form.bank_name.id_for_label }}">Bank name</label>
+      <label for="{{ form.bank_name.id_for_label }}">Bank Name</label>
       {{ form.bank_name }}
     </div>
     <div class="form-row">
       <div class="field-group">
-        <label for="{{ form.account_number.id_for_label }}">Account number</label>
+        <label for="{{ form.account_number.id_for_label }}">Account Number</label>
         {{ form.account_number }}
       </div>
       <div class="field-group">
-        <label for="{{ form.account_name.id_for_label }}">Account name</label>
+        <label for="{{ form.account_name.id_for_label }}">Account Name</label>
         {{ form.account_name }}
       </div>
     </div>
-    <button type="submit" class="btn btn-primary btn-block btn-lg">Submit payout request</button>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">Submit Payout Request</button>
   </form>
 </section>
 {% endblock %}

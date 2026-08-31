@@ -33,7 +33,7 @@ class CustomAdminDashboardTests(TestCase):
         self.client.login(username="adminuser", password="adminpassword123")  # nosec B106
         response = self.client.get(reverse("core:admin_dashboard"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Site Control Dashboard")
+        self.assertContains(response, "Admin Control Dashboard")
 
     def test_staff_user_can_view_users(self):
         self.client.login(username="adminuser", password="adminpassword123")  # nosec B106

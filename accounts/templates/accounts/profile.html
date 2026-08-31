@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Your profile | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Profile Settings | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="page-header text-center">
   <div class="container" style="max-width: 600px;">
-    <span class="eyebrow">{% if user.is_item_owner %}Owner Account{% else %}Customer Account{% endif %}</span>
-    <h1 class="mt-0">Account Profile</h1>
-    <p class="subtle" style="margin: 0 auto;">Manage your personal profile and account credentials in {{ PLATFORM_SERVICE_AREA }}.</p>
+    <span class="eyebrow">{% if user.is_item_owner %}Owner Profile{% else %}Customer Profile{% endif %}</span>
+    <h1 class="mt-0">Account Details</h1>
+    <p class="subtle" style="margin: 0 auto;">Update your contact details and default account information.</p>
   </div>
 </div>
-<section class="container" style="max-width: 560px; padding-bottom: 60px;">
+<section class="container" style="max-width: 540px; padding-bottom: 60px;">
   <form method="post" class="form-card stack" novalidate>
     {% csrf_token %}
     <div class="form-row">
@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="field-group">
-      <label for="{{ form.email.id_for_label }}">Email address</label>
+      <label for="{{ form.email.id_for_label }}">Email</label>
       {{ form.email }}
     </div>
     <div class="field-group">
@@ -33,7 +33,7 @@
       <label for="{{ form.address.id_for_label }}">Address</label>
       {{ form.address }}
     </div>
-    <button type="submit" class="btn btn-primary">Save changes</button>
+    <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
   </form>
 </section>
 {% endblock %}

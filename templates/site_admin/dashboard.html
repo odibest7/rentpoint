@@ -4,8 +4,8 @@
 <div class="page-header">
   <div class="container">
     <span class="eyebrow">Platform Administration</span>
-    <h1 class="mt-0">Site Control Dashboard</h1>
-    <p class="subtle">System overview, metrics, users, platform volume, and pending payout approvals in {{ PLATFORM_SERVICE_AREA }}.</p>
+    <h1 class="mt-0">Admin Control Dashboard</h1>
+    <p class="subtle">Platform metrics, user activity, transactions, and pending approvals in {{ PLATFORM_SERVICE_AREA }}.</p>
   </div>
 </div>
 
@@ -45,7 +45,7 @@
             </span>
           </div>
           <strong class="mono stat-value">₦{{ pending_withdrawals_sum|floatformat:2 }}</strong>
-          <span class="stat-sub">{{ pending_withdrawals_count }} pending requests</span>
+          <span class="stat-sub">{{ pending_withdrawals_count }} awaiting approval</span>
         </div>
       </div>
 

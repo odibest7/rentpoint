@@ -13,7 +13,7 @@
         <span>Rent<span style="color:var(--color-accent-teal);">Point</span></span>
       </div>
       <div class="receipt-subtitle">
-        RENTAL MARKETPLACE RECEIPT &middot; {{ PLATFORM_SERVICE_AREA }}
+        ELECTRONIC TRANSACTION RECEIPT &middot; {{ PLATFORM_SERVICE_AREA }}
       </div>
     </div>
 
@@ -34,11 +34,10 @@
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
         <polyline points="22 4 12 14.01 9 11.01" />
       </svg>
-      PAYMENT STATUS: {{ transaction.get_status_display|upper }}
+      STATUS: {{ transaction.get_status_display|upper }}
     </div>
     <div class="status-ref">
-      {% if transaction.provider_reference %}Ref: {{ transaction.provider_reference }}{% else %}Channel: Electronic
-      Escrow{% endif %}
+      {% if transaction.provider_reference %}Ref: {{ transaction.provider_reference }}{% else %}Paystack Escrow Channel{% endif %}
     </div>
   </div>
 

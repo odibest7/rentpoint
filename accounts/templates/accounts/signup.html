@@ -1,27 +1,27 @@
 {% extends "base.html" %}
-{% block title %}Sign up | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Sign Up | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="auth-shell">
   <div class="auth-visual">
-    <div class="brand" style="color:#fff;"><span style="color:#2DD4BF;">Rent</span>Point</div>
+    <div class="brand" style="color:#fff;"><span style="color:var(--color-accent-teal-border);">Rent</span>Point</div>
     <blockquote>
       {% if is_item_owner_signup %}
-        "List once, get paid electronically, and always know what you have earned."
+        "List your equipment, receive electronic payments, and track every payout clearly."
       {% else %}
-        "Compare items, pay with confidence, and keep a record of every rental."
+        "Browse verified listings, pay securely, and get instant receipts for every rental."
       {% endif %}
     </blockquote>
-    <p style="color:rgba(255,255,255,0.65);">Serving {{ PLATFORM_SERVICE_AREA }}</p>
+    <p style="color:rgba(255,255,255,0.7); font-size: 0.875rem;">Serving {{ PLATFORM_SERVICE_AREA }}</p>
   </div>
 
   <div class="auth-form-side">
     <div class="auth-form-wrap">
-      <h1>{% if is_item_owner_signup %}Create your item owner account{% else %}Create your customer account{% endif %}</h1>
+      <h1>{% if is_item_owner_signup %}Item Owner Registration{% else %}Create Customer Account{% endif %}</h1>
       <p class="subtle">
         {% if is_item_owner_signup %}
-          Not looking to list items? <a href="{% url 'accounts:signup_customer' %}">Sign up as a customer instead</a>.
+          Looking to rent items instead? <a href="{% url 'accounts:signup_customer' %}">Sign up as customer</a>.
         {% else %}
-          Have items or property to rent out? <a href="{% url 'accounts:signup_item_owner' %}">Sign up as an item owner instead</a>.
+          Have items or equipment to rent out? <a href="{% url 'accounts:signup_item_owner' %}">Sign up as item owner</a>.
         {% endif %}
       </p>
 
@@ -40,7 +40,7 @@
           </div>
         </div>
         <div class="field-group">
-          <label for="{{ form.email.id_for_label }}">Email address</label>
+          <label for="{{ form.email.id_for_label }}">Email</label>
           {{ form.email }}
           {% for error in form.email.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
         </div>
@@ -66,10 +66,10 @@
             {% for error in form.password2.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
           </div>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Create account</button>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Create Account</button>
       </form>
 
-      <p class="auth-switch">Already have an account? <a href="{% url 'accounts:login' %}">Log in</a></p>
+      <p class="auth-switch">Already have an account? <a href="{% url 'accounts:login' %}">Log In</a></p>
     </div>
   </div>
 </div>

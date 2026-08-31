@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Something went wrong | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Server Error | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<div class="section container text-center">
-  <h1>Something went wrong</h1>
-  <p>An unexpected error occurred. Please try again in a moment.</p>
-  <a href="{% url 'core:home' %}" class="btn btn-primary">Back to home</a>
+<div class="section container text-center" style="padding: 90px 20px;">
+  <div class="stat-icon amber" style="margin: 0 auto 20px; width: 56px; height: 56px; font-size: 1.5rem;">500</div>
+  <h1 class="mt-0" style="font-size: 2rem;">Something Went Wrong</h1>
+  <p class="subtle" style="max-width: 440px; margin: 0 auto 24px;">An unexpected error occurred. Please try again shortly or return to the homepage.</p>
+  <a href="{% url 'core:home' %}" class="btn btn-primary">Return to Home</a>
 </div>
 {% endblock %}

@@ -4,8 +4,8 @@
 <div class="page-header">
   <div class="container">
     <span class="eyebrow">Owner Wallet</span>
-    <h1 class="mt-0">Earnings &amp; Withdrawal</h1>
-    <p class="subtle">Monitor your rental income balance, total payouts, and submit payout requests.</p>
+    <h1 class="mt-0">Earnings &amp; Payouts</h1>
+    <p class="subtle">Track rental income, completed earnings, and request bank payouts in {{ PLATFORM_SERVICE_AREA }}.</p>
   </div>
 </div>
 
@@ -23,7 +23,7 @@
             </span>
           </div>
           <strong class="mono stat-value">₦{{ wallet.balance|floatformat:2 }}</strong>
-          <span class="stat-sub">Ready to withdraw</span>
+          <span class="stat-sub">Available to withdraw</span>
         </div>
 
         <div class="stat-card">
@@ -34,27 +34,27 @@
             </span>
           </div>
           <strong class="mono stat-value">₦{{ wallet.total_earned|floatformat:2 }}</strong>
-          <span class="stat-sub">Lifetime earnings</span>
+          <span class="stat-sub">Lifetime rental earnings</span>
         </div>
 
         <div class="stat-card">
           <div class="stat-header">
-            <span>Total Withdrawn</span>
+            <span>Total Paid Out</span>
             <span class="stat-icon amber">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
             </span>
           </div>
           <strong class="mono stat-value">₦{{ wallet.total_withdrawn|floatformat:2 }}</strong>
-          <span class="stat-sub">Paid out to bank</span>
+          <span class="stat-sub">Settled to bank</span>
         </div>
       </div>
 
       <div class="flex-between" style="margin: 32px 0 16px;">
         <div>
-          <h2 class="mt-0" style="font-size: 1.35rem;">Withdrawal History</h2>
-          <p class="subtle" style="margin: 0;">Track the status of your bank payout requests.</p>
+          <h2 class="mt-0" style="font-size: 1.35rem;">Payout History</h2>
+          <p class="subtle" style="margin: 0;">Status of requested bank payouts.</p>
         </div>
-        <a href="{% url 'wallet:withdraw' %}" class="btn btn-primary">Request Withdrawal</a>
+        <a href="{% url 'wallet:withdraw' %}" class="btn btn-primary">Request Payout</a>
       </div>
 
       {% if withdrawals %}

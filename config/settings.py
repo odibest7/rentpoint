@@ -48,6 +48,8 @@ SECRET_KEY = os.environ.get(
 DEBUG = env_bool("DJANGO_DEBUG", default=True)
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", default="127.0.0.1,localhost,testserver")
+if "testserver" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("testserver")
 
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", default="")
 

@@ -4,8 +4,8 @@
 <div class="page-header">
   <div class="container">
     <span class="eyebrow">Platform Administration</span>
-    <h1 class="mt-0">Category Management</h1>
-    <p class="subtle">Add, update, or remove rental marketplace categories in {{ PLATFORM_SERVICE_AREA }}.</p>
+    <h1 class="mt-0">Categories</h1>
+    <p class="subtle">Manage catalogue categories and icons for listings in {{ PLATFORM_SERVICE_AREA }}.</p>
   </div>
 </div>
 
@@ -21,9 +21,9 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>Category Name</th>
-                    <th>Listings Count</th>
-                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Listings</th>
+                    <th>Identifier</th>
                     <th class="text-right">Actions</th>
                   </tr>
                 </thead>
@@ -32,7 +32,7 @@
                     <tr>
                       <td data-label="Category name" class="font-semibold">{{ c.name }}</td>
                       <td data-label="Listings count">
-                        <span class="badge badge-neutral">{{ c.item_count }} listings</span>
+                        <span class="badge badge-neutral">{{ c.item_count }} item{{ c.item_count|pluralize }}</span>
                       </td>
                       <td data-label="Description" class="subtle text-xs mono">{{ c.icon|default:"standard" }}</td>
                       <td data-label="Actions" class="text-right">
@@ -42,7 +42,7 @@
                             <button type="submit" class="btn btn-sm btn-ghost btn-danger-text">Delete</button>
                           </form>
                         {% else %}
-                          <span class="subtle text-xs" title="Category has active items">In Use</span>
+                          <span class="subtle text-xs" title="Category has active items">Active</span>
                         {% endif %}
                       </td>
                     </tr>
@@ -58,18 +58,18 @@
         </div>
 
         <div class="form-card">
-          <h3 class="mt-0">Add New Category</h3>
+          <h3 class="mt-0">Add Category</h3>
           <form method="post" class="stack">
             {% csrf_token %}
             <div class="field-group" style="margin: 0;">
-              <label for="name">Category Name</label>
-              <input type="text" name="name" id="name" required placeholder="e.g. Generators &amp; Power">
+              <label for="name">Name</label>
+              <input type="text" name="name" id="name" required placeholder="e.g. Canopies &amp; Tents">
             </div>
             <div class="field-group" style="margin: 0;">
               <label for="icon">Icon Identifier</label>
-              <input type="text" name="icon" id="icon" placeholder="e.g. sofa, canopy, tools">
+              <input type="text" name="icon" id="icon" placeholder="e.g. canopy, tools, chairs">
             </div>
-            <button type="submit" class="btn btn-primary btn-block">+ Create Category</button>
+            <button type="submit" class="btn btn-primary btn-block">Add Category</button>
           </form>
         </div>
       </div>

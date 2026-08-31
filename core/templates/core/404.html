@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Page not found | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Page Not Found | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<div class="section container text-center">
-  <h1>Page not found</h1>
-  <p>The page you are looking for does not exist or may have been moved.</p>
-  <a href="{% url 'core:home' %}" class="btn btn-primary">Back to home</a>
+<div class="section container text-center" style="padding: 90px 20px;">
+  <div class="stat-icon amber" style="margin: 0 auto 20px; width: 56px; height: 56px; font-size: 1.5rem;">404</div>
+  <h1 class="mt-0" style="font-size: 2rem;">Page Not Found</h1>
+  <p class="subtle" style="max-width: 440px; margin: 0 auto 24px;">The link you followed may be broken or the page may have been moved.</p>
+  <a href="{% url 'core:home' %}" class="btn btn-primary">Return to Home</a>
 </div>
 {% endblock %}

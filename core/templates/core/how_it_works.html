@@ -1,36 +1,75 @@
 {% extends "base.html" %}
-{% block title %}How it works | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}How It Works | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="page-header text-center">
   <div class="container" style="max-width: 760px;">
-    <span class="eyebrow">How It Works</span>
-    <h1 class="mt-0">Simple, Transparent Rentals</h1>
+    <span class="eyebrow">The Process</span>
+    <h1 class="mt-0">How RentPoint Works</h1>
+    <p class="hero-lead" style="margin: 0 auto;">A transparent, escrow-secured marketplace connecting customers and equipment owners across {{ PLATFORM_SERVICE_AREA }}.</p>
   </div>
 </div>
 
 <section class="section">
   <div class="container">
-    <div class="item-grid" style="grid-template-columns: repeat(3, 1fr);">
-      <div class="item-card"><div class="item-card-body" style="padding:22px;">
-        <h3 class="mt-0">1. Browse and choose</h3>
-        <p class="subtle">Search or filter listings by category, location, and price. Every listing shows the owner's description, condition, and rate.</p>
-      </div></div>
-      <div class="item-card"><div class="item-card-body" style="padding:22px;">
-        <h3 class="mt-0">2. Pay securely</h3>
-        <p class="subtle">Set your quantity and rental duration, then complete payment through RentPoint's electronic payment channel.</p>
-      </div></div>
-      <div class="item-card"><div class="item-card-body" style="padding:22px;">
-        <h3 class="mt-0">3. Get your receipt</h3>
-        <p class="subtle">A reference number and dated receipt are generated instantly, and the item owner's earnings update automatically.</p>
-      </div></div>
+    <div class="section-head text-center" style="max-width: 600px; margin: 0 auto 36px;">
+      <h2>For Renters &amp; Customers</h2>
+      <p>Find, inspect, and rent verified items in three simple steps.</p>
+    </div>
+    <div class="item-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+      <div class="item-card">
+        <div class="item-card-body" style="padding:28px;">
+          <div class="stat-icon teal" style="margin-bottom: 16px;">1</div>
+          <h3 class="mt-0" style="font-size: 1.2rem;">Find &amp; Select</h3>
+          <p class="subtle" style="font-size: 0.925rem;">Browse listings by category, rate, and location. View photos, owner ratings, and specifications.</p>
+        </div>
+      </div>
+      <div class="item-card">
+        <div class="item-card-body" style="padding:28px;">
+          <div class="stat-icon teal" style="margin-bottom: 16px;">2</div>
+          <h3 class="mt-0" style="font-size: 1.2rem;">Pay Electronically</h3>
+          <p class="subtle" style="font-size: 0.925rem;">Select quantity and duration. Complete payment via Paystack with funds held safely until fulfillment.</p>
+        </div>
+      </div>
+      <div class="item-card">
+        <div class="item-card-body" style="padding:28px;">
+          <div class="stat-icon teal" style="margin-bottom: 16px;">3</div>
+          <h3 class="mt-0" style="font-size: 1.2rem;">Collect &amp; Handover</h3>
+          <p class="subtle" style="font-size: 0.925rem;">Receive an instant digital receipt with owner contact details and handover instructions.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="section">
-  <div class="container" style="max-width: 760px;">
-    <h2>For item owners</h2>
-    <p>List an item with a description, category, price, and photos. When a customer pays, your earnings balance updates right away. Request a withdrawal at any time above the minimum threshold, and track the status of each request from your dashboard.</p>
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-head text-center" style="max-width: 600px; margin: 0 auto 36px;">
+      <h2>For Item Owners</h2>
+      <p>Turn idle property and gear into predictable income.</p>
+    </div>
+    <div class="item-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+      <div class="item-card">
+        <div class="item-card-body" style="padding:28px;">
+          <div class="stat-icon emerald" style="margin-bottom: 16px;">1</div>
+          <h3 class="mt-0" style="font-size: 1.2rem;">List Your Gear</h3>
+          <p class="subtle" style="font-size: 0.925rem;">Upload photos, set your rental price, and specify location and availability terms.</p>
+        </div>
+      </div>
+      <div class="item-card">
+        <div class="item-card-body" style="padding:28px;">
+          <div class="stat-icon emerald" style="margin-bottom: 16px;">2</div>
+          <h3 class="mt-0" style="font-size: 1.2rem;">Fulfill Bookings</h3>
+          <p class="subtle" style="font-size: 0.925rem;">Receive notified orders, coordinate handover with the renter, and hand over the item.</p>
+        </div>
+      </div>
+      <div class="item-card">
+        <div class="item-card-body" style="padding:28px;">
+          <div class="stat-icon emerald" style="margin-bottom: 16px;">3</div>
+          <h3 class="mt-0" style="font-size: 1.2rem;">Withdraw Payouts</h3>
+          <p class="subtle" style="font-size: 0.925rem;">Your earnings credit automatically upon completed rentals. Withdraw directly to your bank account anytime.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 {% endblock %}

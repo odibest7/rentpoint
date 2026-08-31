@@ -1,17 +1,17 @@
 {% extends "base.html" %}
-{% block title %}My listings | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}My Listings | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="page-header">
   <div class="container">
-    <span class="eyebrow">Owner Dashboard</span>
+    <span class="eyebrow">Owner Hub</span>
     <div class="flex-between">
       <div>
         <h1 class="mt-0">My Listings</h1>
-        <p class="subtle">Manage, track, and create rental listings for customers in {{ PLATFORM_SERVICE_AREA }}.</p>
+        <p class="subtle">Manage, edit, and track your active equipment and property listings in {{ PLATFORM_SERVICE_AREA }}.</p>
       </div>
       <a href="{% url 'listings:item_create' %}" class="btn btn-primary">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        List New Item
+        New Listing
       </a>
     </div>
   </div>
@@ -27,9 +27,9 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Item Name</th>
+                <th>Listing</th>
                 <th>Category</th>
-                <th>Price Rate</th>
+                <th>Rate</th>
                 <th>Status</th>
                 <th class="text-right">Actions</th>
               </tr>
@@ -39,9 +39,10 @@
                 <tr>
                   <td data-label="Item">
                     <a href="{{ item.get_absolute_url }}" class="table-link-title">{{ item.name }}</a>
+                    <div class="subtle text-xs">{{ item.location }}</div>
                   </td>
                   <td data-label="Category"><span class="table-tag">{{ item.category.name }}</span></td>
-                  <td data-label="Price rate" class="mono font-semibold">₦{{ item.rental_price|floatformat:0 }} <span class="table-unit">/ {{ item.get_price_unit_display }}</span></td>
+                  <td data-label="Rate" class="mono font-semibold">₦{{ item.rental_price|floatformat:0 }} <span class="table-unit">/ {{ item.get_price_unit_display }}</span></td>
                   <td data-label="Status">
                     {% if item.is_available %}
                       <span class="badge badge-success"><span class="badge-dot"></span>Available</span>
@@ -52,7 +53,7 @@
                   <td data-label="Actions" class="text-right">
                     <div class="table-actions">
                       <a href="{% url 'listings:item_update' item.slug %}" class="btn btn-sm btn-outline">Edit</a>
-                      <a href="{% url 'listings:item_delete' item.slug %}" class="btn btn-sm btn-ghost btn-danger-text">Remove</a>
+                      <a href="{% url 'listings:item_delete' item.slug %}" class="btn btn-sm btn-ghost btn-danger-text">Delete</a>
                     </div>
                   </td>
                 </tr>
@@ -65,9 +66,9 @@
           <div class="empty-icon">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
           </div>
-          <h3>You have not listed any items yet</h3>
-          <p class="subtle">Add your first item so customers across {{ PLATFORM_SERVICE_AREA }} can find and rent it.</p>
-          <a href="{% url 'listings:item_create' %}" class="btn btn-primary">List your first item</a>
+          <h3>No items listed yet</h3>
+          <p class="subtle">Add your first listing so renters across {{ PLATFORM_SERVICE_AREA }} can book your gear.</p>
+          <a href="{% url 'listings:item_create' %}" class="btn btn-primary">Create First Listing</a>
         </div>
       {% endif %}
     </div>

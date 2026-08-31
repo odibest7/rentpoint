@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Browse rentable items | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Browse Catalogue | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="page-header">
   <div class="container">
     <span class="eyebrow">Rental Catalogue</span>
-    <h1 class="mt-0">Rentable Items &amp; Property in {{ PLATFORM_SERVICE_AREA }}</h1>
-    <p class="hero-lead mt-0">Filter by category, location, or price to find exactly what you need.</p>
+    <h1 class="mt-0">Available in {{ PLATFORM_SERVICE_AREA }}</h1>
+    <p class="hero-lead mt-0">Browse and rent verified equipment, tools, party rentals, and spaces.</p>
   </div>
 </div>
 
@@ -27,12 +27,14 @@
         {{ form.location }}
       </div>
       <div class="field-group">
-        <label for="{{ form.max_price.id_for_label }}">Max price</label>
+        <label for="{{ form.max_price.id_for_label }}">Max Price (₦)</label>
         {{ form.max_price }}
       </div>
     </div>
-    <button type="submit" class="btn btn-primary">Apply filters</button>
-    <a href="{% url 'listings:item_list' %}" class="btn btn-ghost">Reset</a>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <button type="submit" class="btn btn-primary">Filter Results</button>
+      <a href="{% url 'listings:item_list' %}" class="btn btn-ghost">Reset</a>
+    </div>
   </form>
 
   {% if page_obj.object_list %}
@@ -43,11 +45,11 @@
     </div>
 
     {% if page_obj.has_other_pages %}
-      <div class="flex-between" style="margin-top:32px;">
+      <div class="flex-between" style="margin-top:36px; padding-top: 20px; border-top: 1px solid var(--color-border);">
         {% if page_obj.has_previous %}
           <a class="btn btn-outline" href="?{% if request.GET.q %}q={{ request.GET.q|urlencode }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category|urlencode }}&{% endif %}{% if request.GET.location %}location={{ request.GET.location|urlencode }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">&larr; Previous</a>
         {% else %}<span></span>{% endif %}
-        <span class="subtle">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <span class="subtle" style="font-size: 0.9rem;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
           <a class="btn btn-outline" href="?{% if request.GET.q %}q={{ request.GET.q|urlencode }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category|urlencode }}&{% endif %}{% if request.GET.location %}location={{ request.GET.location|urlencode }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Next &rarr;</a>
         {% else %}<span></span>{% endif %}
@@ -55,9 +57,9 @@
     {% endif %}
   {% else %}
     <div class="empty-state">
-      <h3>No items match your search</h3>
-      <p class="subtle">Try clearing a filter or searching a different term.</p>
-      <a href="{% url 'listings:item_list' %}" class="btn btn-primary">Clear filters</a>
+      <h3>No items found</h3>
+      <p class="subtle">Try broadening your search or resetting filters.</p>
+      <a href="{% url 'listings:item_list' %}" class="btn btn-primary">Reset Filters</a>
     </div>
   {% endif %}
 </section>

@@ -5,13 +5,13 @@
 {% block content %}
 <div class="page-header">
   <div class="container">
-    <span class="eyebrow">{% if user.is_item_owner %}Owner Dashboard{% else %}Customer Portal{% endif %}</span>
-    <h1 class="mt-0">{% if user.is_item_owner %}Rental Transactions{% else %}My Rentals &amp; Order History{% endif %}</h1>
+    <span class="eyebrow">{% if user.is_item_owner %}Owner Hub{% else %}Customer Portal{% endif %}</span>
+    <h1 class="mt-0">{% if user.is_item_owner %}Rental Transactions{% else %}My Rentals{% endif %}</h1>
     <p class="subtle">
       {% if user.is_item_owner %}
-        Permanent, transparent records of all electronic payments and earnings for your listings in {{ PLATFORM_SERVICE_AREA }}.
+        Records of electronic payments and earnings for your listings in {{ PLATFORM_SERVICE_AREA }}.
       {% else %}
-        Review your rented equipment, track payment settlements, and access official electronic receipts in {{ PLATFORM_SERVICE_AREA }}.
+        Review rental orders, payment settlements, and official digital receipts.
       {% endif %}
     </p>
   </div>
@@ -32,7 +32,7 @@
               </div>
             </div>
             <div class="stat-value">{{ total_count }}</div>
-            <div class="stat-sub">All-time customer rentals</div>
+            <div class="stat-sub">Lifetime orders</div>
           </div>
 
           <div class="stat-card">
@@ -43,7 +43,7 @@
               </div>
             </div>
             <div class="stat-value">{{ paid_count }}</div>
-            <div class="stat-sub">Credited to your wallet</div>
+            <div class="stat-sub">Credited to wallet</div>
           </div>
 
           <div class="stat-card stat-card-highlight">
@@ -54,7 +54,7 @@
               </div>
             </div>
             <div class="stat-value">₦{{ total_earnings|floatformat:2 }}</div>
-            <div class="stat-sub">After {{ PLATFORM_COMMISSION_PERCENT }}% platform commission</div>
+            <div class="stat-sub">After {{ PLATFORM_COMMISSION_PERCENT }}% platform fee</div>
           </div>
         </div>
 
@@ -158,29 +158,29 @@
             </div>
           </div>
           <div class="stat-value">{{ total_count }}</div>
-          <div class="stat-sub">All-time rental requests</div>
+          <div class="stat-sub">Lifetime requests</div>
         </div>
 
         <div class="stat-card">
           <div class="stat-header">
-            <span>Confirmed &amp; Paid</span>
+            <span>Paid &amp; Confirmed</span>
             <div class="stat-icon emerald">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
           </div>
           <div class="stat-value">{{ paid_count }}</div>
-          <div class="stat-sub">Active receipts on ledger</div>
+          <div class="stat-sub">Active ledger receipts</div>
         </div>
 
         <div class="stat-card stat-card-highlight">
           <div class="stat-header">
-            <span>Total Amount Paid</span>
+            <span>Total Spent</span>
             <div class="stat-icon teal">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
             </div>
           </div>
           <div class="stat-value">₦{{ total_spent|floatformat:2 }}</div>
-          <div class="stat-sub">Secure electronic payments</div>
+          <div class="stat-sub">Escrow protected</div>
         </div>
       </div>
 
@@ -191,7 +191,7 @@
         </div>
         <a href="{% url 'listings:item_list' %}" class="btn btn-sm btn-outline">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
-          Browse More Items
+          Browse Catalogue
         </a>
       </div>
 
@@ -202,9 +202,9 @@
               <tr>
                 <th>Item &amp; Category</th>
                 <th>Reference</th>
-                <th>Item Owner</th>
-                <th>Rental Details</th>
-                <th>Amount Paid</th>
+                <th>Owner</th>
+                <th>Duration &amp; Qty</th>
+                <th>Total Paid</th>
                 <th>Status</th>
                 <th class="text-right">Action</th>
               </tr>
