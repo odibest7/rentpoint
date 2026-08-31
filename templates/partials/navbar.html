@@ -11,7 +11,7 @@
 
     <nav aria-label="Primary nav">
       <ul class="nav-links">
-        <li><a href="{% url 'listings:item_list' %}">Browse Items</a></li>
+        <li><a href="{% url 'listings:item_list' %}">Browse</a></li>
         <li><a href="{% url 'core:how_it_works' %}">How It Works</a></li>
         <li><a href="{% url 'core:about' %}">About</a></li>
         {% if user.is_authenticated %}

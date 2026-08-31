@@ -1,17 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Log in | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Log In | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="auth-shell">
   <div class="auth-visual">
-    <div class="brand" style="color:#fff;"><span style="color:#2DD4BF;">Rent</span>Point</div>
-    <blockquote>"One place to find, pay for, and keep track of every rental in {{ PLATFORM_SERVICE_AREA }}."</blockquote>
-    <p style="color:rgba(255,255,255,0.65);">Serving {{ PLATFORM_SERVICE_AREA }}</p>
+    <div class="brand" style="color:#fff;"><span style="color:var(--color-accent-teal-border);">Rent</span>Point</div>
+    <blockquote>"The trusted marketplace to find, pay for, and manage rentals across {{ PLATFORM_SERVICE_AREA }}."</blockquote>
+    <p style="color:rgba(255,255,255,0.7); font-size: 0.875rem;">Serving {{ PLATFORM_SERVICE_AREA }}</p>
   </div>
 
   <div class="auth-form-side">
     <div class="auth-form-wrap">
-      <h1>Welcome back</h1>
-      <p class="subtle">Log in to manage your rentals or your listings.</p>
+      <h1>Welcome Back</h1>
+      <p class="subtle">Log in to manage your bookings and listings.</p>
 
       <form method="post" class="form-card stack" novalidate>
         {% csrf_token %}
@@ -26,13 +26,13 @@
         {% if form.non_field_errors %}
           {% for error in form.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
         {% endif %}
-        <button type="submit" class="btn btn-primary btn-block">Log in</button>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Log In</button>
       </form>
 
       <p class="auth-switch">
         New to RentPoint?
-        <a href="{% url 'accounts:signup_customer' %}">Sign up as a customer</a> or
-        <a href="{% url 'accounts:signup_item_owner' %}">as an item owner</a>
+        <a href="{% url 'accounts:signup_customer' %}">Sign up as customer</a> or
+        <a href="{% url 'accounts:signup_item_owner' %}">as item owner</a>
       </p>
     </div>
   </div>

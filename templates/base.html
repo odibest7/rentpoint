@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}{{ PLATFORM_NAME }} | Rent items and property in {{ PLATFORM_SERVICE_AREA }}{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}Browse and rent household items, event equipment, furniture, fashion pieces, and commercial space in {{ PLATFORM_SERVICE_AREA }}, with secure electronic payment and transparent transaction records.{% endblock %}">
+  <title>{% block title %}{{ PLATFORM_NAME }} | Rental Marketplace in {{ PLATFORM_SERVICE_AREA }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Rent verified equipment, items, and space in {{ PLATFORM_SERVICE_AREA }} with secure payments and instant receipts.{% endblock %}">
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
   {% include "partials/navbar.html" %}
 
   <main>
-    <div class="container no-print">
+    <div class="container messages-container no-print">
       {% include "partials/messages.html" %}
     </div>
     {% block content %}{% endblock %}

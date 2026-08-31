@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-{% block title %}{% if is_new %}List a new item{% else %}Edit listing{% endif %} | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}{% if is_new %}Create Listing{% else %}Edit Listing{% endif %} | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="page-header">
   <div class="container">
-    <span class="eyebrow">Item owner</span>
-    <h1>{% if is_new %}List a new item{% else %}Edit "{{ item.name }}"{% endif %}</h1>
+    <span class="eyebrow">Owner Hub</span>
+    <h1>{% if is_new %}Create a New Listing{% else %}Edit "{{ item.name }}"{% endif %}</h1>
   </div>
 </div>
 
-<section class="container" style="padding-bottom:60px; max-width:760px;">
+<section class="container" style="padding-bottom:60px; max-width:720px;">
   <form method="post" enctype="multipart/form-data" class="form-card stack" novalidate>
     {% csrf_token %}
     <div class="field-group">
-      <label for="{{ form.name.id_for_label }}">Item name</label>
+      <label for="{{ form.name.id_for_label }}">Item Name</label>
       {{ form.name }}
       {% for error in form.name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
@@ -22,17 +22,17 @@
       {% for error in form.category.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
     <div class="field-group">
-      <label for="{{ form.description.id_for_label }}">Description</label>
+      <label for="{{ form.description.id_for_label }}">Description &amp; Specifications</label>
       {{ form.description }}
       {% for error in form.description.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
     <div class="form-row">
       <div class="field-group">
-        <label for="{{ form.rental_price.id_for_label }}">Rental price (₦)</label>
+        <label for="{{ form.rental_price.id_for_label }}">Rental Rate (₦)</label>
         {{ form.rental_price }}
       </div>
       <div class="field-group">
-        <label for="{{ form.price_unit.id_for_label }}">Price unit</label>
+        <label for="{{ form.price_unit.id_for_label }}">Pricing Unit</label>
         {{ form.price_unit }}
       </div>
     </div>
@@ -42,20 +42,22 @@
         {{ form.condition }}
       </div>
       <div class="field-group">
-        <label for="{{ form.quantity_available.id_for_label }}">Quantity available</label>
+        <label for="{{ form.quantity_available.id_for_label }}">Available Quantity</label>
         {{ form.quantity_available }}
       </div>
     </div>
     <div class="field-group">
-      <label for="{{ form.location.id_for_label }}">Location</label>
+      <label for="{{ form.location.id_for_label }}">Location / Town Area</label>
       {{ form.location }}
     </div>
     <div class="field-group">
-      <label>{{ form.is_available }} Available for rent right now</label>
+      <label style="display:flex; align-items:center; gap:8px; font-weight:500;">
+        {{ form.is_available }} Available for rent immediately
+      </label>
     </div>
 
     <fieldset>
-      <legend>Photos</legend>
+      <legend>Item Photos</legend>
       {{ formset.management_form }}
       <div data-formset-rows>
         {% for image_form in formset %}
@@ -72,7 +74,9 @@
       <button type="button" class="btn btn-sm btn-ghost" data-add-image-row>+ Add another photo</button>
     </fieldset>
 
-    <button type="submit" class="btn btn-primary">{% if is_new %}Publish listing{% else %}Save changes{% endif %}</button>
+    <div style="margin-top:16px;">
+      <button type="submit" class="btn btn-primary btn-block btn-lg">{% if is_new %}Publish Listing{% else %}Save Changes{% endif %}</button>
+    </div>
   </form>
 </section>
 {% endblock %}

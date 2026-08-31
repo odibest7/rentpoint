@@ -4,57 +4,56 @@
 {% block content %}
 <div class="page-header text-center">
   <div class="container" style="max-width: 580px;">
-    <span class="eyebrow">Checkout &amp; Escrow</span>
-    <h1 class="mt-0">Complete Your Payment</h1>
-    <p class="subtle" style="margin: 0 auto;">Review order details and pay securely using Paystack.</p>
+    <span class="eyebrow">Secure Checkout</span>
+    <h1 class="mt-0">Payment Summary</h1>
+    <p class="subtle" style="margin: 0 auto;">Review rental details before confirming escrow payment.</p>
   </div>
 </div>
 
-<section class="container" style="padding-bottom:70px; max-width:560px;">
+<section class="container" style="padding-bottom:70px; max-width:540px;">
   <div class="form-card checkout-card">
     <div class="checkout-card-header">
-      <span class="eyebrow">Payment review</span>
-      <h2 class="mt-0">Order Summary</h2>
-      <p>Check the rental details before confirming your secure payment.</p>
+      <h2 class="mt-0" style="font-size:1.35rem;">Order Review</h2>
+      <p class="subtle" style="font-size:0.9rem;">Funds are held securely by Paystack until item handover.</p>
     </div>
 
     <section class="checkout-section" aria-labelledby="checkout-order-heading">
-      <h3 id="checkout-order-heading">Rental details</h3>
+      <h3 id="checkout-order-heading">Rental Details</h3>
       <div class="checkout-details">
         <div class="checkout-detail-row"><span class="checkout-label">Item</span><span class="checkout-value checkout-item-name">{{ transaction.item.name }}</span></div>
         <div class="checkout-detail-row"><span class="checkout-label">Quantity</span><span class="checkout-value">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</span></div>
         <div class="checkout-detail-row"><span class="checkout-label">Duration</span><span class="checkout-value">{{ transaction.duration }} &times; {{ transaction.item.get_price_unit_display }}</span></div>
-        <div class="checkout-detail-row"><span class="checkout-label">Reference code</span><span class="checkout-value"><span class="badge-code">{{ transaction.reference }}</span></span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Reference</span><span class="checkout-value"><span class="badge-code">{{ transaction.reference }}</span></span></div>
       </div>
     </section>
 
     <section class="checkout-section" aria-labelledby="checkout-handover-heading">
-      <h3 id="checkout-handover-heading">Location &amp; handover</h3>
+      <h3 id="checkout-handover-heading">Fulfillment &amp; Location</h3>
       <div class="checkout-details">
-        <div class="checkout-detail-row"><span class="checkout-label">Fulfillment method</span><span class="checkout-value checkout-value-emphasis">{{ transaction.get_delivery_option_display }}</span></div>
-        <div class="checkout-detail-row"><span class="checkout-label">Item location</span><span class="checkout-value">{{ transaction.item.location }}</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Method</span><span class="checkout-value checkout-value-emphasis">{{ transaction.get_delivery_option_display }}</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Item Area</span><span class="checkout-value">{{ transaction.item.location }}</span></div>
         {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
-          <div class="checkout-detail-row"><span class="checkout-label">Delivery address</span><span class="checkout-value">{{ transaction.delivery_address }}</span></div>
+          <div class="checkout-detail-row"><span class="checkout-label">Delivery Address</span><span class="checkout-value">{{ transaction.delivery_address }}</span></div>
         {% endif %}
-        <div class="checkout-detail-row"><span class="checkout-label">Coordination phone</span><span class="checkout-value mono">{{ transaction.contact_phone|default:user.phone_number }}</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Contact Phone</span><span class="checkout-value mono">{{ transaction.contact_phone|default:user.phone_number }}</span></div>
         {% if transaction.pickup_notes %}
-          <div class="checkout-detail-row checkout-detail-row-long"><span class="checkout-label">Handover notes</span><span class="checkout-value">{{ transaction.pickup_notes }}</span></div>
+          <div class="checkout-detail-row checkout-detail-row-long"><span class="checkout-label">Handover Notes</span><span class="checkout-value">{{ transaction.pickup_notes }}</span></div>
         {% endif %}
       </div>
     </section>
 
     <div class="checkout-total" aria-label="Total amount due">
-      <span>Total amount due</span>
+      <span>Total Amount</span>
       <strong class="mono">₦{{ transaction.amount|floatformat:2 }}</strong>
     </div>
 
     <button id="paystack-pay-btn" type="button" class="btn btn-primary btn-block btn-lg">
-      Pay ₦{{ transaction.amount|floatformat:2 }} Now
+      Pay ₦{{ transaction.amount|floatformat:2 }} via Paystack
     </button>
 
     <div class="checkout-security-note">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Secured with Paystack &middot; Serving {{ PLATFORM_SERVICE_AREA }}
+      Secured with 256-bit Encryption &middot; {{ PLATFORM_SERVICE_AREA }}
     </div>
   </div>
 </section>

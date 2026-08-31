@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Remove listing | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Delete Listing | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<section class="container" style="padding:60px 0; max-width:520px;">
-  <div class="form-card text-center">
-    <h1>Remove "{{ item.name }}"?</h1>
-    <p class="subtle">This will permanently remove the listing. Existing transaction records for this item are kept.</p>
-    <form method="post" class="flex-between" style="justify-content:center; gap:12px;">
+<section class="container" style="padding:60px 0; max-width:500px;">
+  <div class="form-card text-center" style="padding:36px 28px;">
+    <h1 style="font-size:1.6rem; margin-top:0;">Delete "{{ item.name }}"?</h1>
+    <p class="subtle" style="margin-bottom:24px;">This will permanently remove the listing from the catalogue. Historical transaction records remain on ledger.</p>
+    <form method="post" style="display:flex; justify-content:center; gap:12px;">
       {% csrf_token %}
       <a href="{% url 'listings:owner_item_list' %}" class="btn btn-outline">Cancel</a>
-      <button type="submit" class="btn btn-danger">Yes, remove it</button>
+      <button type="submit" class="btn btn-danger">Delete Listing</button>
     </form>
   </div>
 </section>

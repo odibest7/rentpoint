@@ -9,11 +9,11 @@
           <span class="brand-text">Rent<span class="brand-accent">Point</span></span>
         </a>
         <p class="subtle footer-desc">
-          A modern rental management marketplace in {{ PLATFORM_SERVICE_AREA }}. Browse, list, and pay for rentable property with transparent receipts.
+          Verified rental marketplace in {{ PLATFORM_SERVICE_AREA }}. Rent items, equipment, and property with secure digital records.
         </p>
       </div>
       <div>
-        <h4>Explore Platform</h4>
+        <h4>Explore</h4>
         <ul>
           <li><a href="{% url 'listings:item_list' %}">Browse Items</a></li>
           <li><a href="{% url 'core:how_it_works' %}">How It Works</a></li>
@@ -23,25 +23,25 @@
       <div>
         <h4>Item Owners</h4>
         <ul>
-          <li><a href="{% url 'accounts:signup_item_owner' %}">Become an Owner</a></li>
+          <li><a href="{% url 'accounts:signup_item_owner' %}">List Your Items</a></li>
           <li><a href="{% url 'listings:owner_item_list' %}">Owner Dashboard</a></li>
-          <li><a href="{% url 'wallet:earnings' %}">Payout Earnings</a></li>
+          <li><a href="{% url 'wallet:earnings' %}">Earnings &amp; Payouts</a></li>
         </ul>
       </div>
       <div>
         <h4>Customers</h4>
         <ul>
-          <li><a href="{% url 'accounts:signup_customer' %}">Customer Sign Up</a></li>
-          <li><a href="{% url 'accounts:login' %}">Account Log In</a></li>
-          <li><a href="{% url 'transactions:my_transactions' %}">Rental Receipts</a></li>
+          <li><a href="{% url 'accounts:signup_customer' %}">Create Account</a></li>
+          <li><a href="{% url 'accounts:login' %}">Log In</a></li>
+          <li><a href="{% url 'transactions:my_transactions' %}">My Rentals</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>&copy; {% now "Y" %} RentPoint. Serving {{ PLATFORM_SERVICE_AREA }}.</span>
+      <span>&copy; {% now "Y" %} RentPoint &middot; {{ PLATFORM_SERVICE_AREA }}</span>
       <span class="footer-secure">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Secured Electronic Transaction Records
+        Secured Electronic Records
       </span>
     </div>
   </div>

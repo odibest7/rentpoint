@@ -6,32 +6,32 @@
   <div class="container hero-grid">
     <div class="hero-content">
       <span class="eyebrow">
-        <span class="eyebrow-dot"></span> Serving {{ PLATFORM_SERVICE_AREA }}
+        <span class="eyebrow-dot"></span> {{ PLATFORM_SERVICE_AREA }}
       </span>
-      <h1>Rent verified equipment &amp; items with complete confidence.</h1>
+      <h1>Rent equipment and items with confidence.</h1>
       <p class="hero-lead">
-        Connect directly with local owners for event canopies, chairs, shop space, tools, and fashion with instant electronic payments and permanent receipts.
+        Connect directly with verified local owners for event canopies, tools, spaces, and equipment with secure electronic payments and instant receipts.
       </p>
       <div class="hero-actions">
         <a href="{% url 'listings:item_list' %}" class="btn btn-primary btn-lg">
-          Explore {{ item_count }} Items
+          Browse Listings
         </a>
         <a href="{% url 'accounts:signup_item_owner' %}" class="btn btn-outline btn-lg">
-          List Your Items
+          List an Item
         </a>
       </div>
       <div class="hero-stats">
         <div class="hero-stat">
           <strong>{{ item_count }}+</strong>
-          <span>Available Listings</span>
+          <span>Active Listings</span>
         </div>
         <div class="hero-stat">
           <strong>100%</strong>
-          <span>Verified Payments</span>
+          <span>Verified Escrow</span>
         </div>
         <div class="hero-stat">
           <strong>Instant</strong>
-          <span>Digital Receipts</span>
+          <span>Digital Records</span>
         </div>
       </div>
     </div>
@@ -39,7 +39,7 @@
     <div class="hero-showcase-wrapper">
       <div class="hero-showcase">
         <div class="hero-showcase-media">
-          <span class="hero-showcase-tag">Featured Rental</span>
+          <span class="hero-showcase-tag">Featured</span>
           <span class="badge badge-success hero-showcase-status"><span class="badge-dot"></span>Available</span>
         </div>
         <div class="hero-showcase-body">
@@ -63,21 +63,20 @@
     <div class="section-head">
       <div>
         <h2>Browse by Category</h2>
-        <p>Explore specialized categories tailored for household, party, and commercial needs in {{ PLATFORM_SERVICE_AREA }}.</p>
+        <p>Explore equipment and rental options across {{ PLATFORM_SERVICE_AREA }}.</p>
       </div>
       <a href="{% url 'listings:item_list' %}" class="btn btn-ghost">
-        See all categories
+        All categories
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>
     </div>
     <div class="chip-row">
       {% for category in categories %}
         <a href="{% url 'listings:item_list' %}?category={{ category.id }}" class="chip">
-          <span class="chip-icon">🏷️</span>
           <span>{{ category.name }}</span>
         </a>
       {% empty %}
-        <p class="subtle">Categories will appear here once the platform is seeded with listings.</p>
+        <p class="subtle">Categories will appear here once listings are added.</p>
       {% endfor %}
     </div>
   </div>
@@ -87,11 +86,11 @@
   <div class="container">
     <div class="section-head">
       <div>
-        <h2>Recently Listed Items</h2>
-        <p>Explore recent equipment and items posted by verified owners across {{ PLATFORM_SERVICE_AREA }}.</p>
+        <h2>Recently Listed</h2>
+        <p>Latest equipment and items posted by verified owners.</p>
       </div>
       <a href="{% url 'listings:item_list' %}" class="btn btn-ghost">
-        View all catalogue
+        View all items
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>
     </div>
@@ -104,8 +103,8 @@
       </div>
     {% else %}
       <div class="empty-state">
-        <h3>No listings available right now</h3>
-        <p class="subtle">Be the first item owner to add a rental listing to the marketplace.</p>
+        <h3>No listings available yet</h3>
+        <p class="subtle">Be the first to list an item or property on RentPoint.</p>
         <a href="{% url 'accounts:signup_item_owner' %}" class="btn btn-primary">List Your First Item</a>
       </div>
     {% endif %}
@@ -115,16 +114,16 @@
 <section class="section section-highlight">
   <div class="container">
     <div class="section-head text-center" style="max-width: 640px; margin: 0 auto 36px;">
-      <h2>Two Roles, One Transparent System</h2>
-      <p>Designed around customer demand and item owner monetization in {{ PLATFORM_SERVICE_AREA }}.</p>
+      <h2>Two Ways to Use RentPoint</h2>
+      <p>Built for renters looking for reliable gear and owners monetizing equipment in {{ PLATFORM_SERVICE_AREA }}.</p>
     </div>
     <div class="item-grid role-grid">
       <div class="role-card">
         <div class="role-icon customer-icon">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <h3>Need to Rent Items?</h3>
-        <p class="subtle">Browse available listings, view clear pricing, and complete payment electronically with instant receipt generation.</p>
+        <h3>Looking to Rent?</h3>
+        <p class="subtle">Browse verified items, view transparent rates, and pay securely with instant receipts and handover tracking.</p>
         <a href="{% url 'accounts:signup_customer' %}" class="btn btn-primary">Sign Up as Customer</a>
       </div>
 
@@ -132,9 +131,9 @@
         <div class="role-icon owner-icon">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
         </div>
-        <h3>Have Items to Monetize?</h3>
-        <p class="subtle">List your spare items or property, track active orders automatically, and request payout withdrawals directly to your bank account.</p>
-        <a href="{% url 'accounts:signup_item_owner' %}" class="btn btn-accent">Sign Up as Item Owner</a>
+        <h3>Own Items to Rent Out?</h3>
+        <p class="subtle">List your spare gear or property, receive direct electronic payments into your wallet, and withdraw to your bank anytime.</p>
+        <a href="{% url 'accounts:signup_item_owner' %}" class="btn btn-accent">List Items as Owner</a>
       </div>
     </div>
   </div>

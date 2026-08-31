@@ -2,7 +2,8 @@
   <div class="alert-list">
     {% for message in messages %}
       <div class="alert alert-{{ message.tags }}">
-        {{ message }}
+        <span>{{ message }}</span>
+        <button type="button" class="alert-dismiss" data-dismiss-alert aria-label="Dismiss message">&times;</button>
       </div>
     {% endfor %}
   </div>

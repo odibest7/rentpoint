@@ -4,17 +4,17 @@
 {% block content %}
 <div class="page-header">
   <div class="container" style="max-width: 640px;">
-    <a href="{{ item.get_absolute_url }}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to item</a>
+    <a href="{{ item.get_absolute_url }}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to Item</a>
     <div style="display:block;">
-      <span class="eyebrow">Rental Booking</span>
+      <span class="eyebrow">Booking Initiation</span>
     </div>
     <h1 class="mt-0">Rent {{ item.name }}</h1>
-    <p class="subtle">₦{{ item.rental_price|floatformat:0 }} / {{ item.get_price_unit_display }} &middot; Located in {{ item.location }}</p>
+    <p class="subtle">₦{{ item.rental_price|floatformat:0 }} / {{ item.get_price_unit_display }} &middot; {{ item.location }}</p>
   </div>
 </div>
 
 <section class="container" style="padding-bottom:70px; max-width:640px;">
-  <!-- Owner & Location Verification Banner -->
+  <!-- Item & Location Banner -->
   <div class="card" style="margin-bottom: 24px; padding: 18px 22px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
     <div class="flex-between">
       <div style="display: flex; align-items: center; gap: 12px;">
@@ -22,8 +22,8 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
         <div>
-          <div class="font-semibold text-sm" style="color:var(--color-primary-navy);">Item Location: {{ item.location }}</div>
-          <div class="subtle text-xs">Listed by {{ item.owner.get_full_name|default:item.owner.username }}{% if item.owner.is_verified %} &middot; Verified Owner{% endif %}</div>
+          <div class="font-semibold text-sm" style="color:var(--color-primary-navy);">{{ item.location }}</div>
+          <div class="subtle text-xs">Owner: {{ item.owner.get_full_name|default:item.owner.username }}{% if item.owner.is_verified %} &middot; Verified Owner{% endif %}</div>
         </div>
       </div>
       <span class="badge badge-success"><span class="badge-dot"></span>Available</span>
@@ -34,12 +34,12 @@
     {% csrf_token %}
 
     <h3 class="mt-0" style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin-bottom: 18px;">
-      1. Rental Quantity &amp; Duration
+      1. Quantity &amp; Duration
     </h3>
 
     <div class="form-row">
       <div class="field-group">
-        <label for="{{ form.quantity.id_for_label }}">Quantity to Rent</label>
+        <label for="{{ form.quantity.id_for_label }}">Quantity</label>
         {{ form.quantity }}
         <p class="field-hint">{{ form.quantity.help_text }}</p>
         {% for error in form.quantity.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
@@ -53,39 +53,39 @@
     </div>
 
     <h3 style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin: 24px 0 18px;">
-      2. Location &amp; Handover Details
+      2. Handover &amp; Contact Information
     </h3>
 
     <div class="field-group">
-      <label for="{{ form.delivery_option.id_for_label }}">Fulfillment / Handover Preference</label>
+      <label for="{{ form.delivery_option.id_for_label }}">Fulfillment Preference</label>
       {{ form.delivery_option }}
-      <p class="field-hint">Choose whether you will pick up at the owner's address in {{ item.location }} or need direct delivery.</p>
+      <p class="field-hint">Choose between self-pickup in {{ item.location }} or direct delivery.</p>
       {% for error in form.delivery_option.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
 
     <div class="field-group">
-      <label for="{{ form.contact_phone.id_for_label }}">Your Phone Number (For Handover Coordination)</label>
+      <label for="{{ form.contact_phone.id_for_label }}">Phone Number</label>
       {{ form.contact_phone }}
       <p class="field-hint">{{ form.contact_phone.help_text }}</p>
       {% for error in form.contact_phone.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
 
     <div class="field-group">
-      <label for="{{ form.delivery_address.id_for_label }}">Your Delivery Address / Specific Area</label>
+      <label for="{{ form.delivery_address.id_for_label }}">Delivery Address</label>
       {{ form.delivery_address }}
       <p class="field-hint">{{ form.delivery_address.help_text }}</p>
       {% for error in form.delivery_address.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
 
     <div class="field-group">
-      <label for="{{ form.pickup_notes.id_for_label }}">Special Instructions / Handover Notes (Optional)</label>
+      <label for="{{ form.pickup_notes.id_for_label }}">Special Handover Instructions (Optional)</label>
       {{ form.pickup_notes }}
       {% for error in form.pickup_notes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
     </div>
 
     <div style="margin-top: 14px; padding-top: 18px; border-top: 1px solid var(--color-border);">
       <button type="submit" class="btn btn-primary btn-block btn-lg">
-        Proceed to Secure Checkout &rarr;
+        Proceed to Review &amp; Pay &rarr;
       </button>
     </div>
   </form>

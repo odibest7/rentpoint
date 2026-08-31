@@ -1,14 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Identity verification | {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}Identity Verification | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="page-header">
   <div class="container">
-    <span class="eyebrow">Owner Account</span>
-    <h1 class="mt-0">Identity verification</h1>
+    <span class="eyebrow">Owner Trust &amp; Safety</span>
+    <h1 class="mt-0">Identity Verification</h1>
     <p class="subtle">
-      Verified item owners carry a badge that customers see on every listing, item page, and
-      receipt. It tells a customer paying a stranger in {{ PLATFORM_SERVICE_AREA }} that RentPoint
-      staff have checked this owner's National Identification Number against the name on their account.
+      Verified owners display an official trust badge on all listings and receipts, confirming their identity with RentPoint.
     </p>
   </div>
 </div>
@@ -22,35 +20,32 @@
   {% if user.verification_status == "verified" %}
     <div class="form-card text-center">
       {% if existing.selfie_image %}
-        <img src="{{ existing.selfie_image.url }}" alt="Your submitted selfie" style="width:88px; height:88px; object-fit:cover; border-radius:50%; border:3px solid var(--color-accent-teal); margin: 0 auto 14px;">
+        <img src="{{ existing.selfie_image.url }}" alt="Submitted selfie" style="width:88px; height:88px; object-fit:cover; border-radius:50%; border:3px solid var(--color-accent-teal); margin: 0 auto 14px;">
       {% endif %}
       <span class="badge badge-success" style="font-size: 0.85rem; padding: 8px 16px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        Verified owner
+        Verified Owner
       </span>
-      <h3 style="margin-top: 18px;">You're verified</h3>
+      <h3 style="margin-top: 18px;">Account Verified</h3>
       <p class="subtle">
-        Reviewed {{ existing.reviewed_at|date:"d M Y" }}. Your listings, item pages, and receipts now
-        show a verified badge to customers.
+        Approved on {{ existing.reviewed_at|date:"d M Y" }}. Your listings and receipts now display your verified status.
       </p>
       {% if existing %}
-        <p class="subtle mono" style="font-size: 0.82rem;">NIN on file: {{ existing.masked_nin }} · Live selfie and NIN card photos submitted</p>
+        <p class="subtle mono" style="font-size: 0.82rem;">NIN: {{ existing.masked_nin }} &middot; Identity verified</p>
       {% endif %}
     </div>
 
   {% elif user.verification_status == "pending" %}
     <div class="form-card text-center">
       {% if existing.selfie_image %}
-        <img src="{{ existing.selfie_image.url }}" alt="Your submitted selfie" style="width:88px; height:88px; object-fit:cover; border-radius:50%; border:3px solid var(--color-warning); margin: 0 auto 14px;">
+        <img src="{{ existing.selfie_image.url }}" alt="Submitted selfie" style="width:88px; height:88px; object-fit:cover; border-radius:50%; border:3px solid var(--color-warning); margin: 0 auto 14px;">
       {% endif %}
-      <span class="badge badge-warning" style="font-size: 0.85rem; padding: 8px 16px;">Pending review</span>
-      <h3 style="margin-top: 18px;">Your submission is being reviewed</h3>
+      <span class="badge badge-warning" style="font-size: 0.85rem; padding: 8px 16px;">Review Pending</span>
+      <h3 style="margin-top: 18px;">Under Staff Review</h3>
       <p class="subtle">
-        Submitted {{ existing.submitted_at|date:"d M Y" }} with your live selfie and both sides of your NIN card. RentPoint staff review verification
-        submissions by hand, so this can take a little time. You'll see your badge appear here as
-        soon as it's approved.
+        Submitted on {{ existing.submitted_at|date:"d M Y" }}. Our verification team will review your ID details shortly.
       </p>
-      <p class="subtle mono" style="font-size: 0.82rem;">Name on file: {{ existing.full_legal_name }} &middot; NIN: {{ existing.masked_nin }}</p>
+      <p class="subtle mono" style="font-size: 0.82rem;">Name: {{ existing.full_legal_name }} &middot; NIN: {{ existing.masked_nin }}</p>
     </div>
 
   {% else %}
@@ -107,35 +102,35 @@
 
       <div class="verification-card-uploads">
         <div class="field-group verification-card-upload" data-card-upload>
-          <span class="verification-card-label" id="{{ form.nin_front_image.id_for_label }}-label">Front of NIN card</span>
+          <span class="verification-card-label" id="{{ form.nin_front_image.id_for_label }}-label">Front of NIN Card</span>
           <label class="verification-dropzone" for="{{ form.nin_front_image.id_for_label }}" data-card-dropzone tabindex="0" aria-labelledby="{{ form.nin_front_image.id_for_label }}-label" aria-describedby="{{ form.nin_front_image.id_for_label }}-hint">
             <span class="verification-dropzone-icon" aria-hidden="true">ID</span>
             <span class="verification-dropzone-copy">
-              <strong data-card-action>Tap to upload front of NIN card</strong>
-              <span>JPG, PNG, or HEIC · up to 5 MB</span>
+              <strong data-card-action>Upload front of NIN card</strong>
+              <span>JPG, PNG, or HEIC &middot; max 5 MB</span>
             </span>
             {{ form.nin_front_image }}
           </label>
-          <p class="field-hint" id="{{ form.nin_front_image.id_for_label }}-hint">Flat, well-lit photo with every detail in focus.</p>
+          <p class="field-hint" id="{{ form.nin_front_image.id_for_label }}-hint">Clear, well-lit photo showing all text in focus.</p>
           <div class="verification-card-selected" data-card-selected hidden>
-            <img class="verification-card-preview" data-card-preview="front" alt="Preview of front of NIN card">
+            <img class="verification-card-preview" data-card-preview="front" alt="Front of NIN card preview">
             <button type="button" class="btn btn-sm btn-ghost" data-card-remove>Remove photo</button>
           </div>
           {% for error in form.nin_front_image.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
         </div>
         <div class="field-group verification-card-upload" data-card-upload>
-          <span class="verification-card-label" id="{{ form.nin_back_image.id_for_label }}-label">Back of NIN card</span>
+          <span class="verification-card-label" id="{{ form.nin_back_image.id_for_label }}-label">Back of NIN Card</span>
           <label class="verification-dropzone" for="{{ form.nin_back_image.id_for_label }}" data-card-dropzone tabindex="0" aria-labelledby="{{ form.nin_back_image.id_for_label }}-label" aria-describedby="{{ form.nin_back_image.id_for_label }}-hint">
             <span class="verification-dropzone-icon" aria-hidden="true">ID</span>
             <span class="verification-dropzone-copy">
-              <strong data-card-action>Tap to upload back of NIN card</strong>
-              <span>JPG, PNG, or HEIC · up to 5 MB</span>
+              <strong data-card-action>Upload back of NIN card</strong>
+              <span>JPG, PNG, or HEIC &middot; max 5 MB</span>
             </span>
             {{ form.nin_back_image }}
           </label>
-          <p class="field-hint" id="{{ form.nin_back_image.id_for_label }}-hint">Keep the back flat and in focus so every detail is readable.</p>
+          <p class="field-hint" id="{{ form.nin_back_image.id_for_label }}-hint">Clear photo showing reverse side details.</p>
           <div class="verification-card-selected" data-card-selected hidden>
-            <img class="verification-card-preview" data-card-preview="back" alt="Preview of back of NIN card">
+            <img class="verification-card-preview" data-card-preview="back" alt="Back of NIN card preview">
             <button type="button" class="btn btn-sm btn-ghost" data-card-remove>Remove photo</button>
           </div>
           {% for error in form.nin_back_image.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
@@ -143,11 +138,9 @@
       </div>
 
       <p class="field-hint">
-        Your NIN and selfie are stored for verification only. Everywhere on RentPoint other than
-        this staff review process, only the last four digits of your NIN are ever shown, and your
-        selfie is never shown to customers.
+        Your ID documents and selfie are stored securely for staff verification only. Only the last four digits of your NIN are ever referenced publicly.
       </p>
-      <button type="submit" class="btn btn-primary">Submit for verification</button>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">Submit for Verification</button>
     </form>
   {% endif %}
     </div>
