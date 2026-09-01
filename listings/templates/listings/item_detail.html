@@ -3,37 +3,29 @@
 {% block title %}{{ item.name }} | {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="page-header">
+<div class="page-header product-page-header">
   <div class="container">
-    <a href="{% url 'listings:item_list' %}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to Catalogue</a>
-    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
-      <span class="eyebrow" style="margin-bottom:0;">{{ item.category.name }}</span>
-      {% if item.is_available %}<span class="badge badge-success"><span class="badge-dot"></span>Available</span>{% else %}<span class="badge badge-neutral"><span class="badge-dot"></span>Unavailable</span>{% endif %}
-    </div>
-    <h1 class="mt-0">{{ item.name }}</h1>
-    <p class="subtle">
-      {{ item.location }} &middot; Condition: {{ item.get_condition_display }} &middot; Listed by {{ item.owner.get_full_name|default:item.owner.username }}
-      {% if item.owner.is_verified %}
-      <span class="verified-tag" title="Item owner verified by RentPoint" style="margin-left:6px;">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-          stroke-linecap="round">
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-          <polyline points="22 4 12 14.01 9 11.01" />
-        </svg>
-        Verified Owner
-      </span>
-      {% endif %}
-    </p>
+    <a href="{% url 'listings:item_list' %}" class="btn btn-sm btn-outline product-back-link">&larr; Back to Catalogue</a>
+    <h1 class="product-title">{{ item.name }}</h1>
   </div>
 </div>
 
-<section class="container" style="padding-bottom: 60px;">
-  <div class="hero-grid" style="align-items:start;">
-    <div>
-      <div class="item-gallery" data-item-gallery>
-        <button type="button" class="hero-showcase-media item-gallery-hero" data-gallery-open="0" aria-label="View photos of {{ item.name }}"
-          style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}'); background-size:cover; background-position:center;{% endif %} aspect-ratio:4/3; border-radius:var(--radius-lg);">
-          <span class="hero-showcase-tag">{{ item.category.name }}</span>
+<section class="container product-detail-shell">
+  <div class="product-layout">
+    <div class="product-main-column">
+      <div class="card-panel product-gallery-panel" data-item-gallery>
+        <button type="button" class="item-gallery-hero product-gallery-stage" data-gallery-open="0" aria-label="View photos of {{ item.name }}"
+          style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}'); background-size:cover; background-position:center;{% endif %} border-radius: var(--radius-xl);">
+          {% if not item.primary_image %}
+            <span class="image-empty-state" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z"/>
+                <circle cx="12" cy="11" r="3"/>
+                <path d="m8 17 2.2-2.3a1.7 1.7 0 0 1 2.4 0L15 16l1.5-1.7a1.7 1.7 0 0 1 2.4 0L20 15.5"/>
+              </svg>
+            </span>
+          {% endif %}
+          <span class="product-gallery-tag">{{ item.category.name }}</span>
           {% if item.images.count > 1 %}<span class="item-gallery-count">{{ item.images.count }} photos</span>{% endif %}
         </button>
 
@@ -48,112 +40,70 @@
         {% endif %}
       </div>
 
-      <div style="margin-top:32px;">
-        <h2 style="font-size:1.3rem; margin-bottom:12px;">Description</h2>
-        <div class="subtle" style="line-height:1.7; font-size:0.975rem;">
+      <div class="card-panel product-info-panel">
+        <div class="info-panel-header">
+          <h2>Description</h2>
+        </div>
+        <div class="product-description">
           {{ item.description|linebreaks }}
         </div>
       </div>
 
-      <!-- Fulfillment Overview -->
-      <div class="card"
-        style="margin-top: 32px; padding: 24px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
-        <h3 class="mt-0"
-          style="font-size: 1.1rem; color: var(--color-primary-navy); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          Location &amp; Handover
-        </h3>
-        <p class="subtle" style="margin: 0 0 14px; font-size: 0.925rem;">
-          Available in <strong>{{ item.location }}</strong> ({{ PLATFORM_SERVICE_AREA }}).
-        </p>
-        <ul
-          style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; font-size:0.875rem; color:var(--color-ink-soft);">
-          <li style="display:flex; align-items:center; gap:8px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)"
-              stroke-width="2.5">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            <span><strong>Pickup:</strong> Coordinate direct collection with owner in {{ item.location }}.</span>
-          </li>
-          <li style="display:flex; align-items:center; gap:8px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)"
-              stroke-width="2.5">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            <span><strong>Delivery:</strong> Specify destination during checkout if delivery is needed.</span>
-          </li>
-          <li style="display:flex; align-items:center; gap:8px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)"
-              stroke-width="2.5">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            <span><strong>Proof of Payment:</strong> Official receipts include phone numbers and verification stamps.</span>
-          </li>
+      <div class="card-panel product-info-panel">
+        <div class="info-panel-header">
+          <h3>Location &amp; Handover</h3>
+        </div>
+        <p class="product-meta-copy">Available in <strong>{{ item.location }}</strong> ({{ PLATFORM_SERVICE_AREA }}).</p>
+        <ul class="handover-list">
+          <li><span class="checkmark">✓</span><span><strong>Pickup:</strong> Coordinate direct collection with the owner in {{ item.location }}.</span></li>
+          <li><span class="checkmark">✓</span><span><strong>Delivery:</strong> Specify destination during checkout if delivery is needed.</span></li>
+          <li><span class="checkmark">✓</span><span><strong>Proof of Payment:</strong> Official receipts include phone numbers and verification stamps.</span></li>
         </ul>
       </div>
     </div>
 
-    <aside class="form-card" style="padding:28px;">
-      <div class="flex-between">
-        <span class="item-card-price" style="font-size:1.4rem;">
-          <span class="price-amount" style="font-size:1.75rem;">₦{{ item.rental_price|floatformat:2 }}</span>
-          <span class="price-unit">/ {{ item.get_price_unit_display }}</span>
-        </span>
-        {% if item.is_available %}<span class="badge badge-success"><span class="badge-dot"></span>Available</span>{% else %}<span class="badge badge-neutral"><span class="badge-dot"></span>Unavailable</span>{% endif %}
+    <aside class="card-panel product-sidebar">
+      <div class="product-price-row">
+        <div class="product-price-block">
+          <span class="product-price">₦{{ item.rental_price|floatformat:2 }}</span>
+          <span class="product-price-unit">/ {{ item.get_price_unit_display }}</span>
+        </div>
+        {% if item.is_available %}
+          <span class="badge badge-success product-status-badge sidebar-status"><span class="badge-dot"></span>Available</span>
+        {% else %}
+          <span class="badge badge-neutral product-status-badge sidebar-status"><span class="badge-dot"></span>Unavailable</span>
+        {% endif %}
       </div>
 
-      <div
-        style="margin:20px 0; padding:16px 0; border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border); display:flex; flex-direction:column; gap:10px; font-size:0.9rem;">
-        <div class="flex-between"><span class="subtle">Category</span><span class="font-semibold">{{ item.category.name }}</span></div>
-        <div class="flex-between"><span class="subtle">Stock</span><span class="font-semibold">{{ item.quantity_available }} available</span></div>
-        <div class="flex-between"><span class="subtle">Location</span><span class="font-semibold"
-            style="color:var(--color-primary-navy);">{{ item.location }}</span></div>
-        <div class="flex-between"><span class="subtle">Condition</span><span class="font-semibold">{{ item.get_condition_display }}</span></div>
-        <div class="flex-between">
-          <span class="subtle">Owner</span>
-          <span class="font-semibold" style="display:flex; align-items:center; gap:6px;">
-            {{ item.owner.get_full_name|default:item.owner.username }}
-            {% if item.owner.is_verified %}
-            <span class="verified-tag" title="Item owner verified by RentPoint">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                stroke-linecap="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-              Verified
-            </span>
-            {% endif %}
-          </span>
-        </div>
+      <div class="product-summary-list">
+        <div class="summary-row"><span>Category</span><strong>{{ item.category.name }}</strong></div>
+        <div class="summary-row"><span>Stock</span><strong>{{ item.quantity_available }} available</strong></div>
+        <div class="summary-row"><span>Location</span><strong>{{ item.location }}</strong></div>
+        <div class="summary-row"><span>Condition</span><strong>{{ item.get_condition_display }}</strong></div>
+        <div class="summary-row summary-row-owner"><span>Owner</span><strong>{{ item.owner.get_full_name|default:item.owner.username }}</strong></div>
       </div>
 
       {% if item.is_available %}
-      {% if user.is_authenticated %}
-      {% if user.is_customer %}
-      <a href="{% url 'transactions:start_rental' item.slug %}" class="btn btn-primary btn-block btn-lg">Rent This Item</a>
-      {% elif item.owner == user %}
-      <a href="{% url 'listings:item_update' item.slug %}" class="btn btn-outline btn-block">Edit Listing</a>
+        {% if user.is_authenticated %}
+          {% if user.is_customer %}
+            <a href="{% url 'transactions:start_rental' item.slug %}" class="btn btn-primary btn-block btn-lg">Rent This Item</a>
+          {% elif item.owner == user %}
+            <a href="{% url 'listings:item_update' item.slug %}" class="btn btn-outline btn-block">Edit Listing</a>
+          {% else %}
+            <p class="sidebar-note">Item owner accounts cannot rent items. Switch to a customer account to book.</p>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'accounts:login' %}?next={% url 'transactions:start_rental' item.slug %}" class="btn btn-primary btn-block btn-lg">Log in to Rent</a>
+          <p class="sidebar-note text-center">New here? <a href="{% url 'accounts:signup_customer' %}">Create account</a></p>
+        {% endif %}
       {% else %}
-      <p class="subtle" style="font-size:0.875rem;">Item owner accounts cannot rent items. Switch to a customer account to book.</p>
-      {% endif %}
-      {% else %}
-      <a href="{% url 'accounts:login' %}?next={% url 'transactions:start_rental' item.slug %}"
-        class="btn btn-primary btn-block btn-lg">Log in to Rent</a>
-      <p class="subtle text-center" style="margin-top:12px; font-size:0.85rem;">New here? <a
-          href="{% url 'accounts:signup_customer' %}">Create account</a></p>
-      {% endif %}
-      {% else %}
-      <button class="btn btn-outline btn-block" disabled>Currently unavailable</button>
+        <button class="btn btn-outline btn-block" disabled>Currently unavailable</button>
       {% endif %}
     </aside>
   </div>
 
   {% if related_items %}
-  <div class="section-head" style="margin-top:64px;">
+  <div class="section-head product-related-head">
     <div>
       <h2>More in {{ item.category.name }}</h2>
       <p>Similar rental listings available in {{ PLATFORM_SERVICE_AREA }}.</p>
@@ -161,7 +111,7 @@
   </div>
   <div class="item-grid">
     {% for related in related_items %}
-    {% include "listings/_item_card.html" with item=related %}
+      {% include "listings/_item_card.html" with item=related %}
     {% endfor %}
   </div>
   {% endif %}
