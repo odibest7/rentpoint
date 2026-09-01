@@ -308,11 +308,11 @@ img {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--color-border);
-  box-shadow: 0 1px 3px rgba(10, 35, 66, 0.03);
+  background: rgba(8, 18, 31, 0.72);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 10px 30px rgba(4, 12, 22, 0.16);
 }
 
 .navbar-inner {
@@ -348,12 +348,12 @@ img {
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 800;
-  color: var(--color-primary-navy);
+  color: #F8FAFC;
   letter-spacing: -0.03em;
 }
 
 .brand-accent {
-  color: var(--color-accent-teal);
+  color: #5EEAD4;
 }
 
 .brand-tag {
@@ -362,9 +362,9 @@ img {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--color-ink-muted);
-  background: var(--color-border-subtle);
-  border: 1px solid var(--color-border);
+  color: #D5F6F1;
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.3);
   padding: 3px 10px;
   border-radius: var(--radius-full);
 }
@@ -379,7 +379,7 @@ img {
 }
 
 .nav-links a {
-  color: var(--color-ink-soft);
+  color: rgba(226, 232, 240, 0.9);
   font-weight: 600;
   font-size: 0.9rem;
   padding: 8px 14px;
@@ -388,8 +388,8 @@ img {
 }
 
 .nav-links a:hover {
-  background: var(--color-accent-teal-subtle);
-  color: var(--color-accent-teal-dark);
+  background: rgba(45, 212, 191, 0.12);
+  color: #E6FFFB;
 }
 
 .btn-admin-link {
@@ -425,11 +425,11 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: var(--radius-full);
-  box-shadow: var(--shadow-xs);
-  color: var(--color-primary-navy);
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.18);
+  color: #F8FAFC;
   padding: 6px 10px 6px 8px;
   cursor: pointer;
   transition: all 0.18s ease;
@@ -437,8 +437,9 @@ img {
 
 .user-menu-trigger:hover,
 .user-menu-trigger[aria-expanded="true"] {
-  border-color: var(--color-accent-teal-border);
-  box-shadow: 0 8px 18px rgba(10, 35, 66, 0.08);
+  border-color: rgba(94, 234, 212, 0.4);
+  box-shadow: 0 12px 24px rgba(2, 6, 23, 0.2);
+  background: rgba(15, 23, 42, 0.72);
 }
 
 .user-menu-copy {
@@ -499,18 +500,18 @@ img {
   top: calc(100% + 12px);
   right: 0;
   width: min(320px, 84vw);
-  background: rgba(255, 255, 255, 0.98);
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.22);
   border-radius: var(--radius-lg);
-  box-shadow: 0 18px 40px rgba(10, 35, 66, 0.12), 0 8px 18px rgba(10, 35, 66, 0.06);
+  box-shadow: 0 22px 50px rgba(2, 6, 23, 0.28), 0 8px 18px rgba(15, 23, 42, 0.18);
   padding: 12px;
   z-index: 200;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px) scale(0.98);
   transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px) saturate(1.25);
+  -webkit-backdrop-filter: blur(14px) saturate(1.25);
 }
 
 .user-menu-popover::before {
@@ -520,9 +521,9 @@ img {
   right: 22px;
   width: 12px;
   height: 12px;
-  background: rgba(255, 255, 255, 0.98);
-  border-left: 1px solid rgba(148, 163, 184, 0.25);
-  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.9);
+  border-left: 1px solid rgba(148, 163, 184, 0.22);
+  border-top: 1px solid rgba(148, 163, 184, 0.22);
   transform: rotate(45deg);
 }
 
@@ -542,12 +543,12 @@ img {
 
 .user-menu-header strong {
   display: block;
-  color: var(--color-primary-navy);
+  color: #F8FAFC;
   font-size: 0.95rem;
 }
 
 .user-menu-header small {
-  color: var(--color-ink-muted);
+  color: rgba(226, 232, 240, 0.75);
   font-size: 0.76rem;
 }
 
@@ -561,7 +562,7 @@ img {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--color-ink-soft);
+  color: rgba(226, 232, 240, 0.88);
   border-radius: var(--radius-md);
   padding: 10px 12px;
   font-weight: 600;
@@ -569,13 +570,13 @@ img {
 }
 
 .user-menu-item:hover {
-  background: linear-gradient(180deg, rgba(0, 168, 150, 0.08), rgba(0, 168, 150, 0.04));
-  color: var(--color-accent-teal-dark);
+  background: linear-gradient(180deg, rgba(45, 212, 191, 0.12), rgba(14, 165, 233, 0.1));
+  color: #F0FDFA;
   transform: translateX(1px);
 }
 
 .user-menu-item svg {
-  color: var(--color-primary-navy);
+  color: #5EEAD4;
 }
 
 .user-menu-divider {
@@ -2749,9 +2750,9 @@ select:focus {
 
 @media (max-width: 430px) {
   .navbar {
-    background: rgba(255, 255, 255, 0.96);
-    border-bottom-color: rgba(148, 163, 184, 0.2);
-    box-shadow: 0 6px 18px rgba(10, 35, 66, 0.06);
+    background: rgba(8, 18, 31, 0.8);
+    border-bottom-color: rgba(148, 163, 184, 0.18);
+    box-shadow: 0 10px 26px rgba(2, 6, 23, 0.14);
   }
 
   .navbar-inner {
@@ -2771,6 +2772,7 @@ select:focus {
   .user-menu-trigger {
     padding: 5px 8px 5px 6px;
     min-height: 44px;
+    background: rgba(15, 23, 42, 0.62);
   }
 
   .user-menu-copy {
@@ -2785,8 +2787,10 @@ select:focus {
     width: 42px;
     height: 42px;
     border-radius: 12px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-    box-shadow: 0 8px 16px rgba(10, 35, 66, 0.08);
+    background: rgba(15, 23, 42, 0.7);
+    border-color: rgba(148, 163, 184, 0.2);
+    color: #E2E8F0;
+    box-shadow: 0 8px 16px rgba(2, 6, 23, 0.18);
   }
 }
 
@@ -3014,12 +3018,12 @@ select:focus {
     top: 100%;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.98);
+    background: rgba(8, 18, 31, 0.92);
     border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     padding: 16px 24px 24px;
-    box-shadow: 0 20px 38px rgba(10, 35, 66, 0.12);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 22px 42px rgba(2, 6, 23, 0.24);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
   }
 
   .navbar.nav-open .mobile-auth-links {
