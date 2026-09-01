@@ -6,7 +6,7 @@ from listings.models import Category, Item
 
 def home(request):
     featured_items = (
-        Item.objects.filter(is_available=True).select_related("category", "owner")[:8]
+        Item.objects.filter(is_available=True).select_related("category", "owner")[:4]
     )
     categories = Category.objects.all()[:8]
     context = {

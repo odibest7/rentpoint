@@ -113,29 +113,76 @@
 
 <section class="section section-highlight">
   <div class="container">
-    <div class="section-head text-center" style="max-width: 640px; margin: 0 auto 36px;">
-      <h2>Two Ways to Use RentPoint</h2>
-      <p>Built for renters looking for reliable gear and owners monetizing equipment in {{ PLATFORM_SERVICE_AREA }}.</p>
-    </div>
-    <div class="item-grid role-grid">
-      <div class="role-card">
-        <div class="role-icon customer-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <h3>Looking to Rent?</h3>
-        <p class="subtle">Browse verified items, view transparent rates, and pay securely with instant receipts and handover tracking.</p>
-        <a href="{% url 'accounts:signup_customer' %}" class="btn btn-primary">Sign Up as Customer</a>
+    {% if not request.user.is_authenticated %}
+      <div class="section-head text-center" style="max-width: 640px; margin: 0 auto 36px;">
+        <h2>Two Ways to Use RentPoint</h2>
+        <p>Built for renters looking for reliable gear and owners monetizing equipment in {{ PLATFORM_SERVICE_AREA }}.</p>
       </div>
+      <div class="item-grid role-grid">
+        <div class="role-card">
+          <div class="role-icon customer-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>Looking to Rent?</h3>
+          <p class="subtle">Browse verified items, view transparent rates, and pay securely with instant receipts and handover tracking.</p>
+          <a href="{% url 'accounts:signup_customer' %}" class="btn btn-primary">Sign Up as Customer</a>
+        </div>
 
-      <div class="role-card">
-        <div class="role-icon owner-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+        <div class="role-card">
+          <div class="role-icon owner-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          </div>
+          <h3>Own Items to Rent Out?</h3>
+          <p class="subtle">List your spare gear or property, receive direct electronic payments into your wallet, and withdraw to your bank anytime.</p>
+          <a href="{% url 'accounts:signup_item_owner' %}" class="btn btn-accent">List Items as Owner</a>
         </div>
-        <h3>Own Items to Rent Out?</h3>
-        <p class="subtle">List your spare gear or property, receive direct electronic payments into your wallet, and withdraw to your bank anytime.</p>
-        <a href="{% url 'accounts:signup_item_owner' %}" class="btn btn-accent">List Items as Owner</a>
       </div>
-    </div>
+    {% elif request.user.is_customer %}
+      <div class="section-head text-center" style="max-width: 640px; margin: 0 auto 36px;">
+        <h2>Welcome back, {{ request.user.first_name|default:request.user.username }}</h2>
+      </div>
+      <div class="item-grid role-grid">
+        <div class="role-card">
+          <div class="role-icon customer-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>Ready to rent something?</h3>
+          <p class="subtle">Browse verified gear, compare rates, and book with confidence using secure payments and instant receipts.</p>
+          <a href="{% url 'listings:item_list' %}" class="btn btn-primary">Browse Items</a>
+        </div>
+
+        <div class="role-card muted-card">
+          <div class="role-icon owner-icon" style="background: rgba(148, 163, 184, 0.14); color: #64748b;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          </div>
+          <h3>Owner accounts are separate</h3>
+          <p class="subtle">You’re signed in as a renter. If you want to list items, you’ll need a separate owner account.</p>
+        </div>
+      </div>
+    {% elif request.user.is_item_owner %}
+      <div class="section-head text-center" style="max-width: 640px; margin: 0 auto 36px;">
+        <h2>Welcome back, {{ request.user.first_name|default:request.user.username }}</h2>
+      </div>
+      <div class="item-grid role-grid">
+        <div class="role-card">
+          <div class="role-icon owner-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          </div>
+          <h3>Manage your listings</h3>
+          <p class="subtle">Keep your items visible, update availability, and respond to incoming rental requests from your dashboard.</p>
+          <a href="{% url 'listings:owner_item_list' %}" class="btn btn-primary">Go to Listings</a>
+        </div>
+
+        <div class="role-card">
+          <div class="role-icon owner-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h18v10H3z"/><path d="M8 11h8"/><path d="M8 15h5"/><path d="M6 7V5h12v2"/></svg>
+          </div>
+          <h3>Earnings & withdrawals</h3>
+          <p class="subtle">Track payments, monitor your wallet balance, and manage withdrawals whenever you’re ready.</p>
+          <a href="{% url 'wallet:earnings' %}" class="btn btn-accent">View Wallet</a>
+        </div>
+      </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}
