@@ -5,6 +5,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   initPasswordVisibilityToggles();
   initMobileNav();
+  initAccountMenu();
   initItemGallery();
   initAlertDismiss();
   initFormsetAdd();
@@ -87,6 +88,36 @@ function initMobileNav() {
     navbar.classList.toggle("nav-open");
     const expanded = navbar.classList.contains("nav-open");
     toggle.setAttribute("aria-expanded", String(expanded));
+  });
+}
+
+function initAccountMenu() {
+  const wrap = document.querySelector(".user-menu-wrap");
+  if (!wrap) return;
+
+  const trigger = wrap.querySelector(".user-menu-trigger");
+  if (!trigger) return;
+
+  function setOpen(open) {
+    wrap.classList.toggle("is-open", open);
+    trigger.setAttribute("aria-expanded", String(open));
+  }
+
+  trigger.addEventListener("click", function (event) {
+    event.stopPropagation();
+    setOpen(!wrap.classList.contains("is-open"));
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!wrap.contains(event.target)) {
+      setOpen(false);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      setOpen(false);
+    }
   });
 }
 
