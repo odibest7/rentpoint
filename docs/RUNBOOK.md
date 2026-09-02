@@ -1,4 +1,4 @@
-# RentPoint — Runbook
+# RentPoint: Runbook
 
 RentPoint is the Automated Web-Based Property and Rental Management System
 for Nsukka Urban described in the project report, built as a real, working
@@ -21,8 +21,8 @@ part of this codebase:
 | Transaction management for recording/monitoring payments           | `transactions` app (`Transaction` model, receipts, history) |
 | Withdrawal mechanism for item owners                               | `wallet` app (`Wallet`, `WithdrawalRequest`)                |
 
-The two operational user types from the report — **customer** and **item
-owner** — are modelled as a single `role` field on a custom `User` model
+The two operational user types from the report (**customer** and **item
+owner**) are modelled as a single `role` field on a custom `User` model
 (`accounts` app), so authorization logic lives in one place instead of being
 duplicated across views. The **administrator** role from the report is
 covered by Django's built-in `is_staff` / `is_superuser` flags and the
@@ -140,8 +140,8 @@ the same codebase runs in development and production without code changes.
 | `DJANGO_DEBUG`                                            | Verbose error pages                                                    | `True`                                     |
 | `DJANGO_ALLOWED_HOSTS`                                    | Comma-separated allowed hostnames                                      | `127.0.0.1,localhost,testserver`           |
 | `DJANGO_CSRF_TRUSTED_ORIGINS`                             | Comma-separated trusted origins for CSRF (needed behind HTTPS proxies) | empty                                      |
-| `DB_ENGINE`                                               | `sqlite` (default) or `mysql`                                          | `sqlite`                                   |
-| `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` | MySQL connection details (only read when `DB_ENGINE=mysql`)            | —                                          |
+| `DB_ENGINE`                                               | Database engine: sqlite or mysql                                       | `sqlite`                                   |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` | MySQL connection details (only read when `DB_ENGINE=mysql`)            | N/A                                        |
 | `PLATFORM_NAME`                                           | Brand name shown across the site                                       | `RentPoint`                                |
 | `PLATFORM_SERVICE_AREA`                                   | Location text shown across the site                                    | `Nsukka Urban`                             |
 | `PLATFORM_COMMISSION_PERCENT`                             | Platform's cut of each paid transaction                                | `8`                                        |
@@ -159,22 +159,20 @@ production. To switch:
 # in .env
 DB_ENGINE=mysql
 DB_NAME=rentpoint
-DB_USER=rentpoint
-DB_PASSWORD=your-password
+DB_USER=rentpoint_user
+DB_PASSWORD=your-secure-password
 DB_HOST=127.0.0.1
 DB_PORT=3306
 ```
 
-Then install the MySQL driver (already listed in `requirements.txt`) and
-re-run migrations against the new database:
+Then install the MySQL driver (already in `requirements.txt`) and run migrations:
 
 ```bash
 pip install mysqlclient
 python manage.py migrate
 ```
 
-No application code changes are required; `config/settings.py` reads
-`DB_ENGINE` and configures `DATABASES` accordingly.
+Nothing in the views, models, or forms needs to change: Django handles the dialect difference transparently.
 
 ---
 
@@ -187,23 +185,23 @@ To work with a real gateway:
 1. Fill in the valid Paystack secret/public key values in `.env`.
 2. The callback URL is generated dynamically from the current request, so
    there is no separate `.env` value to maintain for it.
-3. No view, template, or model needs to change — `transactions/views.py`
+3. No view, template, or model needs to change: `transactions/views.py`
    only ever calls `get_gateway().charge(...)`.
 
 ---
 
 ## 7. Roles and permissions, in practice
 
-- **Anonymous visitor** — can browse `/listings/`, view item detail pages,
+- **Anonymous visitor**: Can browse `/listings/`, view item detail pages,
   read the about/how-it-works pages, and sign up.
-- **Customer** (`role=customer`) — everything above, plus renting an item
+- **Customer** (`role=customer`): Everything above, plus renting an item
   (which creates a `Transaction`), paying for it, and viewing their own
   transaction history and receipts.
-- **Item owner** (`role=item_owner`) — can create, edit, and remove their
+- **Item owner** (`role=item_owner`): Can create, edit, and remove their
   own listings; cannot rent items (a customer account is required for
   that); can view their sales transactions, their wallet balance, and
   request withdrawals.
-- **Administrator** (`is_staff=True`) — full access to `/admin/`, where
+- **Administrator** (`is_staff=True`): Full access to `/admin/`, where
   every model can be inspected, and where withdrawal requests are approved
   or rejected via the "Approve and pay" / "Reject" bulk actions on the
   `WithdrawalRequest` admin page.
@@ -248,6 +246,4 @@ development, not just written and assumed to work:
   `DJANGO_SECRET_KEY`.
 - Point `DB_ENGINE` at a managed MySQL instance and run `migrate`.
 - Add email notifications for payment confirmation and withdrawal status
-  changes (not built yet — the report does not require it, but it is a
-  natural extension of the transaction and withdrawal records that already
-  exist).
+  changes (the transaction and withdrawal records already support this).

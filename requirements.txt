@@ -10,8 +10,8 @@ gunicorn==23.*
 # Static files serving in production (no separate Nginx/CDN config needed)
 whitenoise==6.*
 
-# PostgreSQL driver — used when DB_ENGINE=postgres (Supabase, Railway, Neon, etc.)
+# PostgreSQL driver: used when DB_ENGINE=postgres (Supabase, Railway, Neon, etc.)
 psycopg2-binary==2.*
 
-# MySQL driver — only needed when DB_ENGINE=mysql (shared hosting, etc.)
+# MySQL driver: only needed when DB_ENGINE=mysql (shared hosting, etc.)
 mysqlclient==2.*

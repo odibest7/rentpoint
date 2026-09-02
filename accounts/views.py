@@ -68,9 +68,9 @@ def profile(request):
 def verification(request):
     """Lets an item owner submit their NIN for identity verification, and
     shows them the current status of that submission. A customer account
-    has no verification of its own — verification exists to answer the
+    has no verification of its own because verification exists to answer the
     question a customer asks before paying a stranger: "can I trust this
-    item owner?" — so this page is item-owner only."""
+    item owner?", so this page is item-owner only."""
     if not request.user.is_item_owner:
         messages.error(request, "Identity verification is only for item owner accounts.")
         return redirect("core:redirect_after_login")

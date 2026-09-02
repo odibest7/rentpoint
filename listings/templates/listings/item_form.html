@@ -2,9 +2,10 @@
 {% block title %}{% if is_new %}Create Listing{% else %}Edit Listing{% endif %} | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
 <div class="page-header">
-  <div class="container">
-    <span class="eyebrow">Owner Hub</span>
-    <h1>{% if is_new %}Create a New Listing{% else %}Edit "{{ item.name }}"{% endif %}</h1>
+  <div class="container" style="max-width:720px;">
+    <span class="eyebrow"><span class="eyebrow-dot"></span> Owner Listing Management</span>
+    <h1 class="mt-0">{% if is_new %}Publish a New Rental Listing{% else %}Edit "{{ item.name }}"{% endif %}</h1>
+    <p class="hero-lead mt-0">{% if is_new %}Set transparent rates, upload clear photos, and specify rental availability for renters in {{ PLATFORM_SERVICE_AREA }}.{% else %}Update item description, photos, pricing, and availability status.{% endif %}</p>
   </div>
 </div>
 

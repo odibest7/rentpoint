@@ -38,7 +38,7 @@ class OwnerVerificationAdmin(admin.ModelAdmin):
 
     def _image_thumbnail(self, image, alt):
         if not image:
-            return "—"
+            return "None"
         return format_html(
             '<a href="{0}" target="_blank" rel="noopener"><img src="{0}" alt="{1}" style="width:64px;height:48px;object-fit:cover;border-radius:4px;"></a>',
             image.url,

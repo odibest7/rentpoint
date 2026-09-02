@@ -3,9 +3,21 @@
 {% block content %}
 <div class="page-header">
   <div class="container">
-    <span class="eyebrow">Rental Catalogue</span>
-    <h1 class="mt-0">Available in {{ PLATFORM_SERVICE_AREA }}</h1>
-    <p class="hero-lead mt-0">Browse and rent verified equipment, tools, party rentals, and spaces.</p>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <span class="eyebrow"><span class="eyebrow-dot"></span> Rental Catalogue</span>
+        <h1 class="mt-0">Explore Available Equipment &amp; Rentals</h1>
+        <p class="hero-lead mt-0">Browse verified listings in {{ PLATFORM_SERVICE_AREA }} with transparent rates, escrow protection, and instant receipts.</p>
+      </div>
+      {% if user.is_authenticated and user.is_item_owner %}
+        <div style="display: flex; gap: 12px; align-items: center; padding-top: 8px;">
+          <a href="{% url 'listings:item_create' %}" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            List New Item
+          </a>
+        </div>
+      {% endif %}
+    </div>
   </div>
 </div>
 
