@@ -1,0 +1,24 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="18" y1="14" x2="108" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071B2E"/>
+      <stop offset="1" stop-color="#0B2A47"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="18" y1="20" x2="102" y2="96" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67F4E4"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="58" y1="50" x2="94" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F9D57A"/>
+      <stop offset="1" stop-color="#F5B942"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bg)"/>
+  <rect x="18" y="18" width="92" height="92" rx="20" stroke="rgba(94,234,212,0.2)" stroke-width="2"/>
+
+  <path d="M42 38V90H58.11C71.52 90 81.98 81.55 81.98 68.75C81.98 58.85 76.21 51.98 66.32 49.76L83.72 38H68.19L54.94 48.54H58.11V38H42ZM58.11 54.61H59.63C66.31 54.61 70.29 58.38 70.29 65.5C70.29 72.38 66.24 76.51 59.38 76.51H58.11V54.61Z" fill="url(#teal)"/>
+
+  <path d="M79.66 78.35L92.69 90.7H82.68L72.22 81.18L79.66 78.35Z" fill="url(#gold)"/>
+  <circle cx="89" cy="42" r="6" fill="#F5B942"/>
+</svg>

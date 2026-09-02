@@ -6,7 +6,7 @@ browse and pay for rentals electronically, and every payment produces a
 permanent, transparent transaction record.
 
 Built with Python, Django, HTML, CSS, and JavaScript, with SQLite for
-development and MySQL for production — matching the technology plan in the
+development and MySQL for production, matching the technology plan in the
 accompanying project report.
 
 ## Quick start
@@ -26,11 +26,11 @@ Then open `http://127.0.0.1:8000/`.
 
 ## Documentation
 
-- **[docs/RUNBOOK.md](docs/RUNBOOK.md)** — full architecture, environment
+- **[docs/RUNBOOK.md](docs/RUNBOOK.md)**: Full architecture, environment
   variables, how to switch to MySQL, how to connect a real payment
   gateway, roles and permissions, and what has been tested end to end.
   Start here.
-- **[docs/DESIGN.md](docs/DESIGN.md)** — the visual design plan and the
+- **[docs/DESIGN.md](docs/DESIGN.md)**: The visual design plan and the
   reasoning behind every colour, font, and layout decision.
 
 ## Project structure

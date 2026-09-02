@@ -1,10 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Delete Listing | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<section class="container" style="padding:60px 0; max-width:500px;">
+<div class="page-header text-center">
+  <div class="container" style="max-width:560px;">
+    <span class="eyebrow" style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.15); color: #FCA5A5;"><span class="eyebrow-dot" style="background: #EF4444;"></span> Remove Listing</span>
+    <h1 class="mt-0">Confirm Deletion</h1>
+    <p class="hero-lead mt-0">Are you sure you want to remove "{{ item.name }}" from the catalogue?</p>
+  </div>
+</div>
+
+<section class="container" style="padding:40px 0 60px; max-width:500px;">
   <div class="form-card text-center" style="padding:36px 28px;">
-    <h1 style="font-size:1.6rem; margin-top:0;">Delete "{{ item.name }}"?</h1>
-    <p class="subtle" style="margin-bottom:24px;">This will permanently remove the listing from the catalogue. Historical transaction records remain on ledger.</p>
+    <h2 style="font-size:1.4rem; margin-top:0;">Delete "{{ item.name }}"?</h2>
+    <p class="subtle" style="margin-bottom:24px;">This will permanently remove the listing from the public catalogue. Historical transaction records will remain securely in your ledger.</p>
     <form method="post" style="display:flex; justify-content:center; gap:12px;">
       {% csrf_token %}
       <a href="{% url 'listings:owner_item_list' %}" class="btn btn-outline">Cancel</a>

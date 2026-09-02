@@ -8,9 +8,9 @@ against a small, provider-independent interface.
 
 Provider
 --------
-paystack — live Paystack payments (Nigerian NGN). Supply the real API
-           keys in the environment, then initialize hosted checkout,
-           redirect back to the callback URL, and verify the payment.
+paystack: Live Paystack payments (Nigerian NGN). Supply the real API
+          keys in the environment, then initialize hosted checkout,
+          redirect back to the callback URL, and verify the payment.
 """
 
 import json
@@ -57,7 +57,7 @@ class PaystackGateway(BasePaymentGateway):
     Live Paystack integration (https://paystack.com).
 
     How the flow works:
-    1. call charge() — this calls Paystack's Initialize Transaction API
+    1. Call charge(): This calls the Paystack Initialize Transaction API
        and returns a redirect_url pointing to Paystack's hosted checkout.
     2. The view redirects the customer to redirect_url.
     3. After the customer pays (or cancels), Paystack redirects back to
@@ -66,9 +66,9 @@ class PaystackGateway(BasePaymentGateway):
        confirm the payment was actually successful.
 
     Required environment variables:
-        PAYSTACK_SECRET_KEY   — starts with sk_live_... (production)
-                                or sk_test_... (testing mode)
-        PAYSTACK_PUBLIC_KEY   — starts with pk_live_... or pk_test_...
+        PAYSTACK_SECRET_KEY: Starts with sk_live_... (production)
+                             or sk_test_... (testing mode)
+        PAYSTACK_PUBLIC_KEY: Starts with pk_live_... or pk_test_...
     """
 
     provider_name = "paystack"
@@ -84,7 +84,7 @@ class PaystackGateway(BasePaymentGateway):
             raise ValueError("PAYSTACK_SECRET_KEY must be a Paystack test or live secret key.")
         return key
     def _request(self, method, path, body=None):
-        """Minimal HTTP helper — avoids adding requests as a dependency."""
+        """Minimal HTTP helper using standard library urllib."""
         url = f"{self._BASE}{path}"
         if urlsplit(url).scheme.lower() not in {"http", "https"}:
             raise ValueError("Payment gateway URL must use HTTP or HTTPS.")

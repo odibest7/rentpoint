@@ -3,9 +3,9 @@ Item owner identity verification.
 
 Trust between customers and item owners is one of the concerns the
 project report raises directly. Letting an item owner submit their NIN
-(National Identification Number) and having it checked against NIMC's
-records is the standard way Nigerian platforms build that trust, but
-NIMC does not expose a free public verification endpoint — real
+(National Identification Number) and having it checked against NIMC records
+is the standard way Nigerian platforms build that trust, but
+NIMC does not expose a free public verification endpoint. Real
 verification requires a paid third-party provider such as Prembly,
 VerifyMe, or Youverify.
 
@@ -17,7 +17,7 @@ small, provider-independent interface.
 Unlike payments, there is no safe "auto-approve" default here. Wrongly
 telling a customer an owner is verified is worse than not verifying
 anyone at all, so the default provider (ManualReviewProvider) never
-auto-approves anything — it only records the submission and leaves the
+auto-approves anything. It only records the submission and leaves the
 owner's status at "pending" for a member of staff to review by hand,
 via the site-admin verification queue. Swapping in a real provider is a
 matter of implementing the same interface and changing

@@ -6,78 +6,55 @@
   <div class="container hero-grid">
     <div class="hero-content">
       <span class="eyebrow">
-        <span class="eyebrow-dot"></span> {{ PLATFORM_SERVICE_AREA }}
+        <span class="eyebrow-dot"></span> Verified Rental Marketplace in {{ PLATFORM_SERVICE_AREA }}
       </span>
-      <h1>Rent equipment and items with confidence.</h1>
+      <h1>Rent Equipment, Event Gear &amp; Spaces with Confidence</h1>
       <p class="hero-lead">
-        Connect directly with verified local owners for event canopies, tools, spaces, and equipment with secure electronic payments and instant receipts.
+        Connect directly with trusted local owners. Pay securely through protected escrow and receive instant, official transaction receipts.
       </p>
+
+      <form action="{% url 'listings:item_list' %}" method="get" class="hero-search-form" role="search">
+        <div class="hero-search-input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" name="q" placeholder="Search canopies, tools, sound gear, spaces..." aria-label="Search rental listings">
+        </div>
+        {% if categories %}
+        <select name="category" class="hero-search-category" aria-label="Select category">
+          <option value="">All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+        {% endif %}
+        <button type="submit" class="btn btn-primary hero-search-btn">
+          <span>Search</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+
       <div class="hero-actions">
-        <a href="{% url 'listings:item_list' %}" class="btn btn-primary btn-lg">
-          Browse Listings
+        <a href="{% url 'listings:item_list' %}" class="btn btn-outline btn-lg">
+          Browse All Catalogue
         </a>
-        <a href="{% url 'accounts:signup_item_owner' %}" class="btn btn-outline btn-lg">
-          List an Item
+        <a href="{% url 'accounts:signup_item_owner' %}" class="btn btn-outline btn-lg" style="background: rgba(0, 168, 150, 0.15); border-color: rgba(45, 212, 191, 0.4); color: #2DD4BF;">
+          List Your Gear as Owner
         </a>
       </div>
+
       <div class="hero-stats">
         <div class="hero-stat">
-          <strong>{{ item_count }}+</strong>
-          <span>Active Listings</span>
+          <strong>{{ item_count|default:"0" }}+</strong>
+          <span>Verified Listings</span>
         </div>
         <div class="hero-stat">
           <strong>100%</strong>
-          <span>Verified Escrow</span>
+          <span>Escrow Protected</span>
         </div>
         <div class="hero-stat">
           <strong>Instant</strong>
-          <span>Digital Records</span>
+          <span>Official Receipts</span>
         </div>
       </div>
-    </div>
-
-    <div class="hero-showcase-wrapper">
-      <div class="hero-showcase">
-        <div class="hero-showcase-media">
-          <span class="hero-showcase-tag">Featured</span>
-          <span class="badge badge-success hero-showcase-status"><span class="badge-dot"></span>Available</span>
-        </div>
-        <div class="hero-showcase-body">
-          <h3 class="mt-0" style="color:var(--color-primary-navy);">White Canopy &amp; Chairs (Set of 100)</h3>
-          <p class="subtle">Odenigbo, Nsukka &middot; Verified Owner</p>
-          <div class="item-card-footer">
-            <div class="item-card-price">
-              <span class="price-amount">₦15,000</span>
-              <span class="price-unit">/ event</span>
-            </div>
-            <a href="{% url 'listings:item_list' %}" class="btn btn-sm btn-primary">Rent Now</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section section-alt">
-  <div class="container">
-    <div class="section-head">
-      <div>
-        <h2>Browse by Category</h2>
-        <p>Explore equipment and rental options across {{ PLATFORM_SERVICE_AREA }}.</p>
-      </div>
-      <a href="{% url 'listings:item_list' %}" class="btn btn-ghost">
-        All categories
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </a>
-    </div>
-    <div class="chip-row">
-      {% for category in categories %}
-        <a href="{% url 'listings:item_list' %}?category={{ category.id }}" class="chip">
-          <span>{{ category.name }}</span>
-        </a>
-      {% empty %}
-        <p class="subtle">Categories will appear here once listings are added.</p>
-      {% endfor %}
     </div>
   </div>
 </section>

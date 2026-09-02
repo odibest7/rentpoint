@@ -35,8 +35,8 @@ class User(AbstractUser):
     # Denormalized onto the user (rather than only living on
     # OwnerVerification) so item cards, listing pages, and receipts can
     # show a verified badge without an extra query on every render.
-    # OwnerVerification remains the source of truth for *why* this status
-    # was reached — the submitted NIN, the reviewer, and the reasoning.
+    # OwnerVerification remains the source of truth for why this status
+    # was reached (the submitted NIN, the reviewer, and the reasoning).
     verification_status = models.CharField(
         max_length=12,
         choices=VerificationStatus.choices,
@@ -68,14 +68,14 @@ class OwnerVerification(models.Model):
     """
     An item owner's identity verification submission: the NIN (National
     Identification Number) and legal name they provided, plus an audit
-    trail of who reviewed it and why. One row per owner — resubmitting
+    trail of who reviewed it and why. One row per owner: resubmitting
     after a rejection updates this row rather than creating a new one, so
     there is always exactly one current submission to review.
 
     The NIN is genuinely sensitive personal data (comparable to a
     national ID or SSN elsewhere), so nothing outside this model or the
     Django admin should ever read the `nin` field directly. Use
-    `masked_nin` everywhere else — item cards, dashboards, the
+    `masked_nin` everywhere else: item cards, dashboards, and the
     verification status page shown back to the owner themselves. The selfie photo and both physical NIN-card photographs are treated with
     the same care: they are only ever shown on the staff review queue and in
     the Django admin, never to customers or on any public page.

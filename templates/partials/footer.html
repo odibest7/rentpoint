@@ -32,7 +32,16 @@
         <h4>Customers</h4>
         <ul>
           <li><a href="{% url 'accounts:signup_customer' %}">Create Account</a></li>
-          <li><a href="{% url 'accounts:login' %}">Log In</a></li>
+          {% if request.user.is_authenticated %}
+            <li>
+              <form action="{% url 'accounts:logout' %}" method="post" class="footer-logout-form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm footer-logout-btn">Log Out</button>
+              </form>
+            </li>
+          {% else %}
+            <li><a href="{% url 'accounts:login' %}">Log In</a></li>
+          {% endif %}
           <li><a href="{% url 'transactions:my_transactions' %}">My Rentals</a></li>
         </ul>
       </div>
