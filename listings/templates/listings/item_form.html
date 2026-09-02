@@ -57,25 +57,75 @@
       </label>
     </div>
 
-    <fieldset>
-      <legend>Item Photos</legend>
+    <div class="photo-upload-section">
+      <div class="photo-upload-header">
+        <div>
+          <h2 class="photo-upload-title">Item Photographs</h2>
+          <p class="photo-upload-subtitle">Upload clear photos showing the item from different angles. The first photo is your main listing cover photo.</p>
+        </div>
+      </div>
+
       {{ formset.management_form }}
-      <div data-formset-rows>
+      
+      <div class="photo-upload-grid" data-photo-grid>
         {% for image_form in formset %}
-          <div class="form-row" data-formset-row style="align-items:center;">
+          <div class="photo-upload-card {% if image_form.instance.pk and image_form.instance.image %}has-photo{% endif %}" data-photo-card data-form-index="{{ forloop.counter0 }}">
             {{ image_form.id }}
-            <div class="field-group">{{ image_form.image }}</div>
-            <div class="field-group">
-              {{ image_form.position }}
-              {% if image_form.DELETE %}<label style="font-weight:400; display:flex; align-items:center; gap:6px; margin-top:8px;">{{ image_form.DELETE }} Remove</label>{% endif %}
-            </div>
+            {{ image_form.position }}
+            
+            {% if image_form.instance.pk and image_form.instance.image %}
+              <!-- Existing saved image -->
+              <div class="photo-preview-wrap">
+                <img src="{{ image_form.instance.image.url }}" class="photo-preview-img" alt="Item photo {{ forloop.counter }}">
+                {% if forloop.first %}
+                  <span class="photo-badge-cover">Cover Photo</span>
+                {% else %}
+                  <span class="photo-badge-index">Photo #{{ forloop.counter }}</span>
+                {% endif %}
+              </div>
+              <div class="photo-card-actions">
+                <span class="photo-card-filename">Saved Image</span>
+                {% if image_form.DELETE %}
+                  <label class="photo-action-btn photo-btn-remove" style="cursor:pointer; margin:0;">
+                    {{ image_form.DELETE }}
+                    <span>Remove</span>
+                  </label>
+                {% endif %}
+              </div>
+              <div style="display:none;">
+                {{ image_form.image }}
+              </div>
+            {% else %}
+              <!-- New upload slot -->
+              <div class="photo-dropzone-content" data-dropzone>
+                <div class="photo-dropzone-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                </div>
+                <div class="photo-dropzone-label">{% if forloop.first %}Upload Cover Photo{% else %}Upload Photo{% endif %}</div>
+                <div class="photo-dropzone-hint">Click or drag &amp; drop</div>
+              </div>
+              {{ image_form.image }}
+              
+              <!-- Container for client-side live preview -->
+              <div class="photo-live-preview" style="display:none; width:100%;"></div>
+            {% endif %}
           </div>
         {% endfor %}
       </div>
-      <button type="button" class="btn btn-sm btn-ghost" data-add-image-row>+ Add another photo</button>
-    </fieldset>
 
-    <div style="margin-top:16px;">
+      <div class="photo-upload-footer">
+        <button type="button" class="btn btn-sm btn-outline" data-add-photo-btn>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Add another photo</span>
+        </button>
+        <span class="photo-count-info">Up to 8 high-resolution photos (PNG, JPG, WEBP)</span>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;">
       <button type="submit" class="btn btn-primary btn-block btn-lg">{% if is_new %}Publish Listing{% else %}Save Changes{% endif %}</button>
     </div>
   </form>

@@ -38,8 +38,23 @@
               {% for item in items %}
                 <tr>
                   <td data-label="Item">
-                    <a href="{{ item.get_absolute_url }}" class="table-link-title">{{ item.name }}</a>
-                    <div class="subtle text-xs">{{ item.location }}</div>
+                    <div class="table-item-cell">
+                      <div class="table-item-thumb">
+                        {% if item.primary_image %}
+                          <img src="{{ item.primary_image.image.url }}" alt="{{ item.name }}">
+                        {% else %}
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                          </svg>
+                        {% endif %}
+                      </div>
+                      <div>
+                        <a href="{{ item.get_absolute_url }}" class="table-link-title">{{ item.name }}</a>
+                        <div class="subtle text-xs">{{ item.location }}</div>
+                      </div>
+                    </div>
                   </td>
                   <td data-label="Category"><span class="table-tag">{{ item.category.name }}</span></td>
                   <td data-label="Rate" class="mono font-semibold">₦{{ item.rental_price|floatformat:0 }} <span class="table-unit">/ {{ item.get_price_unit_display }}</span></td>

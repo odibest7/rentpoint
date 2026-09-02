@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initAccountMenu();
   initItemGallery();
   initAlertDismiss();
-  initFormsetAdd();
+  initPhotoUploader();
   initConfirmDialogs();
   initModalPopups();
   initSelfieCapture();
@@ -199,36 +199,182 @@ function initAlertDismiss() {
 }
 
 /**
- * Lets an item owner add another image row to the listing form without a
- * page reload, by cloning the last empty formset row and updating its
- * Django management-form indices.
+ * Comprehensive item photo uploader:
+ * - Instant client-side previews before saving (ObjectURL)
+ * - Drag-and-drop file upload support
+ * - Dynamic addition of photo slots with Django management-form index syncing
+ * - Clear cover photo vs secondary photo badges
+ * - Smooth removal & replace actions
  */
-function initFormsetAdd() {
-  const addButton = document.querySelector("[data-add-image-row]");
-  if (!addButton) return;
+function initPhotoUploader() {
+  const container = document.querySelector("[data-photo-grid]");
+  const totalForms = document.querySelector("#id_images-TOTAL_FORMS");
+  const maxFormsInput = document.querySelector("#id_images-MAX_NUM_FORMS");
+  const maxForms = maxFormsInput ? parseInt(maxFormsInput.value, 10) : 8;
+  const addButton = document.querySelector("[data-add-photo-btn], [data-add-image-row]");
 
-  addButton.addEventListener("click", function () {
-    const container = document.querySelector("[data-formset-rows]");
-    const totalForms = document.querySelector("#id_images-TOTAL_FORMS");
-    if (!container || !totalForms) return;
+  if (!container) return;
 
-    const rows = container.querySelectorAll("[data-formset-row]");
-    const lastRow = rows[rows.length - 1];
-    const newIndex = parseInt(totalForms.value, 10);
-    const newRow = lastRow.cloneNode(true);
+  function updateCardBadges() {
+    const cards = container.querySelectorAll(".photo-upload-card");
+    let activeIndex = 0;
 
-    newRow.innerHTML = newRow.innerHTML.replace(
-      /images-(\d+)-/g,
-      "images-" + newIndex + "-",
-    );
-    newRow.querySelectorAll("input").forEach(function (input) {
-      if (input.type === "file") input.value = "";
-      if (input.type === "number") input.value = "0";
+    cards.forEach(function (card) {
+      const isDeleted = card.querySelector('input[type="checkbox"][name$="-DELETE"]:checked');
+      if (isDeleted) return;
+
+      const coverBadge = card.querySelector(".photo-badge-cover, .photo-badge-index");
+      if (coverBadge) {
+        if (activeIndex === 0) {
+          coverBadge.className = "photo-badge-cover";
+          coverBadge.textContent = "Cover Photo";
+        } else {
+          coverBadge.className = "photo-badge-index";
+          coverBadge.textContent = "Photo #" + (activeIndex + 1);
+        }
+      }
+      activeIndex++;
     });
 
-    container.appendChild(newRow);
-    totalForms.value = String(newIndex + 1);
-  });
+    const limitInfo = document.querySelector("[data-photo-limit-info]");
+    if (limitInfo) {
+      limitInfo.textContent = `${cards.length} of ${maxForms} photos allowed`;
+    }
+  }
+
+  function bindCardEvents(card) {
+    const fileInput = card.querySelector('input[type="file"]');
+    const dropzone = card.querySelector("[data-dropzone]");
+    const previewContainer = card.querySelector(".photo-live-preview");
+    const positionInput = card.querySelector('input[name$="-position"]');
+
+    if (!fileInput) return;
+
+    // Handle Drag and Drop
+    ["dragenter", "dragover"].forEach(function (eventName) {
+      card.addEventListener(eventName, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        card.style.borderColor = "var(--color-accent-teal)";
+        card.style.backgroundColor = "var(--color-accent-teal-subtle)";
+      });
+    });
+
+    ["dragleave", "drop"].forEach(function (eventName) {
+      card.addEventListener(eventName, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        card.style.borderColor = "";
+        card.style.backgroundColor = "";
+      });
+    });
+
+    card.addEventListener("drop", function (e) {
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileSelect(e.dataTransfer.files[0]);
+      }
+    });
+
+    // Handle standard file selection
+    fileInput.addEventListener("change", function () {
+      if (fileInput.files && fileInput.files[0]) {
+        handleFileSelect(fileInput.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      if (!file.type.startsWith("image/")) {
+        alert("Please select a valid image file (JPG, PNG, WEBP).");
+        return;
+      }
+
+      const imageUrl = URL.createObjectURL(file);
+      card.classList.add("has-photo");
+      if (dropzone) dropzone.style.display = "none";
+
+      if (previewContainer) {
+        previewContainer.style.display = "block";
+        previewContainer.innerHTML = `
+          <div class="photo-preview-wrap">
+            <img src="${imageUrl}" class="photo-preview-img" alt="Selected photo">
+            <span class="photo-badge-index">Preview</span>
+          </div>
+          <div class="photo-card-actions">
+            <span class="photo-card-filename" title="${file.name}">${file.name}</span>
+            <button type="button" class="photo-action-btn photo-btn-remove" data-action="remove-preview">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <span>Remove</span>
+            </button>
+          </div>
+        `;
+
+        const removeBtn = previewContainer.querySelector('[data-action="remove-preview"]');
+        if (removeBtn) {
+          removeBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            fileInput.value = "";
+            card.classList.remove("has-photo");
+            if (dropzone) dropzone.style.display = "";
+            previewContainer.innerHTML = "";
+            previewContainer.style.display = "none";
+            updateCardBadges();
+          });
+        }
+      }
+
+      updateCardBadges();
+    }
+  }
+
+  // Bind existing cards
+  container.querySelectorAll(".photo-upload-card").forEach(bindCardEvents);
+  updateCardBadges();
+
+  // Add another photo button
+  if (addButton && totalForms) {
+    addButton.addEventListener("click", function () {
+      const currentCount = container.querySelectorAll(".photo-upload-card").length;
+      if (currentCount >= maxForms) {
+        alert(`You can upload a maximum of ${maxForms} photos per listing.`);
+        return;
+      }
+
+      const newIndex = parseInt(totalForms.value, 10);
+      const newCard = document.createElement("div");
+      newCard.className = "photo-upload-card";
+      newCard.setAttribute("data-photo-card", "");
+      newCard.setAttribute("data-form-index", String(newIndex));
+
+      newCard.innerHTML = `
+        <input type="hidden" name="images-${newIndex}-id" id="id_images-${newIndex}-id">
+        <input type="hidden" name="images-${newIndex}-position" value="${newIndex}" id="id_images-${newIndex}-position" class="photo-position-input">
+        <div class="photo-dropzone-content" data-dropzone>
+          <div class="photo-dropzone-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+          <div class="photo-dropzone-label">Upload Photo</div>
+          <div class="photo-dropzone-hint">Click or drag &amp; drop</div>
+        </div>
+        <input type="file" name="images-${newIndex}-image" accept="image/*" class="photo-file-input" id="id_images-${newIndex}-image">
+        <div class="photo-live-preview" style="display:none; width:100%;"></div>
+      `;
+
+      container.appendChild(newCard);
+      totalForms.value = String(newIndex + 1);
+
+      bindCardEvents(newCard);
+      updateCardBadges();
+
+      // Trigger file picker on new card immediately for fluid UX
+      const newFileInput = newCard.querySelector('input[type="file"]');
+      if (newFileInput) newFileInput.click();
+    });
+  }
 }
 
 function initConfirmDialogs() {
