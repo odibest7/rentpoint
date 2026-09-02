@@ -1509,11 +1509,22 @@ img {
 
 .item-card-media {
   aspect-ratio: 4 / 3;
-  background: #E2E8F0;
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
   background-size: cover;
   background-position: center;
   position: relative;
   display: block;
+  overflow: hidden;
+}
+
+.item-card-media-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(148, 163, 184, 0.6);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.9) 100%);
 }
 
 .item-card-category {
@@ -4393,4 +4404,275 @@ select:focus {
     padding-top: 8pt !important;
     font-size: 7.5pt !important;
   }
+}
+
+/* ==========================================================================
+   Photo Uploader & Live Preview System
+   ========================================================================== */
+
+.photo-upload-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-top: 8px;
+  box-shadow: var(--shadow-xs);
+}
+
+.photo-upload-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  gap: 12px;
+}
+
+.photo-upload-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary-navy);
+  margin: 0 0 4px;
+}
+
+.photo-upload-subtitle {
+  font-size: 0.85rem;
+  color: var(--color-ink-muted);
+  margin: 0;
+}
+
+.photo-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.photo-upload-card {
+  position: relative;
+  background: var(--color-bg);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.photo-upload-card:hover {
+  border-color: var(--color-accent-teal);
+  background: var(--color-accent-teal-subtle);
+}
+
+.photo-upload-card.has-photo {
+  border-style: solid;
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  padding: 10px;
+  box-shadow: var(--shadow-xs);
+}
+
+.photo-upload-card.has-photo:hover {
+  border-color: var(--color-accent-teal-border);
+  box-shadow: var(--shadow-md);
+}
+
+.photo-dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  cursor: pointer;
+  width: 100%;
+  padding: 20px 8px;
+}
+
+.photo-dropzone-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--color-accent-teal-subtle);
+  color: var(--color-accent-teal-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  margin-bottom: 4px;
+}
+
+.photo-upload-card:hover .photo-dropzone-icon {
+  transform: scale(1.1);
+}
+
+.photo-dropzone-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-primary-navy);
+}
+
+.photo-dropzone-hint {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.photo-preview-wrap {
+  width: 100%;
+  height: 145px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+  background: #0f172a;
+}
+
+.photo-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.photo-upload-card:hover .photo-preview-img {
+  transform: scale(1.03);
+}
+
+.photo-badge-cover {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(10, 35, 66, 0.88);
+  backdrop-filter: blur(8px);
+  color: #5EEAD4;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+}
+
+.photo-badge-index {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(10, 35, 66, 0.8);
+  backdrop-filter: blur(8px);
+  color: #F8FAFC;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  z-index: 2;
+}
+
+.photo-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 8px;
+  gap: 8px;
+}
+
+.photo-card-filename {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+}
+
+.photo-action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.photo-btn-change {
+  color: var(--color-accent-teal-dark);
+}
+.photo-btn-change:hover {
+  background: var(--color-accent-teal-subtle);
+  color: var(--color-accent-teal);
+}
+
+.photo-btn-remove {
+  color: var(--color-danger);
+}
+.photo-btn-remove:hover {
+  background: var(--color-danger-tint);
+}
+
+.photo-file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.photo-upload-card.has-photo .photo-file-input {
+  display: none;
+}
+
+.photo-upload-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-subtle);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.photo-count-info {
+  font-size: 0.825rem;
+  color: var(--color-ink-muted);
+}
+
+/* Owner Table Thumbnail */
+.table-item-cell {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.table-item-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-hover);
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ink-muted);
+  overflow: hidden;
+}
+
+.table-item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

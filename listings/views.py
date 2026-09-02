@@ -62,7 +62,7 @@ def owner_item_list(request):
         messages.error(request, "Only item owner accounts can manage listings.")
         return redirect("core:redirect_after_login")
 
-    items = request.user.items.select_related("category")
+    items = request.user.items.select_related("category").prefetch_related("images")
     return render(request, "listings/owner_item_list.html", {"items": items})
 
 

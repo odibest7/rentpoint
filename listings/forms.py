@@ -40,12 +40,12 @@ ItemImageFormSet = inlineformset_factory(
     Item,
     ItemImage,
     fields=["image", "position"],
-    extra=3,
-    max_num=6,
+    extra=1,
+    max_num=8,
     can_delete=True,
     widgets={
-        "image": forms.ClearableFileInput(attrs={"class": "field-input"}),
-        "position": forms.NumberInput(attrs={"class": "field-input", "min": 0}),
+        "image": forms.FileInput(attrs={"class": "photo-file-input", "accept": "image/*"}),
+        "position": forms.HiddenInput(attrs={"class": "photo-position-input", "value": "0"}),
     },
 )
 
