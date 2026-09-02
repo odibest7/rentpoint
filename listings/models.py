@@ -107,5 +107,22 @@ class ItemImage(models.Model):
     class Meta:
         ordering = ["position", "id"]
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                previous = ItemImage.objects.get(pk=self.pk)
+            except ItemImage.DoesNotExist:
+                previous = None
+
+            if previous and previous.image and previous.image.name and previous.image.name != self.image.name:
+                previous.image.storage.delete(previous.image.name)
+
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.image and self.image.name:
+            self.image.storage.delete(self.image.name)
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         return f"Image for {self.item.name}"

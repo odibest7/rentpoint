@@ -144,5 +144,27 @@ class OwnerVerification(models.Model):
             return "•" * len(self.nin)
         return "•" * (len(self.nin) - 4) + self.nin[-4:]
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                previous = OwnerVerification.objects.get(pk=self.pk)
+            except OwnerVerification.DoesNotExist:
+                previous = None
+
+            for field_name in ["selfie_image", "nin_front_image", "nin_back_image"]:
+                previous_value = getattr(previous, field_name, None) if previous else None
+                current_value = getattr(self, field_name, None)
+                if previous_value and previous_value.name and current_value and current_value.name != previous_value.name:
+                    previous_value.storage.delete(previous_value.name)
+
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        for field_name in ["selfie_image", "nin_front_image", "nin_back_image"]:
+            value = getattr(self, field_name, None)
+            if value and value.name:
+                value.storage.delete(value.name)
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         return f"Verification for {self.owner} ({self.owner.get_verification_status_display()})"
