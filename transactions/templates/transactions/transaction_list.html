@@ -102,8 +102,8 @@
                       <div class="subtle text-xs">{{ transaction.customer.email }}</div>
                     </td>
                     <td data-label="Rental details">
-                      <div class="text-sm font-medium">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</div>
-                      <div class="subtle text-xs">{{ transaction.duration }} {{ transaction.item.get_price_unit_display }}</div>
+                      <div class="text-sm font-medium">{{ transaction.quantity }} {{ transaction.item.name }}</div>
+                      <div class="subtle text-xs">{{ transaction.duration }} day{{ transaction.duration|pluralize }} &middot; ₦{{ transaction.item.rental_price|floatformat:0 }}/day</div>
                     </td>
                     <td data-label="Earning">
                       <div class="table-total mono">₦{{ transaction.owner_earning|floatformat:2 }}</div>
@@ -239,8 +239,8 @@
                     {% if transaction.owner.is_verified %}<div class="subtle text-xs">Verified Owner</div>{% endif %}
                   </td>
                   <td>
-                    <div class="text-sm font-medium">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</div>
-                    <div class="subtle text-xs">{{ transaction.duration }} {{ transaction.item.get_price_unit_display }}</div>
+                    <div class="text-sm font-medium">{{ transaction.quantity }} {{ transaction.item.name }}</div>
+                    <div class="subtle text-xs">{{ transaction.duration }} day{{ transaction.duration|pluralize }} &middot; ₦{{ transaction.item.rental_price|floatformat:0 }}/day</div>
                   </td>
                   <td data-label="Amount paid">
                     <div class="mono font-semibold" style="color:var(--color-primary-navy);">₦{{ transaction.amount|floatformat:2 }}</div>

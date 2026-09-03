@@ -1,191 +1,179 @@
-<div class="receipt-card">
-  <!-- Receipt Document Header -->
-  <div class="receipt-header">
-    <div>
-      <div class="receipt-brand-mark">
-        <span class="brand-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round">
+<div class="real-receipt-document">
+  <!-- Receipt Header -->
+  <div class="real-receipt-head">
+    <div class="real-receipt-brand-block">
+      <div class="real-receipt-logo">
+        <span class="real-receipt-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </span>
-        <span>Rent<span style="color:var(--color-accent-teal);">Point</span></span>
+        <span class="real-receipt-brand-text">Rent<span>Point</span></span>
       </div>
-      <div class="receipt-subtitle">
-        ELECTRONIC TRANSACTION RECEIPT &middot; {{ PLATFORM_SERVICE_AREA }}
-      </div>
+      <p class="real-receipt-tagline">Equipment &amp; Property Rental Platform &middot; {{ PLATFORM_SERVICE_AREA }}</p>
     </div>
 
-    <div class="receipt-doc-badge">
-      <h2 class="receipt-doc-title">OFFICIAL RECEIPT</h2>
-      <div class="receipt-ref-code">{{ transaction.reference }}</div>
-      <div class="receipt-issued-date">
-        Issued: {{ transaction.paid_at|default:transaction.created_at|date:"d M Y, h:i A" }}
-      </div>
-    </div>
-  </div>
-
-  <!-- Transaction Status Banner -->
-  <div
-    class="receipt-status-banner {% if transaction.status == 'paid' %}status-paid{% elif transaction.status == 'pending' %}status-pending{% else %}status-failed{% endif %}">
-    <div class="status-title">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-        <polyline points="22 4 12 14.01 9 11.01" />
-      </svg>
-      STATUS: {{ transaction.get_status_display|upper }}
-    </div>
-    <div class="status-ref">
-      {% if transaction.provider_reference %}Ref: {{ transaction.provider_reference }}{% else %}Paystack Escrow Channel{% endif %}
-    </div>
-  </div>
-
-  <!-- Parties Overview: Customer & Item Owner -->
-  <div class="receipt-parties-grid">
-    <div class="receipt-party-col">
-      <div class="receipt-party-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-        CUSTOMER / RENTER
-      </div>
-      <div class="receipt-party-name">{{ transaction.customer.get_full_name|default:transaction.customer.username }}
-      </div>
-      <div class="receipt-party-detail"><span>Phone:</span> <strong class="mono">{{ transaction.contact_phone|default:transaction.customer.phone_number|default:"Not specified" }}</strong></div>
-      <div class="receipt-party-detail"><span>Email:</span> {{ transaction.customer.email }}</div>
-      {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
-      <div class="receipt-party-detail"><span>Delivery:</span> {{ transaction.delivery_address }}</div>
-      {% endif %}
-    </div>
-
-    <div class="receipt-party-col">
-      <div class="receipt-party-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          <polyline points="9 22 9 12 15 12 15 22" />
-        </svg>
-        HOST / ITEM OWNER
-      </div>
-      <div class="receipt-party-name">
-        {{ transaction.owner.get_full_name|default:transaction.owner.username }}
-        {% if transaction.owner.is_verified %}
-        <span class="verified-tag" title="Item owner's identity has been verified by RentPoint">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-            stroke-linecap="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-          </svg>
-          Verified
-        </span>
+    <div class="real-receipt-meta-block">
+      <div class="real-receipt-doc-title">RECEIPT</div>
+      <div class="real-receipt-ref-pill">#{{ transaction.reference }}</div>
+      <div class="real-receipt-date">{{ transaction.paid_at|default:transaction.created_at|date:"d M Y, h:i A" }}</div>
+      <div class="real-receipt-status-stamp {% if transaction.status == 'paid' %}stamp-paid{% elif transaction.status == 'pending' %}stamp-pending{% else %}stamp-other{% endif %}">
+        {% if transaction.status == 'paid' %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>PAID</span>
+        {% elif transaction.status == 'pending' %}
+          <span>PENDING PAYMENT</span>
+        {% else %}
+          <span>{{ transaction.get_status_display|upper }}</span>
         {% endif %}
       </div>
-      <div class="receipt-party-detail"><span>Phone:</span> <strong class="mono">{{ transaction.owner.phone_number|default:"Not provided" }}</strong></div>
-      <div class="receipt-party-detail"><span>Item Area:</span> {{ transaction.item.location }}</div>
+    </div>
+  </div>
+
+  <div class="real-receipt-dashed-divider"></div>
+
+  <!-- Parties Aligned Grid: Billed To / Item Provider -->
+  <div class="real-receipt-parties-grid">
+    <div class="real-receipt-party-box">
+      <span class="real-party-role-label">Billed To (Renter)</span>
+      <h4 class="real-party-name">{{ transaction.customer.get_full_name|default:transaction.customer.username }}</h4>
+      <div class="real-party-line"><span class="lbl">Phone:</span> <span class="val mono">{{ transaction.contact_phone|default:transaction.customer.phone_number|default:"Not specified" }}</span></div>
+      <div class="real-party-line"><span class="lbl">Email:</span> <span class="val">{{ transaction.customer.email }}</span></div>
+      {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
+        <div class="real-party-line"><span class="lbl">Delivery:</span> <span class="val">{{ transaction.delivery_address }}</span></div>
+      {% endif %}
+    </div>
+
+    <div class="real-receipt-party-box">
+      <span class="real-party-role-label">Host / Item Provider</span>
+      <h4 class="real-party-name">
+        {{ transaction.owner.get_full_name|default:transaction.owner.username }}
+        {% if transaction.owner.is_verified %}
+          <span class="real-verified-badge" title="Verified Owner">&#10003; Verified</span>
+        {% endif %}
+      </h4>
+      <div class="real-party-line"><span class="lbl">Phone:</span> <span class="val mono">{{ transaction.owner.phone_number|default:"Not specified" }}</span></div>
+      <div class="real-party-line"><span class="lbl">Area:</span> <span class="val">{{ transaction.item.location }}</span></div>
       {% if transaction.owner.address %}
-      <div class="receipt-party-detail"><span>Address:</span> {{ transaction.owner.address }}</div>
+        <div class="real-party-line"><span class="lbl">Address:</span> <span class="val">{{ transaction.owner.address }}</span></div>
       {% endif %}
     </div>
   </div>
 
-  <!-- Itemized Rental Breakdown Table -->
-  <div class="receipt-table-wrapper">
-    <table class="receipt-table">
-      <colgroup>
-        <col style="width: 34%;">
-        <col style="width: 16%;">
-        <col style="width: 10%;">
-        <col style="width: 15%;">
-        <col style="width: 25%;">
-      </colgroup>
+  <div class="real-receipt-dashed-divider"></div>
+
+  <!-- Itemized Order Table -->
+  <div class="real-receipt-table-wrapper">
+    <table class="real-receipt-table">
       <thead>
         <tr>
-          <th class="text-left">Item Description</th>
-          <th class="text-right">Unit Rate</th>
-          <th class="text-center">Qty</th>
-          <th class="text-center">Duration</th>
-          <th class="text-right">Amount</th>
+          <th class="col-desc">Item Description</th>
+          <th class="col-rate">Daily Rate</th>
+          <th class="col-qty">Qty</th>
+          <th class="col-dur">Duration</th>
+          <th class="col-amt">Amount</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="text-left">
-            <div class="receipt-item-title">{{ transaction.item.name }}</div>
-            <div class="receipt-item-sub">
-              Category: {{ transaction.item.category.name }} &middot; Condition: {{ transaction.item.get_condition_display }}
+          <td class="col-desc">
+            <div class="real-item-name">{{ transaction.item.name }}</div>
+            <div class="real-item-meta-tags">
+              <span class="meta-tag tag-category">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+                <span>{{ transaction.item.category.name }}</span>
+              </span>
+              <span class="meta-tag tag-condition">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Condition: <strong>{{ transaction.item.get_condition_display }}</strong></span>
+              </span>
             </div>
           </td>
-          <td class="text-right mono">₦{{ transaction.item.rental_price|floatformat:2 }}</td>
-          <td class="text-center">{{ transaction.quantity }}</td>
-          <td class="text-center">{{ transaction.duration }} {{ transaction.item.get_price_unit_display }}</td>
-          <td class="text-right mono font-bold item-total-cell">₦{{ transaction.amount|floatformat:2 }}</td>
+          <td class="col-rate mono">₦{{ transaction.item.rental_price|floatformat:2 }}</td>
+          <td class="col-qty mono font-semibold">{{ transaction.quantity }}</td>
+          <td class="col-dur font-medium">{{ transaction.duration }} day{{ transaction.duration|pluralize }}</td>
+          <td class="col-amt mono font-bold">₦{{ transaction.amount|floatformat:2 }}</td>
         </tr>
       </tbody>
     </table>
   </div>
-  <p class="receipt-currency-note">All amounts shown in Nigerian Naira (₦).</p>
 
-  <!-- Handover & Fulfillment Instructions Box -->
-  <div class="receipt-handover-box">
-    <div class="receipt-handover-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round">
-        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-        <circle cx="12" cy="10" r="3" />
-      </svg>
-      FULFILLMENT &amp; HANDOVER PROTOCOL
+  <div class="real-receipt-formula-badge">
+    <span class="formula-label">Calculation:</span>
+    <span class="formula-text mono">₦{{ transaction.item.rental_price|floatformat:2 }} &times; {{ transaction.quantity }} &times; {{ transaction.duration }} day{{ transaction.duration|pluralize }} = ₦{{ transaction.amount|floatformat:2 }}</span>
+  </div>
+
+  <div class="real-receipt-dashed-divider"></div>
+
+  <!-- Bottom Details & Financial Summary Split -->
+  <div class="real-receipt-bottom-grid">
+    <div class="real-receipt-fulfillment-info">
+      <div class="real-info-card">
+        <div class="real-info-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Handover Protocol</span>
+        </div>
+        <div class="real-info-row">
+          <span class="lbl">Method:</span>
+          <span class="val">{{ transaction.get_delivery_option_display }}</span>
+        </div>
+        <div class="real-info-row">
+          <span class="lbl">Location:</span>
+          <span class="val">{{ transaction.item.location }}{% if transaction.owner.address %} &middot; {{ transaction.owner.address }}{% endif %}</span>
+        </div>
+        {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
+          <div class="real-info-row">
+            <span class="lbl">Deliver to:</span>
+            <span class="val">{{ transaction.delivery_address }}</span>
+          </div>
+        {% endif %}
+        {% if transaction.pickup_notes %}
+          <div class="real-info-row">
+            <span class="lbl">Renter Schedule:</span>
+            <span class="val">{{ transaction.pickup_notes }}</span>
+          </div>
+        {% endif %}
+        <div class="real-info-row">
+          <span class="lbl">Escrow Channel:</span>
+          <span class="val mono text-xs">{% if transaction.provider_reference %}{{ transaction.provider_reference }}{% else %}Paystack Escrow System{% endif %}</span>
+        </div>
+      </div>
     </div>
-    <div class="receipt-handover-grid">
-      <div class="receipt-handover-item">
-        <span class="label">Method</span>
-        <span class="val">{{ transaction.get_delivery_option_display }}</span>
+
+    <div class="real-receipt-totals-panel">
+      <div class="real-totals-row">
+        <span>Rental Subtotal</span>
+        <span class="mono">₦{{ transaction.amount|floatformat:2 }}</span>
       </div>
-      <div class="receipt-handover-item">
-        <span class="label">Location</span>
-        <span class="val">{{ transaction.item.location }}{% if transaction.owner.address %} &middot; {{ transaction.owner.address }}{% endif %}</span>
+      <div class="real-totals-row">
+        <span>Escrow &amp; Handover Protection</span>
+        <span class="text-success font-medium">₦0.00 (Free)</span>
       </div>
-      {% if transaction.delivery_option == "delivery" and transaction.delivery_address %}
-      <div class="receipt-handover-item full-width">
-        <span class="label">Delivery Destination</span>
-        <span class="val">{{ transaction.delivery_address }}</span>
+      <div class="real-totals-divider"></div>
+      <div class="real-totals-row real-grand-total">
+        <span>Total Amount Paid</span>
+        <span class="mono">₦{{ transaction.amount|floatformat:2 }}</span>
       </div>
-      {% endif %}
-      {% if transaction.pickup_notes %}
-      <div class="receipt-handover-item full-width">
-        <span class="label">Renter Notes / Schedule</span>
-        <span class="val">{{ transaction.pickup_notes }}</span>
-      </div>
-      {% endif %}
     </div>
   </div>
 
-  <!-- Financial Totals Summary -->
-  <div class="receipt-summary-box">
-    <div class="receipt-summary-row">
-      <span class="label">Rental Subtotal</span>
-      <span class="val mono">₦{{ transaction.amount|floatformat:2 }}</span>
-    </div>
-    <div class="receipt-summary-row">
-      <span class="label">Escrow Security</span>
-      <span class="val mono green font-semibold">Included (Free)</span>
-    </div>
-    <div class="receipt-summary-total">
-      <span class="total-label">Total Amount Paid</span>
-      <span class="total-figure mono">₦{{ transaction.amount|floatformat:2 }}</span>
-    </div>
-  </div>
+  <div class="real-receipt-dashed-divider"></div>
 
-  <!-- Security & Legal Ledger Verification -->
-  <div class="receipt-security-footer">
-    <div class="security-stamp">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-teal)" stroke-width="2">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      </svg>
-      <span>Official RentPoint Electronic Ledger &middot; Verified Transaction</span>
+  <!-- Barcode & Official Ledger Stamp -->
+  <div class="real-receipt-footer">
+    <div class="real-barcode-wrapper">
+      <div class="real-barcode-bars" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="real-barcode-number mono">{{ transaction.reference }}</div>
     </div>
-    <div class="security-ref mono text-xs">
-      TX-ID: {{ transaction.reference }}
+    <div class="real-receipt-disclaimer">
+      Official Electronic Receipt &middot; Issued by RentPoint Technologies &middot; {{ PLATFORM_SERVICE_AREA }}<br>
+      Retain this electronic receipt as proof of payment and item handover verification.
     </div>
   </div>
 </div>
