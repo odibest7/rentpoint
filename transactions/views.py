@@ -69,7 +69,26 @@ def start_rental(request, slug):
             )
             return redirect("transactions:checkout", reference=transaction.reference)
     else:
-        form = RentalRequestForm(item=item, user=request.user)
+        initial_data = {}
+        raw_qty = request.GET.get("quantity")
+        if raw_qty:
+            try:
+                qty_val = int(raw_qty)
+                if 1 <= qty_val <= item.quantity_available:
+                    initial_data["quantity"] = qty_val
+            except (ValueError, TypeError):
+                pass
+
+        raw_dur = request.GET.get("duration")
+        if raw_dur:
+            try:
+                dur_val = int(raw_dur)
+                if 1 <= dur_val <= 365:
+                    initial_data["duration"] = dur_val
+            except (ValueError, TypeError):
+                pass
+
+        form = RentalRequestForm(initial=initial_data or None, item=item, user=request.user)
 
     return render(request, "transactions/start_rental.html", {"form": form, "item": item})
 

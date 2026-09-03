@@ -13,6 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
   initModalPopups();
   initSelfieCapture();
   initVerificationCardPreviews();
+  initItemDetailCalculator();
+  initStartRentalCalculator();
+  initOwnerPricingSimulator();
 });
 
 function initPasswordVisibilityToggles() {
@@ -673,4 +676,586 @@ function initSelfieCapture() {
   retryBtn.addEventListener("click", startCamera);
 
   window.addEventListener("beforeunload", stopCamera);
+}
+
+/**
+ * Formats a numeric value into a clean Naira currency string with commas.
+ * e.g. 150000 -> "150,000.00" or "150,000"
+ */
+function formatNaira(amount, includeDecimals = false) {
+  const num = Number(amount) || 0;
+  return num.toLocaleString("en-NG", {
+    minimumFractionDigits: includeDecimals ? 2 : 0,
+    maximumFractionDigits: includeDecimals ? 2 : 0,
+  });
+}
+
+/**
+ * Smart pluralizer for item names.
+ * Accurately infers singular vs plural forms so:
+ *  - "Spoon", 1 -> "Spoon"
+ *  - "Spoon", 2 -> "Spoons"
+ *  - "Plastic Chair", 2 -> "Plastic Chairs"
+ *  - "Canopy", 5 -> "Canopies"
+ *  - "Dish", 2 -> "Dishes"
+ *  - "Glass", 4 -> "Glasses"
+ *  - "Box", 3 -> "Boxes"
+ */
+function pluralizeItemName(rawName, count = 1) {
+  if (!rawName || typeof rawName !== "string") {
+    return count === 1 ? "item" : "items";
+  }
+
+  const trimmed = rawName.trim();
+  if (!trimmed) return count === 1 ? "item" : "items";
+
+  // Check if name has extra specs in parentheses, e.g. "White Plastic Chairs (set of 50)"
+  const parenMatch = trimmed.match(/^(.*?)\s*(\([^)]+\))$/);
+  let coreName = trimmed;
+  let suffix = "";
+  if (parenMatch) {
+    coreName = parenMatch[1].trim();
+    suffix = " " + parenMatch[2].trim();
+  }
+
+  const words = coreName.split(/\s+/);
+  const lastWord = words[words.length - 1];
+  const prefixWords = words.slice(0, words.length - 1).join(" ");
+
+  // Normalizer: if the word is already plural, find its singular stem
+  let singularStem = lastWord;
+  const lowerLast = lastWord.toLowerCase();
+
+  if (lowerLast.endsWith("ies") && lowerLast.length > 3) {
+    singularStem = lastWord.slice(0, -3) + (lastWord.endsWith("IES") ? "Y" : "y");
+  } else if (lowerLast.endsWith("ves") && lowerLast.length > 3) {
+    singularStem = lastWord.slice(0, -3) + (lastWord.endsWith("VES") ? "FE" : "fe");
+  } else if (
+    lowerLast.endsWith("es") &&
+    (lowerLast.endsWith("shes") ||
+      lowerLast.endsWith("ches") ||
+      lowerLast.endsWith("xes") ||
+      lowerLast.endsWith("sses") ||
+      lowerLast.endsWith("zes"))
+  ) {
+    singularStem = lastWord.slice(0, -2);
+  } else if (
+    lowerLast.endsWith("s") &&
+    !lowerLast.endsWith("ss") &&
+    !lowerLast.endsWith("us") &&
+    !lowerLast.endsWith("is") &&
+    lowerLast.length > 2
+  ) {
+    singularStem = lastWord.slice(0, -1);
+  }
+
+  let finalNoun = "";
+  if (count === 1) {
+    finalNoun = singularStem;
+  } else {
+    // Generate proper plural from singularStem
+    const lowerStem = singularStem.toLowerCase();
+    if (lowerStem.endsWith("y") && !/[aeiou]y$/i.test(lowerStem)) {
+      finalNoun =
+        singularStem.slice(0, -1) +
+        (singularStem === singularStem.toUpperCase() ? "IES" : "ies");
+    } else if (
+      lowerStem.endsWith("s") ||
+      lowerStem.endsWith("sh") ||
+      lowerStem.endsWith("ch") ||
+      lowerStem.endsWith("x") ||
+      lowerStem.endsWith("z")
+    ) {
+      finalNoun =
+        singularStem +
+        (singularStem === singularStem.toUpperCase() ? "ES" : "es");
+    } else if (lowerStem.endsWith("fe")) {
+      finalNoun =
+        singularStem.slice(0, -2) +
+        (singularStem === singularStem.toUpperCase() ? "VES" : "ves");
+    } else if (lowerStem.endsWith("f") && !lowerStem.endsWith("ff")) {
+      finalNoun =
+        singularStem.slice(0, -1) +
+        (singularStem === singularStem.toUpperCase() ? "VES" : "ves");
+    } else {
+      finalNoun =
+        singularStem +
+        (singularStem === singularStem.toUpperCase() ? "S" : "s");
+    }
+  }
+
+  const fullForm = prefixWords ? `${prefixWords} ${finalNoun}` : finalNoun;
+  return `${fullForm}${suffix}`;
+}
+
+/**
+ * Interactive Item Detail Rental Calculator
+ * Computes: Unit Price × Quantity × Duration (Days) in real time.
+ * Dynamically uses the exact item name (e.g. "1 Spoon", "2 Spoons", "5 Spoons").
+ */
+function initItemDetailCalculator() {
+  const calcSidebar = document.getElementById("itemRentalCalculator");
+  if (!calcSidebar) return;
+
+  const itemName = calcSidebar.dataset.itemName || "Item";
+  const unitPrice = parseFloat(calcSidebar.dataset.unitPrice) || 0;
+  const maxStock = parseInt(calcSidebar.dataset.maxStock, 10) || 1;
+  const baseRentUrl = calcSidebar.dataset.baseRentUrl || "";
+  const loginUrl = calcSidebar.dataset.loginUrl || "";
+
+  const qtyLabel = document.getElementById("calcQtyLabel");
+  const stockHint = document.getElementById("calcStockHint");
+  const qtyInput = document.getElementById("calcQtyInput");
+  const qtyMinus = document.getElementById("calcQtyMinus");
+  const qtyPlus = document.getElementById("calcQtyPlus");
+  const qtyChips = document.querySelectorAll("#calcQtyChips .calc-chip");
+
+  const durInput = document.getElementById("calcDurationInput");
+  const durMinus = document.getElementById("calcDurationMinus");
+  const durPlus = document.getElementById("calcDurationPlus");
+  const durChips = document.querySelectorAll("#calcDurationChips .calc-chip");
+
+  const formulaQty = document.getElementById("formulaQty");
+  const formulaDur = document.getElementById("formulaDuration");
+  const subtotalEl = document.getElementById("calcSubtotal");
+  const grandTotalEl = document.getElementById("calcGrandTotal");
+  const rentBtn = document.getElementById("calcRentButton");
+
+  if (!qtyInput || !durInput) return;
+
+  // Initialize quick chips with actual item names
+  if (qtyChips) {
+    qtyChips.forEach((chip) => {
+      const chipVal = parseInt(chip.dataset.qty, 10);
+      if (chipVal === maxStock && maxStock > 10) {
+        chip.textContent = `All (${chipVal} ${pluralizeItemName(itemName, chipVal)})`;
+      } else if (chipVal) {
+        chip.textContent = `${chipVal} ${pluralizeItemName(itemName, chipVal)}`;
+      }
+    });
+  }
+
+  if (stockHint) {
+    stockHint.textContent = `Max: ${maxStock} ${pluralizeItemName(itemName, maxStock)}`;
+  }
+
+  if (qtyLabel) {
+    qtyLabel.textContent = `Quantity (${pluralizeItemName(itemName, 2)})`;
+  }
+
+  function recalculate() {
+    let qty = parseInt(qtyInput.value, 10);
+    if (isNaN(qty) || qty < 1) qty = 1;
+    if (qty > maxStock) qty = maxStock;
+    qtyInput.value = qty;
+
+    let dur = parseInt(durInput.value, 10);
+    if (isNaN(dur) || dur < 1) dur = 1;
+    if (dur > 365) dur = 365;
+    durInput.value = dur;
+
+    const total = unitPrice * qty * dur;
+    const nameWithCount = pluralizeItemName(itemName, qty);
+
+    if (formulaQty) {
+      formulaQty.textContent = `${qty} ${nameWithCount}`;
+    }
+    if (formulaDur) {
+      formulaDur.textContent = `${dur} ${dur === 1 ? "day" : "days"}`;
+    }
+    if (subtotalEl) {
+      subtotalEl.textContent = `₦${formatNaira(total, true)}`;
+    }
+    if (grandTotalEl) {
+      grandTotalEl.textContent = `₦${formatNaira(total, true)}`;
+      grandTotalEl.classList.remove("calc-pulse-anim");
+      void grandTotalEl.offsetWidth;
+      grandTotalEl.classList.add("calc-pulse-anim");
+    }
+
+    // Sync button href and label
+    if (rentBtn) {
+      const spanEl = rentBtn.querySelector("span");
+      if (spanEl) {
+        if (rentBtn.getAttribute("href")?.includes("/login/")) {
+          spanEl.textContent = `Log in to Rent ${qty} ${nameWithCount} &rarr;`;
+        } else {
+          spanEl.textContent = `Rent ${qty} ${nameWithCount} &rarr;`;
+        }
+      }
+
+      if (baseRentUrl) {
+        const url = new URL(baseRentUrl, window.location.origin);
+        url.searchParams.set("quantity", qty);
+        url.searchParams.set("duration", dur);
+
+        if (loginUrl && rentBtn.getAttribute("href")?.includes("/login/")) {
+          const nextTarget = `${url.pathname}?${url.searchParams.toString()}`;
+          const loginTarget = new URL(loginUrl, window.location.origin);
+          loginTarget.searchParams.set("next", nextTarget);
+          rentBtn.href = loginTarget.pathname + loginTarget.search;
+        } else {
+          rentBtn.href = url.pathname + url.search;
+        }
+      }
+    }
+
+    // Update active states for chips
+    if (qtyChips) {
+      qtyChips.forEach((chip) => {
+        const chipVal = parseInt(chip.dataset.qty, 10);
+        chip.classList.toggle("is-active", chipVal === qty);
+      });
+    }
+
+    if (durChips) {
+      durChips.forEach((chip) => {
+        const chipVal = parseInt(chip.dataset.days, 10);
+        chip.classList.toggle("is-active", chipVal === dur);
+      });
+    }
+  }
+
+  // Stepper handlers
+  if (qtyMinus) {
+    qtyMinus.addEventListener("click", () => {
+      let current = parseInt(qtyInput.value, 10) || 1;
+      if (current > 1) {
+        qtyInput.value = current - 1;
+        recalculate();
+      }
+    });
+  }
+
+  if (qtyPlus) {
+    qtyPlus.addEventListener("click", () => {
+      let current = parseInt(qtyInput.value, 10) || 1;
+      if (current < maxStock) {
+        qtyInput.value = current + 1;
+        recalculate();
+      }
+    });
+  }
+
+  if (durMinus) {
+    durMinus.addEventListener("click", () => {
+      let current = parseInt(durInput.value, 10) || 1;
+      if (current > 1) {
+        durInput.value = current - 1;
+        recalculate();
+      }
+    });
+  }
+
+  if (durPlus) {
+    durPlus.addEventListener("click", () => {
+      let current = parseInt(durInput.value, 10) || 1;
+      if (current < 365) {
+        durInput.value = current + 1;
+        recalculate();
+      }
+    });
+  }
+
+  qtyInput.addEventListener("input", recalculate);
+  durInput.addEventListener("input", recalculate);
+  qtyInput.addEventListener("change", recalculate);
+  durInput.addEventListener("change", recalculate);
+
+  // Quick Chips Handlers
+  if (qtyChips) {
+    qtyChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const val = parseInt(chip.dataset.qty, 10);
+        if (val) {
+          qtyInput.value = Math.min(val, maxStock);
+          recalculate();
+        }
+      });
+    });
+  }
+
+  if (durChips) {
+    durChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const val = parseInt(chip.dataset.days, 10);
+        if (val) {
+          durInput.value = val;
+          recalculate();
+        }
+      });
+    });
+  }
+
+  // Initial calculation run
+  recalculate();
+}
+
+/**
+ * Start Rental Checkout Page Live Calculation
+ * Syncs form inputs (quantity, duration in days, delivery preference) with
+ * the sticky live order summary card using real item name.
+ */
+function initStartRentalCalculator() {
+  const summaryCard = document.getElementById("startRentalSummary");
+  if (!summaryCard) return;
+
+  const itemName = summaryCard.dataset.itemName || "Item";
+  const unitPrice = parseFloat(summaryCard.dataset.unitPrice) || 0;
+  const maxStock = parseInt(summaryCard.dataset.maxStock, 10) || 1;
+  const locationName = summaryCard.dataset.location || "Owner Location";
+
+  const startQtyLabel = document.getElementById("startQtyLabel");
+  const qtyInput = document.getElementById("id_quantity");
+  const durInput = document.getElementById("id_duration");
+  const deliverySelect = document.getElementById("id_delivery_option");
+  const deliveryGroup = document.getElementById("deliveryAddressGroup");
+  const submitBtn = document.getElementById("submitRentalBtn");
+
+  const qtyMinus = document.getElementById("startQtyMinus");
+  const qtyPlus = document.getElementById("startQtyPlus");
+  const durMinus = document.getElementById("startDurMinus");
+  const durPlus = document.getElementById("startDurPlus");
+
+  const sumQtyVal = document.getElementById("sumQtyVal");
+  const sumDurVal = document.getElementById("sumDurVal");
+  const sumQtyDisplay = document.getElementById("sumQtyDisplay");
+  const sumDurDisplay = document.getElementById("sumDurDisplay");
+  const sumDeliveryDisplay = document.getElementById("sumDeliveryDisplay");
+  const sumSubtotal = document.getElementById("sumSubtotal");
+  const sumGrandTotal = document.getElementById("sumGrandTotal");
+
+  if (!qtyInput || !durInput) return;
+
+  if (startQtyLabel) {
+    startQtyLabel.textContent = `Quantity (${pluralizeItemName(itemName, 2)} Needed)`;
+  }
+
+  function updateSummary() {
+    let qty = parseInt(qtyInput.value, 10);
+    if (isNaN(qty) || qty < 1) qty = 1;
+    if (qty > maxStock) qty = maxStock;
+
+    let dur = parseInt(durInput.value, 10);
+    if (isNaN(dur) || dur < 1) dur = 1;
+    if (dur > 365) dur = 365;
+
+    const total = unitPrice * qty * dur;
+    const nameWithCount = pluralizeItemName(itemName, qty);
+
+    if (sumQtyVal) {
+      sumQtyVal.textContent = qty;
+      const tagEl = sumQtyVal.parentElement?.querySelector(".formula-tag");
+      if (tagEl) {
+        tagEl.textContent = nameWithCount.toLowerCase();
+      }
+    }
+    if (sumDurVal) sumDurVal.textContent = dur;
+
+    if (sumQtyDisplay) {
+      sumQtyDisplay.textContent = `${qty} ${nameWithCount}`;
+    }
+    if (sumDurDisplay) {
+      sumDurDisplay.textContent = `${dur} ${dur === 1 ? "day" : "days"}`;
+    }
+
+    if (sumSubtotal) sumSubtotal.textContent = `₦${formatNaira(total, true)}`;
+    if (sumGrandTotal) {
+      sumGrandTotal.textContent = `₦${formatNaira(total, true)}`;
+      sumGrandTotal.classList.remove("calc-pulse-anim");
+      void sumGrandTotal.offsetWidth;
+      sumGrandTotal.classList.add("calc-pulse-anim");
+    }
+
+    if (submitBtn) {
+      const spanEl = submitBtn.querySelector("span");
+      if (spanEl) {
+        spanEl.textContent = `Proceed to Review & Pay for ${qty} ${nameWithCount} &rarr;`;
+      }
+    }
+
+    if (deliverySelect && sumDeliveryDisplay) {
+      const isDelivery = deliverySelect.value === "delivery";
+      if (isDelivery) {
+        sumDeliveryDisplay.textContent = "Direct Delivery";
+        if (deliveryGroup) deliveryGroup.style.display = "block";
+      } else {
+        sumDeliveryDisplay.textContent = `Self-Pickup in ${locationName}`;
+        if (deliveryGroup) deliveryGroup.style.display = "block";
+      }
+    }
+  }
+
+  // Stepper buttons
+  if (qtyMinus) {
+    qtyMinus.addEventListener("click", () => {
+      let current = parseInt(qtyInput.value, 10) || 1;
+      if (current > 1) {
+        qtyInput.value = current - 1;
+        updateSummary();
+      }
+    });
+  }
+
+  if (qtyPlus) {
+    qtyPlus.addEventListener("click", () => {
+      let current = parseInt(qtyInput.value, 10) || 1;
+      if (current < maxStock) {
+        qtyInput.value = current + 1;
+        updateSummary();
+      }
+    });
+  }
+
+  if (durMinus) {
+    durMinus.addEventListener("click", () => {
+      let current = parseInt(durInput.value, 10) || 1;
+      if (current > 1) {
+        durInput.value = current - 1;
+        updateSummary();
+      }
+    });
+  }
+
+  if (durPlus) {
+    durPlus.addEventListener("click", () => {
+      let current = parseInt(durInput.value, 10) || 1;
+      if (current < 365) {
+        durInput.value = current + 1;
+        updateSummary();
+      }
+    });
+  }
+
+  qtyInput.addEventListener("input", updateSummary);
+  durInput.addEventListener("input", updateSummary);
+  qtyInput.addEventListener("change", updateSummary);
+  durInput.addEventListener("change", updateSummary);
+
+  if (deliverySelect) {
+    deliverySelect.addEventListener("change", updateSummary);
+  }
+
+  // Initial update
+  updateSummary();
+}
+
+/**
+ * Item Owner Listing Creation & Edit Pricing Simulator
+ * Dynamically reflects the actual item name typed by the owner (e.g. Spoon -> 2 Spoons).
+ */
+function initOwnerPricingSimulator() {
+  const simulator = document.getElementById("ownerPricingSimulator");
+  if (!simulator) return;
+
+  const nameInput = document.getElementById("id_name");
+  const priceInput = document.getElementById("id_rental_price");
+  const qtyAvailInput = document.getElementById("id_quantity_available");
+
+  const simQtyLabel = document.querySelector('label[for="simQtyInput"]');
+  const simQtyInput = document.getElementById("simQtyInput");
+  const simQtyMinus = document.getElementById("simQtyMinus");
+  const simQtyPlus = document.getElementById("simQtyPlus");
+
+  const simDurInput = document.getElementById("simDurInput");
+  const simDurMinus = document.getElementById("simDurMinus");
+  const simDurPlus = document.getElementById("simDurPlus");
+
+  const formulaText = document.getElementById("simFormulaText");
+  const customerTotalEl = document.getElementById("simCustomerTotal");
+  const ownerPayoutEl = document.getElementById("simOwnerPayout");
+
+  if (!priceInput || !simQtyInput || !simDurInput) return;
+
+  function updateSimulation() {
+    const rawName = (nameInput?.value || "").trim() || "Item";
+    const rate = parseFloat(priceInput.value) || 0;
+    let simQty = parseInt(simQtyInput.value, 10) || 1;
+    let simDur = parseInt(simDurInput.value, 10) || 1;
+
+    if (simQty < 1) simQty = 1;
+    if (simDur < 1) simDur = 1;
+
+    const customerTotal = rate * simQty * simDur;
+    const ownerPayout = customerTotal * 0.95; // 5% platform commission
+    const nameWithCount = pluralizeItemName(rawName, simQty);
+
+    if (simQtyLabel) {
+      simQtyLabel.textContent = `Simulate Customer Quantity (${pluralizeItemName(rawName, 2)}):`;
+    }
+
+    if (formulaText) {
+      formulaText.innerHTML = `
+        <span class="sim-rate">₦${formatNaira(rate, true)}</span> &times; 
+        <span class="sim-qty">${simQty} ${nameWithCount}</span> &times; 
+        <span class="sim-days">${simDur} ${simDur === 1 ? "day" : "days"}</span>
+      `;
+    }
+
+    if (customerTotalEl) {
+      customerTotalEl.textContent = `₦${formatNaira(customerTotal, true)}`;
+    }
+    if (ownerPayoutEl) {
+      ownerPayoutEl.textContent = `₦${formatNaira(ownerPayout, true)}`;
+    }
+  }
+
+  if (simQtyMinus) {
+    simQtyMinus.addEventListener("click", () => {
+      let current = parseInt(simQtyInput.value, 10) || 1;
+      if (current > 1) {
+        simQtyInput.value = current - 1;
+        updateSimulation();
+      }
+    });
+  }
+
+  if (simQtyPlus) {
+    simQtyPlus.addEventListener("click", () => {
+      let current = parseInt(simQtyInput.value, 10) || 1;
+      simQtyInput.value = current + 1;
+      updateSimulation();
+    });
+  }
+
+  if (simDurMinus) {
+    simDurMinus.addEventListener("click", () => {
+      let current = parseInt(simDurInput.value, 10) || 1;
+      if (current > 1) {
+        simDurInput.value = current - 1;
+        updateSimulation();
+      }
+    });
+  }
+
+  if (simDurPlus) {
+    simDurPlus.addEventListener("click", () => {
+      let current = parseInt(simDurInput.value, 10) || 1;
+      simDurInput.value = current + 1;
+      updateSimulation();
+    });
+  }
+
+  if (nameInput) {
+    nameInput.addEventListener("input", updateSimulation);
+    nameInput.addEventListener("change", updateSimulation);
+  }
+
+  priceInput.addEventListener("input", updateSimulation);
+  priceInput.addEventListener("change", updateSimulation);
+  simQtyInput.addEventListener("input", updateSimulation);
+  simDurInput.addEventListener("input", updateSimulation);
+
+  if (qtyAvailInput) {
+    qtyAvailInput.addEventListener("change", () => {
+      const maxVal = parseInt(qtyAvailInput.value, 10);
+      if (maxVal && maxVal > 0 && parseInt(simQtyInput.value, 10) > maxVal) {
+        simQtyInput.value = maxVal;
+      }
+      updateSimulation();
+    });
+  }
+
+  // Initial run
+  updateSimulation();
 }

@@ -21,8 +21,9 @@
       <h3 id="checkout-order-heading">Rental Details</h3>
       <div class="checkout-details">
         <div class="checkout-detail-row"><span class="checkout-label">Item</span><span class="checkout-value checkout-item-name">{{ transaction.item.name }}</span></div>
-        <div class="checkout-detail-row"><span class="checkout-label">Quantity</span><span class="checkout-value">{{ transaction.quantity }} unit{{ transaction.quantity|pluralize }}</span></div>
-        <div class="checkout-detail-row"><span class="checkout-label">Duration</span><span class="checkout-value">{{ transaction.duration }} &times; {{ transaction.item.get_price_unit_display }}</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Quantity</span><span class="checkout-value">{{ transaction.quantity }} {{ transaction.item.name }}</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Duration</span><span class="checkout-value">{{ transaction.duration }} day{{ transaction.duration|pluralize }} (₦{{ transaction.item.rental_price|floatformat:0 }} / day)</span></div>
+        <div class="checkout-detail-row"><span class="checkout-label">Calculation</span><span class="checkout-value mono text-xs">₦{{ transaction.item.rental_price|floatformat:0 }} &times; {{ transaction.quantity }} &times; {{ transaction.duration }} day{{ transaction.duration|pluralize }}</span></div>
         <div class="checkout-detail-row"><span class="checkout-label">Reference</span><span class="checkout-value"><span class="badge-code">{{ transaction.reference }}</span></span></div>
       </div>
     </section>

@@ -40,15 +40,23 @@ class RentalRequestForm(forms.Form):
     def __init__(self, *args, item: Item, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.item = item
-        self.fields["quantity"].widget.attrs.update({"class": "field-input", "max": item.quantity_available})
-        self.fields["duration"].widget.attrs.update({"class": "field-input"})
+        self.fields["quantity"].widget.attrs.update({
+            "class": "field-input stepper-input-target",
+            "min": 1,
+            "max": item.quantity_available,
+        })
+        self.fields["duration"].widget.attrs.update({
+            "class": "field-input stepper-input-target",
+            "min": 1,
+            "max": 365,
+        })
         self.fields["quantity"].help_text = f"{item.quantity_available} available in stock"
         self.fields["duration"].help_text = f"Priced per {item.get_price_unit_display()}"
 
         if user and not self.is_bound:
-            if getattr(user, "phone_number", None):
+            if getattr(user, "phone_number", None) and not self.initial.get("contact_phone"):
                 self.fields["contact_phone"].initial = user.phone_number
-            if getattr(user, "address", None):
+            if getattr(user, "address", None) and not self.initial.get("delivery_address"):
                 self.fields["delivery_address"].initial = user.address
 
     def clean_quantity(self):

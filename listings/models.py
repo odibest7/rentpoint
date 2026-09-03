@@ -50,7 +50,6 @@ class Item(models.Model):
         PER_DAY = "day", "per day"
         PER_WEEK = "week", "per week"
         PER_MONTH = "month", "per month"
-        PER_EVENT = "event", "per event"
 
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,

@@ -3570,6 +3570,486 @@ select:focus {
   position: relative;
 }
 
+/* ============================================================
+   AUTHENTIC REAL RECEIPT ARCHITECTURE (.real-receipt-document)
+   ============================================================ */
+.real-receipt-document {
+  max-width: 680px;
+  margin: 0 auto;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03);
+  padding: 40px 44px;
+  position: relative;
+}
+
+/* 1. Header */
+.real-receipt-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.real-receipt-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.real-receipt-icon {
+  width: 38px;
+  height: 38px;
+  background: #0A2342;
+  color: #FFFFFF;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.real-receipt-brand-text {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0A2342;
+  letter-spacing: -0.02em;
+}
+
+.real-receipt-brand-text span {
+  color: var(--color-accent-teal);
+}
+
+.real-receipt-tagline {
+  font-size: 0.78rem;
+  color: #64748B;
+  margin: 6px 0 0;
+  font-weight: 500;
+}
+
+.real-receipt-meta-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 3px;
+}
+
+.real-receipt-doc-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #0A2342;
+  line-height: 1;
+}
+
+.real-receipt-ref-pill {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #007A6C;
+  background: #E6F7F5;
+  border: 1px solid #B3E7E1;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 3px;
+}
+
+.real-receipt-date {
+  font-size: 0.76rem;
+  color: #64748B;
+  margin-top: 2px;
+}
+
+.real-receipt-status-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+.real-receipt-status-stamp.stamp-paid {
+  background: #ECFDF5;
+  color: #059669;
+  border: 1.5px solid #A7F3D0;
+}
+
+.real-receipt-status-stamp.stamp-pending {
+  background: #FFFBEB;
+  color: #D97706;
+  border: 1.5px solid #FDE68A;
+}
+
+.real-receipt-status-stamp.stamp-other {
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1.5px solid #FECACA;
+}
+
+/* 2. Divider */
+.real-receipt-dashed-divider {
+  height: 0;
+  border: none;
+  border-top: 1.5px dashed #CBD5E1;
+  margin: 22px 0;
+}
+
+/* 3. Parties Grid */
+.real-receipt-parties-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.real-receipt-party-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.real-party-role-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.real-party-name {
+  font-size: 1.0rem;
+  font-weight: 700;
+  color: #0A2342;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.real-verified-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #E6F7F5;
+  color: #007A6C;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid #B3E7E1;
+}
+
+.real-party-line {
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.55;
+  display: flex;
+  gap: 6px;
+}
+
+.real-party-line .lbl {
+  color: #64748B;
+  min-width: 54px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.real-party-line .val {
+  font-weight: 600;
+  color: #0A2342;
+  word-break: break-word;
+}
+
+/* 4. Table */
+.real-receipt-table-wrapper {
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #FFFFFF;
+}
+
+.real-receipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.real-receipt-table thead th {
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 12px 16px;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.real-receipt-table thead th.col-desc { text-align: left; width: 44%; }
+.real-receipt-table thead th.col-rate { text-align: right; width: 18%; }
+.real-receipt-table thead th.col-qty  { text-align: center; width: 10%; }
+.real-receipt-table thead th.col-dur  { text-align: center; width: 12%; }
+.real-receipt-table thead th.col-amt  { text-align: right; width: 16%; }
+
+.real-receipt-table tbody td {
+  padding: 16px 16px;
+  font-size: 0.88rem;
+  color: #334155;
+  vertical-align: middle;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.real-receipt-table tbody td.col-desc { width: 44%; }
+.real-receipt-table tbody td.col-rate { width: 18%; text-align: right; }
+.real-receipt-table tbody td.col-qty  { width: 10%; text-align: center; }
+.real-receipt-table tbody td.col-dur  { width: 12%; text-align: center; }
+.real-receipt-table tbody td.col-amt  { width: 16%; text-align: right; font-weight: 800; color: #0A2342; font-size: 0.95rem; }
+
+.real-item-name {
+  font-weight: 700;
+  color: #0A2342;
+  font-size: 0.96rem;
+  line-height: 1.35;
+}
+
+.real-item-meta-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.meta-tag.tag-category {
+  background: #F1F5F9;
+  color: #334155;
+  border: 1px solid #E2E8F0;
+  font-weight: 600;
+}
+
+.meta-tag.tag-condition {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+  font-weight: 500;
+}
+
+.meta-tag.tag-condition strong {
+  font-weight: 700;
+  color: #047857;
+}
+
+/* 5. Formula Badge */
+.real-receipt-formula-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 9px 14px;
+  border-radius: 6px;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  flex-wrap: wrap;
+}
+
+.real-receipt-formula-badge .formula-label {
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+
+.real-receipt-formula-badge .formula-text {
+  color: #007A6C;
+  font-weight: 700;
+}
+
+/* 6. Bottom Split */
+.real-receipt-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.real-info-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.real-info-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0A2342;
+  margin-bottom: 2px;
+}
+
+.real-info-row {
+  font-size: 0.8rem;
+  display: flex;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.real-info-row .lbl {
+  color: #64748B;
+  min-width: 90px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.real-info-row .val {
+  color: #0A2342;
+  font-weight: 600;
+}
+
+.real-receipt-totals-panel {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.real-totals-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.86rem;
+  color: #475569;
+}
+
+.real-totals-divider {
+  height: 1px;
+  background: #CBD5E1;
+  margin: 3px 0;
+}
+
+.real-grand-total {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #0A2342;
+}
+
+.real-grand-total .mono {
+  font-size: 1.25rem;
+  color: #059669;
+  font-weight: 800;
+}
+
+/* 7. Barcode & Footer */
+.real-receipt-footer {
+  text-align: center;
+  padding-top: 2px;
+}
+
+.real-barcode-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.real-barcode-bars {
+  display: flex;
+  gap: 2px;
+  height: 30px;
+  align-items: stretch;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.real-barcode-bars span {
+  display: block;
+  width: 2px;
+  background: #0A2342;
+}
+
+.real-barcode-bars span:nth-child(2n) { width: 3px; }
+.real-barcode-bars span:nth-child(3n) { width: 1px; }
+.real-barcode-bars span:nth-child(4n) { width: 4px; }
+.real-barcode-bars span:nth-child(5n) { width: 2px; }
+
+.real-barcode-number {
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  color: #64748B;
+}
+
+.real-receipt-disclaimer {
+  font-size: 0.72rem;
+  color: #94A3B8;
+  line-height: 1.5;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .real-receipt-document {
+    padding: 24px 18px;
+  }
+
+  .real-receipt-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .real-receipt-meta-block {
+    align-items: flex-start;
+    text-align: left;
+    margin-top: 8px;
+  }
+
+  .real-receipt-parties-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .real-receipt-bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .real-receipt-table-wrapper {
+    overflow-x: auto;
+  }
+}
+
 /* ----------------------------------------------------------
    HEADER: Logo / Brand + Document Badge
    ---------------------------------------------------------- */
@@ -4091,11 +4571,13 @@ select:focus {
 }
 
 /* Modal inner receipt card resets (no shadow, no rounded top corners) */
-.receipt-modal-dialog .receipt-card {
+.receipt-modal-dialog .receipt-card,
+.receipt-modal-dialog .real-receipt-document {
   border: none;
   box-shadow: none;
   border-radius: 0;
-  padding: 40px 40px 32px;
+  padding: 36px 36px 28px;
+  max-width: 100%;
 }
 
 /* Modal footer control bar */
@@ -4265,7 +4747,8 @@ select:focus {
   }
 
   /* The receipt document */
-  .receipt-card {
+  .receipt-card,
+  .real-receipt-document {
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
@@ -4675,4 +5158,703 @@ select:focus {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* ==========================================================================
+   Dynamic Rental Cost Calculator & Transparent Booking Design
+   ========================================================================== */
+
+/* ---------- Calculator Sidebar on Item Detail ---------- */
+.rental-calculator-sidebar {
+  position: sticky;
+  top: 96px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.rental-calculator-sidebar:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(0, 168, 150, 0.35);
+}
+
+.calc-widget-shell {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.calc-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-ink);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.calc-live-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-teal-subtle);
+  color: var(--color-accent-teal-dark);
+  border: 1px solid var(--color-accent-teal-border);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.calc-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calc-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.calc-field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--color-primary-navy);
+  margin: 0;
+}
+
+.calc-field-label svg {
+  color: var(--color-accent-teal);
+}
+
+.calc-stock-hint {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  font-weight: 500;
+}
+
+/* Stepper Controls */
+.calc-stepper {
+  display: flex;
+  align-items: stretch;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calc-stepper:focus-within {
+  border-color: var(--color-accent-teal);
+  box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.15);
+  background: var(--color-surface);
+}
+
+.calc-step-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: none;
+  color: var(--color-primary-navy);
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.calc-step-btn:hover {
+  background-color: var(--color-accent-teal-subtle);
+  color: var(--color-accent-teal-dark);
+}
+
+.calc-step-btn:active {
+  background-color: var(--color-accent-teal-border);
+}
+
+.calc-step-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary-navy);
+  padding: 8px;
+  outline: none;
+  min-width: 0;
+  -moz-appearance: textfield;
+}
+
+.calc-step-input::-webkit-outer-spin-button,
+.calc-step-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Quick Selection Chips */
+.calc-quick-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.calc-chip {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.calc-chip:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent-teal);
+  color: var(--color-primary-navy);
+}
+
+.calc-chip.is-active {
+  background: var(--color-primary-navy);
+  border-color: var(--color-primary-navy);
+  color: #ffffff;
+}
+
+/* Breakdown Card */
+.calc-breakdown-card {
+  background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calc-formula-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary-navy);
+}
+
+.calc-formula-rate {
+  color: var(--color-accent-teal-dark);
+  font-weight: 700;
+}
+
+.calc-formula-op {
+  color: var(--color-ink-muted);
+  font-weight: 400;
+}
+
+.calc-formula-qty,
+.calc-formula-dur {
+  background: var(--color-bg);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-border);
+}
+
+.calc-breakdown-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calc-breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.calc-row-label {
+  color: var(--color-ink-muted);
+  font-size: 0.85rem;
+}
+
+.calc-row-value {
+  color: var(--color-primary-navy);
+  font-weight: 600;
+}
+
+.calc-badge-free {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-success-tint);
+  color: var(--color-success);
+}
+
+.calc-breakdown-divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 4px 0;
+}
+
+.calc-total-row {
+  padding-top: 4px;
+}
+
+.calc-total-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-primary-navy);
+}
+
+.calc-total-amount {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-accent-teal-dark);
+  letter-spacing: -0.01em;
+}
+
+@keyframes calcPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); color: var(--color-accent-teal); }
+  100% { transform: scale(1); }
+}
+
+.calc-pulse-anim {
+  animation: calcPulse 0.25s ease-out;
+}
+
+/* CTA & Trust Badges */
+.calc-cta-wrap {
+  margin-top: 4px;
+}
+
+.calc-rent-cta {
+  box-shadow: 0 4px 14px 0 rgba(0, 168, 150, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.calc-rent-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px 0 rgba(0, 168, 150, 0.45);
+}
+
+.calc-trust-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.trust-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+}
+
+.trust-badge-item svg {
+  color: var(--color-accent-teal);
+}
+
+.calc-unavailable-box {
+  background: var(--color-surface-hover);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.calc-unavailable-box p {
+  margin: 0 0 12px;
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+}
+
+/* ---------- Start Rental Initiation Page Split Grid ---------- */
+.rental-initiation-container {
+  max-width: 1080px;
+}
+
+.rental-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .rental-split-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rental-form-step {
+  margin-bottom: 24px;
+}
+
+.step-badge-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+  border-bottom: 1.5px solid var(--color-border);
+}
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-navy);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step-title {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--color-primary-navy);
+  font-weight: 700;
+}
+
+.inline-stepper {
+  margin-top: 4px;
+}
+
+.inline-stepper .field-input {
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary-navy);
+  padding: 8px;
+  outline: none;
+  min-width: 0;
+  box-shadow: none;
+}
+
+/* Sticky Live Order Summary Card */
+.rental-summary-column {
+  position: sticky;
+  top: 96px;
+}
+
+.rental-summary-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+}
+
+.summary-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.summary-card-title {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--color-primary-navy);
+  font-weight: 700;
+}
+
+.summary-formula-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 18px;
+}
+
+.formula-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.formula-val {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-primary-navy);
+}
+
+.formula-tag {
+  font-size: 0.7rem;
+  color: var(--color-ink-muted);
+  font-weight: 500;
+}
+
+.formula-sym {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+}
+
+.summary-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summary-breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.88rem;
+}
+
+.summary-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 6px 0;
+}
+
+.summary-total-block {
+  padding: 14px 16px;
+  background: var(--color-accent-teal-subtle);
+  border: 1px solid var(--color-accent-teal-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.summary-total-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-primary-navy);
+}
+
+.summary-total-amount {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--color-accent-teal-dark);
+}
+
+.summary-guarantee-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 14px;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-border);
+}
+
+.guarantee-icon {
+  color: var(--color-success);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.guarantee-text strong {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--color-primary-navy);
+  margin-bottom: 2px;
+}
+
+.guarantee-text p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  line-height: 1.4;
+}
+
+/* ---------- Owner Live Pricing & Calculation Simulator ---------- */
+.owner-pricing-simulator {
+  background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.simulator-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.simulator-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--color-primary-navy);
+  font-size: 1rem;
+}
+
+.simulator-title-group svg {
+  color: var(--color-accent-teal);
+}
+
+.simulator-desc {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  color: var(--color-ink-muted);
+}
+
+.simulator-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.simulator-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .simulator-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sim-control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sim-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  margin: 0;
+}
+
+.sim-stepper {
+  background: var(--color-surface);
+}
+
+.simulator-preview-box {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sim-formula-line {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-primary-navy);
+  text-align: center;
+  padding: 8px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+}
+
+.sim-rate {
+  color: var(--color-accent-teal-dark);
+}
+
+.sim-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 500px) {
+  .sim-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sim-metric-card {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sim-payout-card {
+  background: var(--color-accent-teal-subtle);
+  border-color: var(--color-accent-teal-border);
+}
+
+.sim-metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+}
+
+.sim-payout-card .sim-metric-label {
+  color: var(--color-accent-teal-dark);
+}
+
+.sim-metric-val {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-primary-navy);
+}
+
+.sim-payout-val {
+  color: var(--color-accent-teal-dark);
+}
+
+.sim-fee-note {
+  font-size: 0.7rem;
+  color: var(--color-ink-muted);
 }

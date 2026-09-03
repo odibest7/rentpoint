@@ -3,91 +3,200 @@
 
 {% block content %}
 <div class="page-header">
-  <div class="container" style="max-width: 640px;">
-    <a href="{{ item.get_absolute_url }}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to Item</a>
+  <div class="container">
+    <a href="{{ item.get_absolute_url }}" class="btn btn-sm btn-outline" style="margin-bottom:12px;">&larr; Back to Item Details</a>
     <div style="display:block;">
-      <span class="eyebrow">Booking Initiation</span>
+      <span class="eyebrow"><span class="eyebrow-dot"></span> Secure Rental Initiation</span>
     </div>
     <h1 class="mt-0">Rent {{ item.name }}</h1>
-    <p class="subtle">₦{{ item.rental_price|floatformat:0 }} / {{ item.get_price_unit_display }} &middot; {{ item.location }}</p>
+    <p class="subtle">Set your required quantity and rental duration. Total cost is calculated dynamically.</p>
   </div>
 </div>
 
-<section class="container" style="padding-bottom:70px; max-width:640px;">
-  <!-- Item & Location Banner -->
-  <div class="card" style="margin-bottom: 24px; padding: 18px 22px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
-    <div class="flex-between">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--color-accent-teal-subtle); color: var(--color-accent-teal-dark); display: flex; align-items: center; justify-content: center; font-weight: 700;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
-        <div>
-          <div class="font-semibold text-sm" style="color:var(--color-primary-navy);">{{ item.location }}</div>
-          <div class="subtle text-xs">Owner: {{ item.owner.get_full_name|default:item.owner.username }}{% if item.owner.is_verified %} &middot; Verified Owner{% endif %}</div>
+<section class="container rental-initiation-container" style="padding-bottom:70px;">
+  <div class="rental-split-grid">
+    <!-- Left Column: Form Fields -->
+    <div class="rental-form-column">
+      <!-- Item Quick Summary Banner -->
+      <div class="card rental-item-banner" style="margin-bottom: 24px; padding: 18px 22px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
+        <div class="flex-between">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div class="rental-banner-icon" style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--color-accent-teal-subtle); color: var(--color-accent-teal-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">
+              {% if item.primary_image %}
+                <img src="{{ item.primary_image.image.url }}" alt="{{ item.name }}" style="width:100%; height:100%; object-fit:cover; border-radius:var(--radius-md);">
+              {% else %}
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              {% endif %}
+            </div>
+            <div>
+              <div class="font-semibold" style="color:var(--color-primary-navy); font-size:1.05rem;">{{ item.name }}</div>
+              <div class="subtle text-xs">
+                <span>₦{{ item.rental_price|floatformat:0 }} / {{ item.get_price_unit_display }}</span> &middot;
+                <span>{{ item.location }}</span> &middot;
+                <span>Owner: {{ item.owner.get_full_name|default:item.owner.username }}</span>
+              </div>
+            </div>
+          </div>
+          <span class="badge badge-success"><span class="badge-dot"></span>In Stock ({{ item.quantity_available }})</span>
         </div>
       </div>
-      <span class="badge badge-success"><span class="badge-dot"></span>Available</span>
+
+      <form method="post" class="form-card stack" id="startRentalForm" novalidate style="padding: 28px;">
+        {% csrf_token %}
+
+        <div class="rental-form-step">
+          <div class="step-badge-header">
+            <span class="step-num">1</span>
+            <h3 class="step-title">Select Quantity &amp; Duration (Days)</h3>
+          </div>
+
+          <div class="form-row">
+            <div class="field-group">
+              <label for="{{ form.quantity.id_for_label }}" id="startQtyLabel">Quantity ({{ item.name }} Needed)</label>
+              <div class="calc-stepper inline-stepper">
+                <button type="button" class="calc-step-btn" id="startQtyMinus" aria-label="Decrease quantity">&minus;</button>
+                {{ form.quantity }}
+                <button type="button" class="calc-step-btn" id="startQtyPlus" aria-label="Increase quantity">&plus;</button>
+              </div>
+              <p class="field-hint">{{ form.quantity.help_text }}</p>
+              {% for error in form.quantity.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+
+            <div class="field-group">
+              <label for="{{ form.duration.id_for_label }}">Duration (in Days)</label>
+              <div class="calc-stepper inline-stepper">
+                <button type="button" class="calc-step-btn" id="startDurMinus" aria-label="Decrease duration">&minus;</button>
+                {{ form.duration }}
+                <button type="button" class="calc-step-btn" id="startDurPlus" aria-label="Increase duration">&plus;</button>
+              </div>
+              <p class="field-hint">{{ form.duration.help_text }}</p>
+              {% for error in form.duration.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="rental-form-step">
+          <div class="step-badge-header">
+            <span class="step-num">2</span>
+            <h3 class="step-title">Handover &amp; Contact Information</h3>
+          </div>
+
+          <div class="field-group">
+            <label for="{{ form.delivery_option.id_for_label }}">Fulfillment Preference</label>
+            {{ form.delivery_option }}
+            <p class="field-hint">Choose self-pickup in {{ item.location }} or direct delivery.</p>
+            {% for error in form.delivery_option.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+
+          <div class="field-group">
+            <label for="{{ form.contact_phone.id_for_label }}">Phone Number</label>
+            {{ form.contact_phone }}
+            <p class="field-hint">{{ form.contact_phone.help_text }}</p>
+            {% for error in form.contact_phone.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+
+          <div class="field-group" id="deliveryAddressGroup">
+            <label for="{{ form.delivery_address.id_for_label }}">Delivery Address</label>
+            {{ form.delivery_address }}
+            <p class="field-hint">{{ form.delivery_address.help_text }}</p>
+            {% for error in form.delivery_address.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+
+          <div class="field-group">
+            <label for="{{ form.pickup_notes.id_for_label }}">Special Handover Instructions (Optional)</label>
+            {{ form.pickup_notes }}
+            {% for error in form.pickup_notes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+        </div>
+
+        <div style="margin-top: 14px; padding-top: 18px; border-top: 1px solid var(--color-border);">
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitRentalBtn">
+            <span>Proceed to Review &amp; Pay &rarr;</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Right Column: Sticky Live Order Summary -->
+    <div class="rental-summary-column">
+      <div class="card-panel rental-summary-card" 
+           id="startRentalSummary"
+           data-item-name="{{ item.name }}"
+           data-unit-price="{{ item.rental_price }}"
+           data-max-stock="{{ item.quantity_available }}"
+           data-location="{{ item.location }}">
+        
+        <div class="summary-card-header">
+          <h3 class="summary-card-title">Order Calculation</h3>
+          <span class="calc-live-pill">Auto-Calculated</span>
+        </div>
+
+        <!-- Dynamic Formula Pill -->
+        <div class="summary-formula-box" id="summaryFormula">
+          <div class="formula-item">
+            <span class="formula-val">₦{{ item.rental_price|floatformat:0 }}</span>
+            <span class="formula-tag">per item/day</span>
+          </div>
+          <span class="formula-sym">&times;</span>
+          <div class="formula-item">
+            <span class="formula-val" id="sumQtyVal">1</span>
+            <span class="formula-tag">{{ item.name }}</span>
+          </div>
+          <span class="formula-sym">&times;</span>
+          <div class="formula-item">
+            <span class="formula-val" id="sumDurVal">1</span>
+            <span class="formula-tag">days</span>
+          </div>
+        </div>
+
+        <div class="summary-breakdown-list">
+          <div class="summary-breakdown-row">
+            <span class="subtle">Item Rate</span>
+            <span class="font-medium">₦{{ item.rental_price|floatformat:2 }} / day per {{ item.name }}</span>
+          </div>
+          <div class="summary-breakdown-row">
+            <span class="subtle">Quantity Selected</span>
+            <span class="font-medium" id="sumQtyDisplay">1 {{ item.name }}</span>
+          </div>
+          <div class="summary-breakdown-row">
+            <span class="subtle">Rental Duration</span>
+            <span class="font-medium" id="sumDurDisplay">1 day</span>
+          </div>
+          <div class="summary-breakdown-row">
+            <span class="subtle">Fulfillment</span>
+            <span class="font-medium" id="sumDeliveryDisplay">Self-Pickup in {{ item.location }}</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-breakdown-row">
+            <span class="subtle">Base Rental Cost</span>
+            <span class="font-semibold" id="sumSubtotal">₦{{ item.rental_price|floatformat:2 }}</span>
+          </div>
+          <div class="summary-breakdown-row">
+            <span class="subtle">Paystack Escrow Protection</span>
+            <span class="text-success font-medium">Included (₦0.00)</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total-block">
+            <div class="summary-total-label">Total Amount to Pay</div>
+            <div class="summary-total-amount" id="sumGrandTotal">₦{{ item.rental_price|floatformat:2 }}</div>
+          </div>
+        </div>
+
+        <div class="summary-guarantee-box">
+          <div class="guarantee-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="guarantee-text">
+            <strong>Escrow Protection Guaranteed</strong>
+            <p>Your funds are held securely until item pickup or delivery is verified with official receipt.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
-  <form method="post" class="form-card stack" novalidate style="padding: 28px;">
-    {% csrf_token %}
-
-    <h3 class="mt-0" style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin-bottom: 18px;">
-      1. Quantity &amp; Duration
-    </h3>
-
-    <div class="form-row">
-      <div class="field-group">
-        <label for="{{ form.quantity.id_for_label }}">Quantity</label>
-        {{ form.quantity }}
-        <p class="field-hint">{{ form.quantity.help_text }}</p>
-        {% for error in form.quantity.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
-      <div class="field-group">
-        <label for="{{ form.duration.id_for_label }}">Duration ({{ item.get_price_unit_display }})</label>
-        {{ form.duration }}
-        <p class="field-hint">{{ form.duration.help_text }}</p>
-        {% for error in form.duration.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
-    </div>
-
-    <h3 style="font-size: 1.15rem; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin: 24px 0 18px;">
-      2. Handover &amp; Contact Information
-    </h3>
-
-    <div class="field-group">
-      <label for="{{ form.delivery_option.id_for_label }}">Fulfillment Preference</label>
-      {{ form.delivery_option }}
-      <p class="field-hint">Choose between self-pickup in {{ item.location }} or direct delivery.</p>
-      {% for error in form.delivery_option.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-    </div>
-
-    <div class="field-group">
-      <label for="{{ form.contact_phone.id_for_label }}">Phone Number</label>
-      {{ form.contact_phone }}
-      <p class="field-hint">{{ form.contact_phone.help_text }}</p>
-      {% for error in form.contact_phone.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-    </div>
-
-    <div class="field-group">
-      <label for="{{ form.delivery_address.id_for_label }}">Delivery Address</label>
-      {{ form.delivery_address }}
-      <p class="field-hint">{{ form.delivery_address.help_text }}</p>
-      {% for error in form.delivery_address.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-    </div>
-
-    <div class="field-group">
-      <label for="{{ form.pickup_notes.id_for_label }}">Special Handover Instructions (Optional)</label>
-      {{ form.pickup_notes }}
-      {% for error in form.pickup_notes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-    </div>
-
-    <div style="margin-top: 14px; padding-top: 18px; border-top: 1px solid var(--color-border);">
-      <button type="submit" class="btn btn-primary btn-block btn-lg">
-        Proceed to Review &amp; Pay &rarr;
-      </button>
-    </div>
-  </form>
 </section>
 {% endblock %}
