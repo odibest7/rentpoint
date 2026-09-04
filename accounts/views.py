@@ -1,12 +1,28 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetView,
+)
 from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
 
-from .forms import LoginForm, OwnerVerificationForm, ProfileForm, SignUpForm
+from .forms import (
+    LoginForm,
+    OwnerVerificationForm,
+    ProfileForm,
+    RentPointPasswordResetForm,
+    RentPointSetPasswordForm,
+    SignUpForm,
+)
 from .models import OwnerVerification, User
 from .verification import get_verification_provider
+
 
 
 def signup_customer(request):
@@ -48,6 +64,30 @@ class RentPointLoginView(LoginView):
 
 class RentPointLogoutView(LogoutView):
     next_page = "core:home"
+
+
+class RentPointPasswordResetView(PasswordResetView):
+    template_name = "accounts/password_reset_form.html"
+    email_template_name = "accounts/password_reset_email.txt"
+    html_email_template_name = "accounts/password_reset_email.html"
+    subject_template_name = "accounts/password_reset_subject.txt"
+    form_class = RentPointPasswordResetForm
+    success_url = reverse_lazy("accounts:password_reset_done")
+
+
+class RentPointPasswordResetDoneView(PasswordResetDoneView):
+    template_name = "accounts/password_reset_done.html"
+
+
+class RentPointPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = "accounts/password_reset_confirm.html"
+    form_class = RentPointSetPasswordForm
+    success_url = reverse_lazy("accounts:password_reset_complete")
+
+
+class RentPointPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = "accounts/password_reset_complete.html"
+
 
 
 @login_required

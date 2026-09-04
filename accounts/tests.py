@@ -57,3 +57,100 @@ class OwnerVerificationCleanupTests(TestCase):
 
         self.assertFalse(old_selfie.exists())
         self.assertTrue(Path(verification.selfie_image.path).exists())
+
+
+class PasswordResetTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="emeka_renter",
+            email="emeka@example.com",
+            password="OldPassword123!",
+            first_name="Emeka",
+            last_name="Nnamdi",
+            role=User.Role.CUSTOMER,
+        )
+
+    def test_password_reset_request_view_renders(self):
+        response = self.client.get("/accounts/password-reset/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_form.html")
+        self.assertContains(response, "Forgot Password?")
+
+    def test_password_reset_sends_email_for_registered_user(self):
+        from django.core import mail
+
+        response = self.client.post(
+            "/accounts/password-reset/",
+            {"email": "emeka@example.com"},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_done.html")
+
+        # Verify email was dispatched
+        self.assertEqual(len(mail.outbox), 1)
+        sent_email = mail.outbox[0]
+        self.assertIn("Reset your", sent_email.subject)
+        self.assertEqual(sent_email.to, ["emeka@example.com"])
+        self.assertIn("accounts/password-reset/", sent_email.body)
+
+    def test_password_reset_enumeration_protection(self):
+        from django.core import mail
+
+        response = self.client.post(
+            "/accounts/password-reset/",
+            {"email": "nonexistent@example.com"},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_done.html")
+        # No email sent for non-existent user, but UI confirms gracefully
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_password_reset_confirm_and_complete_flow(self):
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.encoding import force_bytes
+        from django.utils.http import urlsafe_base64_encode
+
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        token = default_token_generator.make_token(self.user)
+
+        # GET confirm page with valid token (Django stores token in session and redirects to set-password form for security)
+        confirm_url = f"/accounts/password-reset/{uid}/{token}/"
+        response = self.client.get(confirm_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_confirm.html")
+        self.assertTrue(response.context["validlink"])
+
+        # POST new password to the active redirected form URL
+        post_url = response.redirect_chain[0][0] if response.redirect_chain else confirm_url
+        post_response = self.client.post(
+            post_url,
+            {
+                "new_password1": "NewSecurePassword999!",
+                "new_password2": "NewSecurePassword999!",
+            },
+            follow=True,
+        )
+        self.assertEqual(post_response.status_code, 200)
+        self.assertTemplateUsed(post_response, "accounts/password_reset_complete.html")
+
+        # Verify user can log in with new password and not old password
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("NewSecurePassword999!"))
+        self.assertFalse(self.user.check_password("OldPassword123!"))
+
+        # Verify old token cannot be reused
+        reuse_response = self.client.get(confirm_url, follow=True)
+        self.assertEqual(reuse_response.status_code, 200)
+        self.assertFalse(reuse_response.context["validlink"])
+
+
+    def test_password_reset_confirm_invalid_token(self):
+        invalid_url = "/accounts/password-reset/invalid-uid/invalid-token/"
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_confirm.html")
+        self.assertFalse(response.context["validlink"])
+        self.assertContains(response, "Reset Link Expired or Invalid")
+

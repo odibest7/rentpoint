@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initItemDetailCalculator();
   initStartRentalCalculator();
   initOwnerPricingSimulator();
+  initPasswordResetMeter();
 });
 
 function initPasswordVisibilityToggles() {
@@ -1259,3 +1260,101 @@ function initOwnerPricingSimulator() {
   // Initial run
   updateSimulation();
 }
+
+function initPasswordResetMeter() {
+  const pwdInput = document.getElementById("id_new_password1");
+  const pwdConfirmInput = document.getElementById("id_new_password2");
+  const strengthBox = document.getElementById("pwd-strength-box");
+  const strengthText = document.getElementById("pwd-strength-text");
+  const strengthBars = strengthBox ? strengthBox.querySelector(".pwd-strength-bars") : null;
+
+  const reqLength = document.getElementById("req-length");
+  const reqLetter = document.getElementById("req-letter");
+  const reqNumber = document.getElementById("req-number");
+  const matchHint = document.getElementById("pwd-match-hint");
+
+  if (!pwdInput) return;
+
+  function updateRequirement(el, isMet) {
+    if (!el) return;
+    el.classList.toggle("met", isMet);
+    const icon = el.querySelector(".req-icon");
+    if (icon) {
+      icon.textContent = isMet ? "✓" : "○";
+    }
+  }
+
+  function evaluateStrength(val) {
+    if (!val) {
+      return { score: 0, label: "Password strength", cls: "" };
+    }
+
+    const hasMinLen = val.length >= 8;
+    const hasUpper = /[A-Z]/.test(val);
+    const hasLower = /[a-z]/.test(val);
+    const hasMixed = hasUpper && hasLower;
+    const hasNumOrSym = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val);
+    const isLong = val.length >= 12;
+
+    updateRequirement(reqLength, hasMinLen);
+    updateRequirement(reqLetter, hasMixed);
+    updateRequirement(reqNumber, hasNumOrSym);
+
+    let score = 0;
+    if (hasMinLen) score += 1;
+    if (hasMixed) score += 1;
+    if (hasNumOrSym) score += 1;
+    if (isLong || (hasMinLen && hasMixed && hasNumOrSym && val.length >= 10)) score += 1;
+
+    if (score <= 1) {
+      return { score: 1, label: "Weak password", cls: "weak" };
+    } else if (score === 2) {
+      return { score: 2, label: "Fair password", cls: "fair" };
+    } else if (score === 3) {
+      return { score: 3, label: "Good password", cls: "good" };
+    } else {
+      return { score: 4, label: "Strong & secure password", cls: "strong" };
+    }
+  }
+
+  function handlePwdInput() {
+    const val = pwdInput.value;
+    const result = evaluateStrength(val);
+
+    if (strengthBars) {
+      strengthBars.className = "pwd-strength-bars" + (result.cls ? " strength-" + result.cls : "");
+    }
+    if (strengthText) {
+      strengthText.textContent = result.label;
+      strengthText.className = "pwd-strength-label" + (result.cls ? " text-" + result.cls : "");
+    }
+
+    checkMatch();
+  }
+
+  function checkMatch() {
+    if (!pwdConfirmInput || !matchHint) return;
+    const val1 = pwdInput.value;
+    const val2 = pwdConfirmInput.value;
+
+    if (!val2) {
+      matchHint.style.display = "none";
+      return;
+    }
+
+    matchHint.style.display = "block";
+    if (val1 === val2) {
+      matchHint.textContent = "✓ Passwords match";
+      matchHint.style.color = "#059669";
+    } else {
+      matchHint.textContent = "✕ Passwords do not match yet";
+      matchHint.style.color = "#DC2626";
+    }
+  }
+
+  pwdInput.addEventListener("input", handlePwdInput);
+  if (pwdConfirmInput) {
+    pwdConfirmInput.addEventListener("input", checkMatch);
+  }
+}
+

@@ -5858,3 +5858,233 @@ select:focus {
   font-size: 0.7rem;
   color: var(--color-ink-muted);
 }
+
+/* ==========================================================================
+   Password Reset & Security UI Enhancements
+   ========================================================================== */
+
+.auth-forgot-wrap {
+  text-align: center;
+  margin-top: 6px;
+}
+
+.auth-forgot-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  transition: all 0.18s ease;
+}
+
+.auth-forgot-link:hover {
+  color: var(--color-primary-navy);
+  background: var(--color-surface-hover);
+  text-decoration: none;
+}
+
+
+.field-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.field-label-row label {
+  margin-bottom: 0;
+}
+
+.auth-header-icon-wrap {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+}
+
+.auth-header-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-teal-subtle);
+  color: var(--color-accent-teal-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-accent-teal-border);
+}
+
+.auth-header-icon.icon-success {
+  background: var(--color-success-tint);
+  color: var(--color-success);
+  border-color: #A7F3D0;
+}
+
+.auth-header-icon.icon-warning {
+  background: #FEF2F2;
+  color: #DC2626;
+  border-color: #FECACA;
+}
+
+.reset-guidance-card {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.guidance-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.guidance-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-primary-navy);
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.guidance-step strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--color-primary-navy);
+  margin-bottom: 2px;
+}
+
+.guidance-step p {
+  font-size: 0.84rem;
+  color: var(--color-ink-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.reset-actions-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (min-width: 480px) {
+  .reset-actions-row {
+    flex-direction: row;
+  }
+}
+
+.security-success-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--color-success-tint);
+  border: 1px solid #A7F3D0;
+  color: #065F46;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+/* Password Strength Meter */
+.pwd-strength-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pwd-strength-bars {
+  display: flex;
+  gap: 4px;
+  height: 5px;
+}
+
+.pwd-strength-bars .bar {
+  flex: 1;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--color-border);
+  transition: background-color 0.25s ease;
+}
+
+.pwd-strength-bars.strength-weak .bar-1 {
+  background: #EF4444;
+}
+
+.pwd-strength-bars.strength-fair .bar-1,
+.pwd-strength-bars.strength-fair .bar-2 {
+  background: #F59E0B;
+}
+
+.pwd-strength-bars.strength-good .bar-1,
+.pwd-strength-bars.strength-good .bar-2,
+.pwd-strength-bars.strength-good .bar-3 {
+  background: #3B82F6;
+}
+
+.pwd-strength-bars.strength-strong .bar-1,
+.pwd-strength-bars.strength-strong .bar-2,
+.pwd-strength-bars.strength-strong .bar-3,
+.pwd-strength-bars.strength-strong .bar-4 {
+  background: #10B981;
+}
+
+.pwd-strength-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+  transition: color 0.25s ease;
+}
+
+.pwd-strength-label.text-weak { color: #DC2626; }
+.pwd-strength-label.text-fair { color: #D97706; }
+.pwd-strength-label.text-good { color: #2563EB; }
+.pwd-strength-label.text-strong { color: #059669; }
+
+/* Password Requirements Checklist */
+.pwd-requirements-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.pwd-req-item {
+  font-size: 0.78rem;
+  color: var(--color-ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.pwd-req-item .req-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.pwd-req-item.met {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.pwd-req-item.met .req-icon {
+  color: var(--color-success);
+}
