@@ -222,6 +222,34 @@ PAYMENT_GATEWAY_PROVIDER = os.environ.get("PAYMENT_GATEWAY_PROVIDER", "paystack"
 PAYSTACK_SECRET_KEY = os.environ.get("PAYSTACK_SECRET_KEY", "")
 PAYSTACK_PUBLIC_KEY = os.environ.get("PAYSTACK_PUBLIC_KEY", "")
 
+# --------------------------------------------------------------------------
+# Email & Password Reset Configuration
+# --------------------------------------------------------------------------
+_email_backend_env = os.environ.get("EMAIL_BACKEND", "")
+if _email_backend_env:
+    EMAIL_BACKEND = _email_backend_env
+elif os.environ.get("EMAIL_HOST"):
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+elif DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", default=True if EMAIL_PORT == 587 else False)
+EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", default=True if EMAIL_PORT == 465 else False)
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL",
+    f"{PLATFORM_NAME} <no-reply@rentpoint.ng>",
+)
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Password reset links expire after 24 hours (86,400 seconds)
+PASSWORD_RESET_TIMEOUT = int(os.environ.get("PASSWORD_RESET_TIMEOUT", 86400))
+
 MESSAGE_TAGS = {
     10: "info",
     20: "info",
@@ -229,3 +257,4 @@ MESSAGE_TAGS = {
     30: "warning",
     40: "danger",
 }
+

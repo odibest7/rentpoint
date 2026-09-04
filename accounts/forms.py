@@ -1,7 +1,14 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.conf import settings
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordResetForm,
+    SetPasswordForm,
+    UserCreationForm,
+)
 
 from .models import OwnerVerification, User
+
 
 
 class SignUpForm(UserCreationForm):
@@ -88,6 +95,75 @@ class LoginForm(AuthenticationForm):
                 "autocomplete": "current-password",
             }
         )
+
+
+class RentPointPasswordResetForm(PasswordResetForm):
+    """
+    Styled password reset request form. Collects user's email address and triggers
+    sending a branded HTML + text reset link. Safe against timing/user enumeration attacks.
+    """
+
+    email = forms.EmailField(
+        label="Email address",
+        max_length=254,
+        widget=forms.EmailInput(
+            attrs={
+                "class": "field-input",
+                "placeholder": "name@example.com",
+                "autocomplete": "email",
+                "autofocus": True,
+                "id": "id_reset_email",
+            }
+        ),
+    )
+
+    def send_mail(
+        self,
+        subject_template_name,
+        email_template_name,
+        context,
+        from_email,
+        to_email,
+        html_email_template_name=None,
+    ):
+        context["platform_name"] = getattr(settings, "PLATFORM_NAME", "RentPoint")
+        context["platform_service_area"] = getattr(settings, "PLATFORM_SERVICE_AREA", "Nsukka Urban")
+        super().send_mail(
+            subject_template_name=subject_template_name,
+            email_template_name=email_template_name,
+            context=context,
+            from_email=from_email,
+            to_email=to_email,
+            html_email_template_name=html_email_template_name or "accounts/password_reset_email.html",
+        )
+
+
+class RentPointSetPasswordForm(SetPasswordForm):
+    """
+    Styled form for entering a new password with password toggles and modern requirements.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["new_password1"].widget.attrs.update(
+            {
+                "class": "field-input password-toggle-input",
+                "placeholder": "Enter new password (min. 8 characters)",
+                "autocomplete": "new-password",
+                "id": "id_new_password1",
+            }
+        )
+        self.fields["new_password1"].help_text = ""
+        self.fields["new_password2"].widget.attrs.update(
+            {
+                "class": "field-input password-toggle-input",
+                "placeholder": "Confirm your new password",
+                "autocomplete": "new-password",
+                "id": "id_new_password2",
+            }
+        )
+        self.fields["new_password2"].help_text = ""
+
 
 
 class ProfileForm(forms.ModelForm):
