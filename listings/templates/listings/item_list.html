@@ -5,9 +5,9 @@
   <div class="container">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
       <div>
-        <span class="eyebrow"><span class="eyebrow-dot"></span> Rental Catalogue</span>
+        <span class="eyebrow"><span class="eyebrow-dot"></span> RENTAL CATALOGUE</span>
         <h1 class="mt-0">Explore Available Equipment &amp; Rentals</h1>
-        <p class="hero-lead mt-0">Browse verified listings in {{ PLATFORM_SERVICE_AREA }} with transparent rates, escrow protection, and instant receipts.</p>
+        <p class="hero-lead mt-0">Verified listings with transparent daily rates, escrow protection, and digital receipts.</p>
       </div>
       {% if user.is_authenticated and user.is_item_owner %}
         <div style="display: flex; gap: 12px; align-items: center; padding-top: 8px;">
@@ -22,30 +22,36 @@
 </div>
 
 <section class="container" style="padding-bottom:60px;">
-  <form method="get" class="form-card" style="margin-bottom:32px;">
-    <div class="form-row">
-      <div class="field-group">
+  <form method="get" class="catalogue-filter-bar" style="margin-bottom:32px;">
+    <div class="catalogue-filter-grid">
+      <div class="catalogue-filter-field">
         <label for="{{ form.q.id_for_label }}">Search</label>
         {{ form.q }}
       </div>
-      <div class="field-group">
+      <div class="catalogue-filter-field">
         <label for="{{ form.category.id_for_label }}">Category</label>
         {{ form.category }}
       </div>
-    </div>
-    <div class="form-row">
-      <div class="field-group">
-        <label for="{{ form.location.id_for_label }}">Location</label>
-        {{ form.location }}
+      <div class="catalogue-filter-field">
+        <label>Location</label>
+        <div class="location-combobox-wrap"
+             data-api-url="{% url 'listings:location_options' %}"
+             data-initial-value="{{ request.GET.location|default:'' }}">
+          {{ form.location }}
+          <div class="location-combobox-popover" role="listbox" aria-label="Location options"></div>
+        </div>
       </div>
-      <div class="field-group">
+      <div class="catalogue-filter-field">
         <label for="{{ form.max_price.id_for_label }}">Max Price (₦)</label>
         {{ form.max_price }}
       </div>
-    </div>
-    <div style="display: flex; gap: 12px; align-items: center;">
-      <button type="submit" class="btn btn-primary">Filter Results</button>
-      <a href="{% url 'listings:item_list' %}" class="btn btn-ghost">Reset</a>
+      <div class="catalogue-filter-actions">
+        <label class="catalogue-filter-actions-spacer" aria-hidden="true">&nbsp;</label>
+        <div style="display:flex; gap:8px;">
+          <button type="submit" class="btn btn-primary catalogue-filter-btn">Filter</button>
+          <a href="{% url 'listings:item_list' %}" class="btn btn-ghost catalogue-filter-btn">Reset</a>
+        </div>
+      </div>
     </div>
   </form>
 

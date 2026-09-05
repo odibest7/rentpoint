@@ -814,7 +814,7 @@ function initItemDetailCalculator() {
   const durInput = document.getElementById("calcDurationInput");
   const durMinus = document.getElementById("calcDurationMinus");
   const durPlus = document.getElementById("calcDurationPlus");
-  const durChips = document.querySelectorAll("#calcDurationChips .calc-chip");
+  const durChips = document.querySelectorAll("#calcDurationChips .calc-seg-pill, #calcDurationChips .calc-chip");
 
   const formulaQty = document.getElementById("formulaQty");
   const formulaDur = document.getElementById("formulaDuration");
@@ -825,23 +825,23 @@ function initItemDetailCalculator() {
   if (!qtyInput || !durInput) return;
 
   // Initialize quick chips with actual item names
-  if (qtyChips) {
+  if (qtyChips && qtyChips.length > 0) {
     qtyChips.forEach((chip) => {
       const chipVal = parseInt(chip.dataset.qty, 10);
       if (chipVal === maxStock && maxStock > 10) {
-        chip.textContent = `All (${chipVal} ${pluralizeItemName(itemName, chipVal)})`;
+        chip.textContent = `All (${chipVal})`;
       } else if (chipVal) {
-        chip.textContent = `${chipVal} ${pluralizeItemName(itemName, chipVal)}`;
+        chip.textContent = `${chipVal}`;
       }
     });
   }
 
   if (stockHint) {
-    stockHint.textContent = `Max: ${maxStock} ${pluralizeItemName(itemName, maxStock)}`;
+    stockHint.textContent = `Max: ${maxStock} units`;
   }
 
   if (qtyLabel) {
-    qtyLabel.textContent = `Quantity (${pluralizeItemName(itemName, 2)})`;
+    qtyLabel.textContent = "Quantity";
   }
 
   function recalculate() {
@@ -859,7 +859,7 @@ function initItemDetailCalculator() {
     const nameWithCount = pluralizeItemName(itemName, qty);
 
     if (formulaQty) {
-      formulaQty.textContent = `${qty} ${nameWithCount}`;
+      formulaQty.textContent = `${qty} item${qty > 1 ? "s" : ""}`;
     }
     if (formulaDur) {
       formulaDur.textContent = `${dur} ${dur === 1 ? "day" : "days"}`;
@@ -874,14 +874,14 @@ function initItemDetailCalculator() {
       grandTotalEl.classList.add("calc-pulse-anim");
     }
 
-    // Sync button href and label
+    // Sync button href and label without awkward wrapping / text clipping
     if (rentBtn) {
       const spanEl = rentBtn.querySelector("span");
       if (spanEl) {
         if (rentBtn.getAttribute("href")?.includes("/login/")) {
-          spanEl.textContent = `Log in to Rent ${qty} ${nameWithCount} &rarr;`;
+          spanEl.textContent = `Log in to Rent \u2192`;
         } else {
-          spanEl.textContent = `Rent ${qty} ${nameWithCount} &rarr;`;
+          spanEl.textContent = `Rent This Item \u2192`;
         }
       }
 

@@ -2,11 +2,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction as db_transaction
-from django.db.models import Q
+from django.db.models import Count, Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from core.utils import is_item_owner_request
 from .forms import ItemForm, ItemImageFormSet, ItemSearchForm
-from .models import Category, Item
+from .models import Category, Item, NSUKKA_ZONES
 
 
 def item_list(request):
@@ -123,3 +124,42 @@ def item_delete(request, slug):
         messages.success(request, f'"{item_name}" has been removed.')
         return redirect("listings:owner_item_list")
     return render(request, "listings/item_confirm_delete.html", {"item": item})
+
+
+
+def location_options(request):
+    """
+    JSON endpoint for the catalogue location combobox.
+    Returns canonical Nsukka zones with the count of available items that
+    contain the zone name anywhere in their location field (icontains),
+    so free-text values like 'Hilltop, Nsukka' are correctly matched to
+    the 'Hilltop' zone.
+
+    Query params:
+      q  – optional search term to filter zone names (case-insensitive)
+    """
+    q = (request.GET.get("q") or "").strip()
+
+    results = []
+    for value, label in NSUKKA_ZONES:
+        # Skip zones that don't match the search term
+        if q and q.lower() not in label.lower():
+            continue
+
+        # Count items whose location field contains this zone name (icontains)
+        # This handles stored values like "Hilltop, Nsukka" -> zone "Hilltop"
+        item_count = (
+            Item.objects
+            .filter(is_available=True, location__icontains=value)
+            .count()
+        )
+
+        # When the user is actively searching, include all matching zones
+        # (even with 0 items) so they can see what exists.
+        # When no search term, only show zones that actually have items.
+        if not q and item_count == 0:
+            continue
+
+        results.append({"value": value, "label": label, "count": item_count})
+
+    return JsonResponse({"results": results})

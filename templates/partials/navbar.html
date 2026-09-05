@@ -11,7 +11,7 @@
 
     <nav aria-label="Primary nav">
       <ul class="nav-links">
-        <li><a href="{% url 'listings:item_list' %}">Browse</a></li>
+        <li><a href="{% url 'listings:item_list' %}">Catalogue</a></li>
         <li><a href="{% url 'core:how_it_works' %}">How It Works</a></li>
         <li><a href="{% url 'core:about' %}">About</a></li>
         {% if user.is_authenticated %}
@@ -24,8 +24,7 @@
           {% else %}
             <li><a href="{% url 'transactions:my_transactions' %}">My Rentals</a></li>
           {% endif %}
-        {% endif %}
-        {% if not user.is_authenticated %}
+        {% else %}
           <li class="mobile-auth-links">
             <a href="{% url 'accounts:login' %}" class="btn btn-accent">Log in</a>
             <a href="{% url 'accounts:signup_customer' %}" class="btn btn-primary">Sign up</a>
@@ -77,8 +76,8 @@
           </div>
         </div>
       {% else %}
-        <a href="{% url 'accounts:login' %}" class="btn btn-accent">Log in</a>
-        <a href="{% url 'accounts:signup_customer' %}" class="btn btn-primary">Sign up</a>
+        <a href="{% url 'accounts:login' %}" class="btn nav-login-btn">Log in</a>
+        <a href="{% url 'accounts:signup_customer' %}" class="btn nav-signup-btn">Sign up</a>
       {% endif %}
       <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>

@@ -4,6 +4,26 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 
+# Recognised Nsukka Urban zones used as standardised location choices.
+# Stored as plain CharField so existing free-text data is preserved.
+NSUKKA_ZONES = [
+    ("Hilltop",         "Hilltop"),
+    ("UNN Campus",      "UNN Campus"),
+    ("Onuiyi",          "Onuiyi"),
+    ("Odenigbo",        "Odenigbo"),
+    ("Ede-Oballa",      "Ede-Oballa"),
+    ("Urban Area",      "Urban Area"),
+    ("Enugwu-Ezike",    "Enugwu-Ezike"),
+    ("Orba",            "Orba"),
+    ("Ibagwa-Ani",      "Ibagwa-Ani"),
+    ("Opi",             "Opi"),
+    ("Eha-Amufu",       "Eha-Amufu"),
+    ("Ogurugu",         "Ogurugu"),
+    ("Ede-Uturu",       "Ede-Uturu"),
+    ("Other / Not Listed", "Other / Not Listed"),
+]
+
+
 class Category(models.Model):
     """
     Groups rentable items so customers can browse and filter instead of
@@ -64,7 +84,10 @@ class Item(models.Model):
     rental_price = models.DecimalField(max_digits=10, decimal_places=2)
     price_unit = models.CharField(max_length=10, choices=PriceUnit.choices, default=PriceUnit.PER_DAY)
     condition = models.CharField(max_length=10, choices=Condition.choices, default=Condition.GOOD)
-    location = models.CharField(max_length=150, help_text="Area within Nsukka Urban, e.g. Odenigbo.")
+    location = models.CharField(
+        max_length=150,
+        help_text="Recognised Nsukka Urban zone where the item is located.",
+    )
     quantity_available = models.PositiveIntegerField(default=1)
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
