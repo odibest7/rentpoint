@@ -15,7 +15,7 @@
     <div class="product-main-column">
       <div class="card-panel product-gallery-panel" data-item-gallery>
         <button type="button" class="item-gallery-hero product-gallery-stage" data-gallery-open="0" aria-label="View photos of {{ item.name }}"
-          style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}'); background-size:cover; background-position:center;{% endif %} border-radius: var(--radius-xl);">
+          style="{% if item.primary_image %}background-image:url('{{ item.primary_image.image.url }}'); background-size:cover; background-position:center;{% endif %}">
           {% if not item.primary_image %}
             <span class="image-empty-state" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -40,25 +40,30 @@
         {% endif %}
       </div>
 
+      <!-- Single Merged Info Card (Description + Location & Handover) -->
       <div class="card-panel product-info-panel">
-        <div class="info-panel-header">
-          <h2>Description</h2>
+        <div class="info-section">
+          <div class="info-panel-header">
+            <h2>Description</h2>
+          </div>
+          <div class="product-description">
+            {{ item.description|linebreaks }}
+          </div>
         </div>
-        <div class="product-description">
-          {{ item.description|linebreaks }}
-        </div>
-      </div>
 
-      <div class="card-panel product-info-panel">
-        <div class="info-panel-header">
-          <h3>Location &amp; Handover</h3>
+        <div class="info-section-divider" aria-hidden="true"></div>
+
+        <div class="info-section">
+          <div class="info-panel-header">
+            <h3>Location &amp; Handover</h3>
+          </div>
+          <p class="product-meta-copy">Available in <strong>{{ item.location }}</strong> ({{ PLATFORM_SERVICE_AREA }}).</p>
+          <ul class="handover-list">
+            <li><span class="checkmark">✓</span><span><strong>Pickup:</strong> Coordinate direct collection with the owner in {{ item.location }}.</span></li>
+            <li><span class="checkmark">✓</span><span><strong>Delivery:</strong> Specify destination during checkout if delivery is needed.</span></li>
+            <li><span class="checkmark">✓</span><span><strong>Proof of Payment:</strong> Official receipts include phone numbers and verification stamps.</span></li>
+          </ul>
         </div>
-        <p class="product-meta-copy">Available in <strong>{{ item.location }}</strong> ({{ PLATFORM_SERVICE_AREA }}).</p>
-        <ul class="handover-list">
-          <li><span class="checkmark">✓</span><span><strong>Pickup:</strong> Coordinate direct collection with the owner in {{ item.location }}.</span></li>
-          <li><span class="checkmark">✓</span><span><strong>Delivery:</strong> Specify destination during checkout if delivery is needed.</span></li>
-          <li><span class="checkmark">✓</span><span><strong>Proof of Payment:</strong> Official receipts include phone numbers and verification stamps.</span></li>
-        </ul>
       </div>
     </div>
 
@@ -95,12 +100,12 @@
           <span class="calc-live-pill">Live Preview</span>
         </div>
 
-        <!-- 1. Quantity Selector -->
+        <!-- 1. Quantity Selector (Clean Numeric Stepper Only) -->
         <div class="calc-control-group">
           <div class="calc-label-row">
             <label for="calcQtyInput" class="calc-field-label">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-              <span id="calcQtyLabel">Quantity ({{ item.name }})</span>
+              <span id="calcQtyLabel">Quantity</span>
             </label>
             <span class="calc-stock-hint" id="calcStockHint">Max: {{ item.quantity_available }}</span>
           </div>
@@ -109,35 +114,30 @@
             <input type="number" id="calcQtyInput" class="calc-step-input" value="1" min="1" max="{{ item.quantity_available }}" step="1" inputmode="numeric">
             <button type="button" class="calc-step-btn calc-step-plus" id="calcQtyPlus" aria-label="Increase quantity">&plus;</button>
           </div>
-          <div class="calc-quick-chips" id="calcQtyChips">
-            <button type="button" class="calc-chip is-active" data-qty="1">1</button>
-            {% if item.quantity_available >= 2 %}<button type="button" class="calc-chip" data-qty="2">2</button>{% endif %}
-            {% if item.quantity_available >= 5 %}<button type="button" class="calc-chip" data-qty="5">5</button>{% endif %}
-            {% if item.quantity_available >= 10 %}<button type="button" class="calc-chip" data-qty="10">10</button>{% endif %}
-            {% if item.quantity_available > 1 %}<button type="button" class="calc-chip" data-qty="{{ item.quantity_available }}">All ({{ item.quantity_available }})</button>{% endif %}
-          </div>
         </div>
 
-        <!-- 2. Duration Selector (Days) -->
+        <!-- 2. Merged Duration Control (Segmented Pills + Compact Stepper) -->
         <div class="calc-control-group">
           <div class="calc-label-row">
             <label for="calcDurationInput" class="calc-field-label">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span>Duration (Days)</span>
+              <span>Duration</span>
             </label>
             <span class="calc-stock-hint">Priced per day</span>
           </div>
-          <div class="calc-stepper">
-            <button type="button" class="calc-step-btn calc-step-minus" id="calcDurationMinus" aria-label="Decrease duration">&minus;</button>
-            <input type="number" id="calcDurationInput" class="calc-step-input" value="1" min="1" max="365" step="1" inputmode="numeric">
-            <button type="button" class="calc-step-btn calc-step-plus" id="calcDurationPlus" aria-label="Increase duration">&plus;</button>
-          </div>
-          <div class="calc-quick-chips" id="calcDurationChips">
-            <button type="button" class="calc-chip is-active" data-days="1">1 Day</button>
-            <button type="button" class="calc-chip" data-days="2">2 Days</button>
-            <button type="button" class="calc-chip" data-days="3">3 Days</button>
-            <button type="button" class="calc-chip" data-days="7">1 Week (7d)</button>
-            <button type="button" class="calc-chip" data-days="14">2 Weeks (14d)</button>
+          <div class="calc-duration-unified">
+            <div class="calc-segmented-pills" id="calcDurationChips">
+              <button type="button" class="calc-seg-pill is-active" data-days="1">1 Day</button>
+              <button type="button" class="calc-seg-pill" data-days="2">2 Days</button>
+              <button type="button" class="calc-seg-pill" data-days="3">3 Days</button>
+              <button type="button" class="calc-seg-pill" data-days="7">1 Wk</button>
+            </div>
+            <div class="calc-stepper calc-stepper-compact">
+              <button type="button" class="calc-step-btn calc-step-minus" id="calcDurationMinus" aria-label="Decrease duration">&minus;</button>
+              <input type="number" id="calcDurationInput" class="calc-step-input" value="1" min="1" max="365" step="1" inputmode="numeric">
+              <span class="calc-step-unit">days</span>
+              <button type="button" class="calc-step-btn calc-step-plus" id="calcDurationPlus" aria-label="Increase duration">&plus;</button>
+            </div>
           </div>
         </div>
 
@@ -168,7 +168,7 @@
           </div>
         </div>
 
-        <!-- Action Button -->
+        <!-- Action Button (Proper padding, full width, 15px font) -->
         <div class="calc-cta-wrap">
           {% if user.is_authenticated %}
             {% if user.is_customer %}
@@ -178,7 +178,7 @@
                 <span>Rent This Item &rarr;</span>
               </a>
             {% elif item.owner == user %}
-              <a href="{% url 'listings:item_update' item.slug %}" class="btn btn-outline btn-block">Edit My Listing</a>
+              <a href="{% url 'listings:item_update' item.slug %}" class="btn btn-outline btn-block calc-rent-cta">Edit My Listing</a>
               <p class="sidebar-note text-center">You are viewing your own item listing.</p>
             {% else %}
               <p class="sidebar-note text-center">Item owner accounts cannot rent items. Switch to a customer account to book.</p>
@@ -212,12 +212,28 @@
         </div>
       {% endif %}
 
-      <div class="product-summary-list" style="margin-top:20px;">
-        <div class="summary-row"><span>Category</span><strong>{{ item.category.name }}</strong></div>
-        <div class="summary-row"><span>Stock</span><strong>{{ item.quantity_available }} {{ item.name }} in stock</strong></div>
-        <div class="summary-row"><span>Location</span><strong>{{ item.location }}</strong></div>
-        <div class="summary-row"><span>Condition</span><strong>{{ item.get_condition_display }}</strong></div>
-        <div class="summary-row summary-row-owner"><span>Owner</span><strong>{{ item.owner.get_full_name|default:item.owner.username }}</strong></div>
+      <!-- Simplified 2-Column Metadata Grid -->
+      <div class="product-specs-grid">
+        <div class="spec-cell">
+          <span class="spec-label">Category</span>
+          <strong class="spec-value">{{ item.category.name }}</strong>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-label">Stock</span>
+          <strong class="spec-value">{{ item.quantity_available }} unit{{ item.quantity_available|pluralize }}</strong>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-label">Location</span>
+          <strong class="spec-value">{{ item.location }}</strong>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-label">Condition</span>
+          <strong class="spec-value">{{ item.get_condition_display }}</strong>
+        </div>
+        <div class="spec-cell spec-cell-wide">
+          <span class="spec-label">Verified Owner</span>
+          <strong class="spec-value">{{ item.owner.get_full_name|default:item.owner.username }}</strong>
+        </div>
       </div>
     </aside>
   </div>

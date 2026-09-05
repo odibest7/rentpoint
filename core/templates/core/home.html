@@ -2,64 +2,83 @@
 {% load static %}
 
 {% block content %}
-<section class="hero">
-  <div class="container hero-grid">
+<section class="hero" id="hero">
+  <div class="container">
     <div class="hero-content">
-      <span class="eyebrow">
-        <span class="eyebrow-dot"></span> Verified Rental Marketplace in {{ PLATFORM_SERVICE_AREA }}
-      </span>
-      <h1>Rent Equipment, Event Gear &amp; Spaces with Confidence</h1>
-      <p class="hero-lead">
-        Connect directly with trusted local owners. Pay securely through protected escrow and receive instant, official transaction receipts.
+      <!-- Minimalist Top Pill Badge -->
+      <p class="hero-badge">
+        <span class="hero-badge-dot">&bull;</span>
+        <span>VERIFIED LOCAL MARKETPLACE</span>
       </p>
 
-      <form action="{% url 'listings:item_list' %}" method="get" class="hero-search-form" role="search">
-        <div class="hero-search-input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <!-- Main Headline -->
+      <h1 class="hero-title">Rent Equipment, Event Gear &amp; Spaces</h1>
+
+      <!-- Trust-focused Sub-headline -->
+      <p class="hero-lead">
+        Connect with verified local owners. Pay safely through escrow and receive instant digital receipts.
+      </p>
+
+      <!-- Floating Unified Search Bar -->
+      <form action="{% url 'listings:item_list' %}" method="get" class="hero-search-bar" role="search">
+        <div class="hero-search-field">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
           <input type="text" name="q" placeholder="Search canopies, tools, sound gear, spaces..." aria-label="Search rental listings">
         </div>
         {% if categories %}
-        <select name="category" class="hero-search-category" aria-label="Select category">
-          <option value="">All Categories</option>
-          {% for cat in categories %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-          {% endfor %}
-        </select>
+        <div class="hero-search-divider" aria-hidden="true"></div>
+        <div class="hero-search-select-wrap">
+          <select name="category" class="hero-search-category" aria-label="Select category">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
         {% endif %}
-        <button type="submit" class="btn btn-primary hero-search-btn">
+        <button type="submit" class="hero-search-submit btn btn-primary" aria-label="Search listings">
           <span>Search</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </button>
       </form>
 
-      <div class="hero-actions">
-        <a href="{% url 'listings:item_list' %}" class="btn btn-outline btn-lg">
-          Browse All Catalogue
-        </a>
-        <a href="{% url 'accounts:signup_item_owner' %}" class="btn btn-outline btn-lg" style="background: rgba(0, 168, 150, 0.15); border-color: rgba(45, 212, 191, 0.4); color: #2DD4BF;">
-          List Your Gear as Owner
-        </a>
-      </div>
-
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <strong>{{ item_count|default:"0" }}+</strong>
-          <span>Verified Listings</span>
+      <!-- Trust Proof Bar: minimal borderless inline row -->
+      <div class="hero-trust-bar">
+        <div class="trust-metric">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="trust-metric-svg">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          <span>{{ item_count|default:"5" }}+ Verified Listings</span>
         </div>
-        <div class="hero-stat">
-          <strong>100%</strong>
-          <span>Escrow Protected</span>
+        <div class="trust-divider" aria-hidden="true"></div>
+        <div class="trust-metric">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="trust-metric-svg">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>100% Escrow Protected</span>
         </div>
-        <div class="hero-stat">
-          <strong>Instant</strong>
-          <span>Official Receipts</span>
+        <div class="trust-divider" aria-hidden="true"></div>
+        <div class="trust-metric">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="trust-metric-svg">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span>Instant Digital Receipts</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section">
+<section class="section section-light" id="catalogue">
   <div class="container">
     <div class="section-head">
       <div>
@@ -88,7 +107,7 @@
   </div>
 </section>
 
-<section class="section section-highlight">
+<section class="section section-tinted" id="how-it-works">
   <div class="container">
     {% if not request.user.is_authenticated %}
       <div class="section-head text-center" style="max-width: 640px; margin: 0 auto 36px;">
@@ -160,6 +179,50 @@
         </div>
       </div>
     {% endif %}
+  </div>
+</section>
+
+<!-- Section 3: Trust & Infrastructure -->
+<section class="section section-light" id="trust-infrastructure">
+  <div class="container">
+    <div class="section-head text-center" style="max-width: 640px; margin: 0 auto 36px;">
+      <h2>Trust &amp; Infrastructure</h2>
+      <p>Every transaction on RentPoint is backed by identity verification, automated escrow, and immutable digital records.</p>
+    </div>
+    <div class="item-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>Verified Ownership</span>
+          <div class="stat-icon teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" style="font-size: 1.25rem;">National ID Check</div>
+        <div class="stat-sub">Staff-verified item owners with National Identity Number verification before listing.</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>Escrow Protection</span>
+          <div class="stat-icon emerald">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" style="font-size: 1.25rem;">100% Escrow Security</div>
+        <div class="stat-sub">Rental payments are held securely in escrow and released only after successful item handover.</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>Digital Proof</span>
+          <div class="stat-icon amber">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" style="font-size: 1.25rem;">Instant Official Receipts</div>
+        <div class="stat-sub">Permanent electronic transaction records with verifiable QR security codes for every rental.</div>
+      </div>
+    </div>
   </div>
 </section>
 {% endblock %}
