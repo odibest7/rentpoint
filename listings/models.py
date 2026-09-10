@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+import time
+import logging
 
 
 # Recognised Nsukka Urban zones used as standardised location choices.
@@ -137,13 +139,62 @@ class ItemImage(models.Model):
                 previous = None
 
             if previous and previous.image and previous.image.name and previous.image.name != self.image.name:
-                previous.image.storage.delete(previous.image.name)
+                # On Windows the file may be locked by another process or by a still-open
+                # file handle. Try to close any open file handles and retry deletion a
+                # few times before giving up to avoid race conditions that raise
+                # PermissionError ([WinError 32]). This makes replace operations
+                # robust in local dev on Windows.
+                try:
+                    previous.image.storage.delete(previous.image.name)
+                except PermissionError:
+                    logger = logging.getLogger(__name__)
+                    for attempt in range(5):
+                        try:
+                            try:
+                                previous.image.close()
+                            except Exception:
+                                pass
+                            # Close underlying file if present
+                            f = getattr(previous.image, 'file', None)
+                            if f:
+                                try:
+                                    f.close()
+                                except Exception:
+                                    pass
+                            previous.image.storage.delete(previous.image.name)
+                            break
+                        except PermissionError:
+                            time.sleep(0.08)
+                    else:
+                        logger.warning("Could not delete previous image '%s' after several attempts (PermissionError).", previous.image.name)
 
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.image and self.image.name:
-            self.image.storage.delete(self.image.name)
+            try:
+                self.image.storage.delete(self.image.name)
+            except PermissionError:
+                # Try a few times to close and delete on Windows where file locks may occur
+                logger = logging.getLogger(__name__)
+                for attempt in range(5):
+                    try:
+                        try:
+                            self.image.close()
+                        except Exception:
+                            pass
+                        f = getattr(self.image, 'file', None)
+                        if f:
+                            try:
+                                f.close()
+                            except Exception:
+                                pass
+                        self.image.storage.delete(self.image.name)
+                        break
+                    except PermissionError:
+                        time.sleep(0.08)
+                else:
+                    logger.warning("Could not delete image '%s' after several attempts (PermissionError).", self.image.name)
         super().delete(*args, **kwargs)
 
     def __str__(self):
