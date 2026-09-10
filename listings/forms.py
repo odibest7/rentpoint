@@ -1,7 +1,69 @@
+from io import BytesIO
+
 from django import forms
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import inlineformset_factory
+from PIL import Image as PILImage
+from PIL import UnidentifiedImageError
+
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+except Exception:
+    pass
 
 from .models import Category, Item, ItemImage, NSUKKA_ZONES
+
+MOBILE_HEIC_TYPES = {"image/heic", "image/heif"}
+
+
+class ItemImageForm(forms.ModelForm):
+    class Meta:
+        model = ItemImage
+        fields = ["image", "position"]
+        widgets = {
+            "image": forms.FileInput(attrs={"class": "photo-file-input", "accept": "image/*"}),
+            "position": forms.HiddenInput(attrs={"class": "photo-position-input", "value": "0"}),
+        }
+
+    def clean_image(self):
+        image = self.cleaned_data.get("image")
+        if not image:
+            return image
+
+        extension = (image.name or "").rsplit(".", 1)[-1].lower() if "." in (image.name or "") else ""
+        content_type = getattr(image, "content_type", "") or ""
+        if content_type and not content_type.startswith("image/"):
+            raise forms.ValidationError("Please upload a valid image file.")
+
+        try:
+            with PILImage.open(image) as img:
+                img.verify()
+        except (UnidentifiedImageError, OSError, ValueError):
+            raise forms.ValidationError("Please upload a valid image file.")
+
+        image.seek(0)
+        try:
+            with PILImage.open(image) as img:
+                actual_format = (getattr(img, "format", None) or "").upper()
+                is_heic_like = (
+                    extension in {"heic", "heif"}
+                    or content_type in MOBILE_HEIC_TYPES
+                    or actual_format in {"HEIC", "HEIF"}
+                )
+                if is_heic_like:
+                    rgb = img.convert("RGB")
+                    buffer = BytesIO()
+                    rgb.save(buffer, format="JPEG", quality=90)
+                    image = SimpleUploadedFile(
+                        f"{(image.name or 'photo').rsplit('.', 1)[0]}.jpg",
+                        buffer.getvalue(),
+                        content_type="image/jpeg",
+                    )
+        except Exception:
+            pass
+
+        return image
 
 
 class ItemForm(forms.ModelForm):
@@ -45,14 +107,10 @@ class ItemForm(forms.ModelForm):
 ItemImageFormSet = inlineformset_factory(
     Item,
     ItemImage,
-    fields=["image", "position"],
+    form=ItemImageForm,
     extra=1,
     max_num=8,
     can_delete=True,
-    widgets={
-        "image":    forms.FileInput(attrs={"class": "photo-file-input", "accept": "image/*"}),
-        "position": forms.HiddenInput(attrs={"class": "photo-position-input", "value": "0"}),
-    },
 )
 
 

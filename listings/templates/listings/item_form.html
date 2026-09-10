@@ -123,6 +123,11 @@
       </div>
 
       {{ formset.management_form }}
+      {% if formset.non_form_errors %}
+        {% for error in formset.non_form_errors %}
+          <p class="field-error">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
       
       <div class="photo-upload-grid" data-photo-grid>
         {% for image_form in formset %}
@@ -165,6 +170,9 @@
                 <div class="photo-dropzone-hint">Click or drag &amp; drop</div>
               </div>
               {{ image_form.image }}
+              {% for error in image_form.image.errors %}
+                <p class="field-error" style="margin-top:8px;">{{ error }}</p>
+              {% endfor %}
               
               <!-- Container for client-side live preview -->
               <div class="photo-live-preview" style="display:none; width:100%;"></div>
@@ -178,7 +186,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <span>Add another photo</span>
         </button>
-        <span class="photo-count-info">Up to 8 high-resolution photos (PNG, JPG, WEBP)</span>
+        <span class="photo-count-info">Up to 8 photos. Any valid image file is supported.</span>
       </div>
     </div>
 
