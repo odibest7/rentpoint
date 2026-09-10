@@ -1,23 +1,56 @@
 {% extends "base.html" %}
 {% block title %}Delete Listing | {{ PLATFORM_NAME }}{% endblock %}
 {% block content %}
-<div class="page-header text-center">
-  <div class="container" style="max-width:560px;">
-    <span class="eyebrow" style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.15); color: #FCA5A5;"><span class="eyebrow-dot" style="background: #EF4444;"></span> Remove Listing</span>
+<!-- Light page backing so keyboard and screenreaders land meaningfully -->
+<div class="container" style="max-width:980px; padding:40px 0;">
+  <div class="page-header text-center" aria-hidden="true">
+    <span class="eyebrow" style="border-color: rgba(239, 68, 68, 0.15); background: rgba(239, 68, 68, 0.05); color: #EF4444;"><span class="eyebrow-dot" style="background: #EF4444;"></span> Remove Listing</span>
     <h1 class="mt-0">Confirm Deletion</h1>
-    <p class="hero-lead mt-0">Are you sure you want to remove "{{ item.name }}" from the catalogue?</p>
+    <p class="hero-lead mt-0">Are you sure you want to remove this listing from the catalogue?</p>
   </div>
 </div>
 
-<section class="container" style="padding:40px 0 60px; max-width:500px;">
-  <div class="form-card text-center" style="padding:36px 28px;">
-    <h2 style="font-size:1.4rem; margin-top:0;">Delete "{{ item.name }}"?</h2>
-    <p class="subtle" style="margin-bottom:24px;">This will permanently remove the listing from the public catalogue. Historical transaction records will remain securely in your ledger.</p>
-    <form method="post" style="display:flex; justify-content:center; gap:12px;">
-      {% csrf_token %}
-      <a href="{% url 'listings:owner_item_list' %}" class="btn btn-outline">Cancel</a>
-      <button type="submit" class="btn btn-danger">Delete Listing</button>
-    </form>
+<!-- Modal overlay -->
+<div class="modal-backdrop is-open" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" aria-describedby="deleteModalDesc">
+  <div class="modal-panel" role="document">
+    <header class="modal-header">
+      <div>
+        <h2 id="deleteModalTitle">Delete "{{ item.name }}"?</h2>
+        <p id="deleteModalDesc" class="subtle">This will permanently remove the listing from the public catalogue. Historical transaction records will remain in your ledger.</p>
+      </div>
+    </header>
+
+    <div class="modal-body">
+      <!-- hero icon removed per user request -->
+
+      <div class="modal-content">
+        <p class="lead" style="margin:0 0 8px; font-weight:600; color:var(--color-primary-navy);">Delete this listing?</p>
+        <p class="subtle" style="margin:0 0 6px; color:var(--color-ink-muted);">This permanently removes it from the public catalogue. Transaction history will remain intact.</p>
+
+        <form method="post" id="deleteListingForm" class="modal-actions" style="margin-top:14px;">
+          {% csrf_token %}
+          <a href="{% url 'listings:owner_item_list' %}" class="btn btn-outline">Cancel</a>
+          <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" style="background: linear-gradient(180deg,#FF3B30 0%,#B91C1C 100%); color:#ffffff; border:0; padding:12px 22px; font-weight:800; min-width:150px;">Delete</button>
+        </form>
+      </div>
+    </div>
   </div>
-</section>
+</div>
+
+<script>
+  (function(){
+    var modal = document.getElementById('deleteModal');
+    var cancel = modal && modal.querySelector('.btn-outline');
+    function closeModal(){
+      if(!modal) return;
+      modal.classList.remove('is-open');
+      window.location.href = '{% url "listings:owner_item_list" %}';
+    }
+    if(cancel) cancel.addEventListener('click', function(e){ e.preventDefault(); closeModal(); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+    // Focus primary destructive action for clarity
+    var primary = document.getElementById('confirmDeleteBtn');
+    if(primary) primary.focus();
+  })();
+</script>
 {% endblock %}
