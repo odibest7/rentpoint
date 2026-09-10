@@ -288,8 +288,12 @@ function initPhotoUploader() {
     });
 
     function handleFileSelect(file) {
-      if (!file.type.startsWith("image/")) {
-        alert("Please select a valid image file (JPG, PNG, WEBP).");
+      const fileType = file.type || "";
+      const fileName = file.name || "";
+      const isAllowed = fileType.startsWith("image/") || /\.(png|jpe?g|gif|bmp|webp|heic|heif|avif|tiff?)$/i.test(fileName);
+
+      if (!isAllowed) {
+        alert("Please upload a valid image file.");
         return;
       }
 
@@ -364,7 +368,7 @@ function initPhotoUploader() {
           <div class="photo-dropzone-label">Upload Photo</div>
           <div class="photo-dropzone-hint">Click or drag &amp; drop</div>
         </div>
-        <input type="file" name="images-${newIndex}-image" accept="image/*" class="photo-file-input" id="id_images-${newIndex}-image">
+        <input type="file" name="images-${newIndex}-image" accept="image/png,image/jpeg,image/webp,image/heic,image/heif" class="photo-file-input" id="id_images-${newIndex}-image">
         <div class="photo-live-preview" style="display:none; width:100%;"></div>
       `;
 

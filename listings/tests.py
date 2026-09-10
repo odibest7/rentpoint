@@ -116,6 +116,70 @@ class ItemCreationAndMediaServingTests(TestCase):
             media_response = self.client.get(media_url)
             self.assertEqual(media_response.status_code, 200)
 
+    def test_owner_create_item_with_heic_style_upload_saves_as_jpeg(self):
+        self.client.force_login(self.owner)
+        heic_style_image = SimpleUploadedFile(
+            "camera.heic",
+            create_test_image_bytes(),
+            content_type="image/heic",
+        )
+
+        post_data = {
+            "name": "Mobile Phone Photo Listing",
+            "category": self.category.pk,
+            "description": "Uploaded from a modern phone camera.",
+            "rental_price": "2500.00",
+            "price_unit": "day",
+            "condition": "good",
+            "location": "Odenigbo, Nsukka",
+            "quantity_available": 1,
+            "is_available": "on",
+            "images-TOTAL_FORMS": "1",
+            "images-INITIAL_FORMS": "0",
+            "images-MIN_NUM_FORMS": "0",
+            "images-MAX_NUM_FORMS": "8",
+            "images-0-id": "",
+            "images-0-position": "0",
+            "images-0-image": heic_style_image,
+        }
+
+        response = self.client.post("/listings/new/", post_data)
+        self.assertEqual(response.status_code, 302)
+        item = Item.objects.get(name="Mobile Phone Photo Listing")
+        self.assertTrue(item.primary_image.image.name.endswith(".jpg"))
+
+    def test_owner_create_item_accepts_any_valid_image_format(self):
+        self.client.force_login(self.owner)
+        bitmap_image = SimpleUploadedFile(
+            "camera.bmp",
+            create_test_image_bytes(),
+            content_type="image/bmp",
+        )
+
+        post_data = {
+            "name": "Bitmap Photo Listing",
+            "category": self.category.pk,
+            "description": "A valid image in a less common format should still be accepted.",
+            "rental_price": "3000.00",
+            "price_unit": "day",
+            "condition": "good",
+            "location": "Hilltop, Nsukka",
+            "quantity_available": 1,
+            "is_available": "on",
+            "images-TOTAL_FORMS": "1",
+            "images-INITIAL_FORMS": "0",
+            "images-MIN_NUM_FORMS": "0",
+            "images-MAX_NUM_FORMS": "8",
+            "images-0-id": "",
+            "images-0-position": "0",
+            "images-0-image": bitmap_image,
+        }
+
+        response = self.client.post("/listings/new/", post_data)
+        self.assertEqual(response.status_code, 302)
+        item = Item.objects.get(name="Bitmap Photo Listing")
+        self.assertTrue(item.primary_image.image.name.endswith((".bmp", ".png", ".jpg", ".jpeg", ".webp")))
+
     def test_owner_item_list_renders_thumbnail(self):
         self.client.force_login(self.owner)
         item = Item.objects.create(

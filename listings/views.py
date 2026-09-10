@@ -85,6 +85,11 @@ def item_create(request):
                 formset.save()
             messages.success(request, f'"{item.name}" has been listed.')
             return redirect("listings:owner_item_list")
+
+        messages.error(
+            request,
+            "Please fix the highlighted fields and upload a valid image file.",
+        )
     else:
         form = ItemForm()
         formset = ItemImageFormSet()
@@ -108,6 +113,11 @@ def item_update(request, slug):
             formset.save()
             messages.success(request, f'"{item.name}" has been updated.')
             return redirect("listings:owner_item_list")
+
+        messages.error(
+            request,
+            "Please fix the highlighted fields and upload a valid image file.",
+        )
     else:
         form = ItemForm(instance=item)
         formset = ItemImageFormSet(instance=item)
